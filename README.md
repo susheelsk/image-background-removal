@@ -15,3 +15,10 @@ For better accuracy, albiet a slower approach, go ahead and try :
 
 ### Dependencies
 >	tensorflow, PIL
+
+### Sample Result
+Input: 
+![alt text](https://github.com/callmesusheel/image-background-removal/raw/master/sample.jpg "Input")
+
+Output: 
+![alt text](https://github.com/callmesusheel/image-background-removal/raw/master/sample_bgremoved.png "Output")
