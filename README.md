@@ -34,6 +34,8 @@ For better accuracy, albiet a slower approach, go ahead and try :
 
 ### Python
 
+Import the `bg_removal_run.py` file in your own python file.
+
 The following functions are supported:
 
 * `convert_image(image)` : Takes in an image and returns a image with background removed.
