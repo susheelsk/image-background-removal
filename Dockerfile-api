@@ -1,0 +1,21 @@
+FROM guignol95/ai_apis:latest
+
+RUN mkdir -p /src
+
+WORKDIR /src
+
+ADD src/requirements.txt /src
+
+RUN pip3 install -r requirements.txt
+
+RUN pip3 install numpy --upgrade
+
+ADD src/app_utils.py /src
+
+ADD src/app.py /src
+
+EXPOSE 5000
+
+ENTRYPOINT ["python3"]
+
+CMD ["app.py"]

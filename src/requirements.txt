@@ -1,0 +1,6 @@
+flask
+requests
+opencv-python
+tensorflow
+pillow
+keras
