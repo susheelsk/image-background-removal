@@ -19,9 +19,9 @@ A tool to remove a background from a portrait image using Tensorflow
 * __New sample images.__
 
 ### Sample Result:
-```More sample images in input and output folders```
-Input: 
-![alt text](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/input/1.jpg "Input")
+* ```More sample images in input and output folders```
+* Input: 
+* ![alt text](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/input/1.jpg "Input")
 
-Output: 
-![alt text](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/output/1.png "Output")
+* Output: 
+* ![alt text](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/output/1.png "Output")
