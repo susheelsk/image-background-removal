@@ -1,20 +1,20 @@
 # Tool to remove the background from the portrait using Tensorflow
 A tool to remove a background from a portrait image using Tensorflow
 **********************************************************************
-### Setup
+### Setup:
 * Clone repository ```git clone https://github.com/OPHoperHPO/image-background-remove-tool```
 * Run ```./bin/setup.sh``` _This setup.sh script loads the trained model._
 **********************************************************************
-### Dependencies
+### Dependencies:
 ```	tensorflow, pillow, tqdm, numpy, scipy ```
 **********************************************************************
-### Running the script
+### Running the script:
  * Put images to the input folder.
  * Run ```run.sh``` for Linux or ```run.bat``` for Windows
  
  > Note:  _You can remove ```1``` in the ``` run.sh (bat) ```script to speed up image processing, but the quality will be worse_
 **********************************************************************
-### Differences from the [original script](https://github.com/susheelsk/image-background-removal)
+### Differences from the [original script](https://github.com/susheelsk/image-background-removal):
 * Added comments to the code.
 * Added ```tqdm``` progress bar.
 * __Removes background from image without loss of image resolution.__
