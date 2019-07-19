@@ -9,8 +9,7 @@ A tool to remove a background from a portrait image using Tensorflow
 * Run ```./bin/setup.sh``` _This setup.sh script loads the trained model._
 ### Running the script
  * Put images to the input folder.
- * Use the script as specified below.
-```	./run.sh```
+ * Run ```run.sh``` for Linux or ```run.bat``` for Windows
 
 ### Differences from the [original script](https://github.com/susheelsk/image-background-removal)
 * Added comments to the code.
@@ -20,6 +19,7 @@ A tool to remove a background from a portrait image using Tensorflow
 * __New sample images.__
 
 ### Sample Result:
+```More sample images in input and output folders```
 Input: 
 ![alt text](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/input/1.jpg "Input")
 
