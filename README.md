@@ -1,6 +1,5 @@
-# Removing the background from portrait photos using Tensorflow
-
-This script removes the background from an input image.
+# Tool to remove the background from the portrait using Tensorflow
+A tool to remove a background from a portrait image using Tensorflow
 
 ### Dependencies
 ```	tensorflow, pillow, tqdm, numpy, scipy ```
@@ -18,6 +17,7 @@ This script removes the background from an input image.
 * Added ```tqdm``` progress bar.
 * __Removes background from image without loss of image resolution.__
 * __The script now processes all images from the input folder and saves them to the output folder with the same name.__
+* __New sample images.__
 
 ### Sample Result:
 Input: 
