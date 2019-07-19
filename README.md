@@ -21,6 +21,10 @@ A tool to remove a background from a portrait image using Tensorflow
 * __The script now processes all images from the input folder and saves them to the output folder with the same name.__
 * __New sample images.__
 **********************************************************************
+### TODO:
+```
+1) Add a graphical interface. (0% done)
+```
 ### Sample Result:
 * __More sample images in input and output folders__
 * Input: 
