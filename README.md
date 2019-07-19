@@ -1,24 +1,27 @@
-# Portrait Segmentation using Tensorflow
+# Removing the background from portrait photos using Tensorflow
 
-This script removes the background from an input image. You can read more about segmentation [here](http://colab.research.google.com/github/tensorflow/models/blob/master/research/deeplab/deeplab_demo.ipynb)
-
-### Setup
-The script setup.sh downloads the trained model and sets it up so that the seg.py script can understand. 
->	./setup.sh
-
-### Running the script
-Go ahead and use the script as specified below, to execute fast but lower accuracy model:
->	python3 seg.py sample.jpg sample.png 
-
-For better accuracy, albiet a slower approach, go ahead and try :
->	python3 seg.py sample.jpg sample.png 1
+This script removes the background from an input image.
 
 ### Dependencies
->	tensorflow, PIL
+```	tensorflow, pillow, tqdm, numpy, scipy ```
 
-### Sample Result
+### Setup
+* Clone repository ```git clone https://github.com/OPHoperHPO/image-background-remove-tool```
+* Run ```./bin/setup.sh``` _This setup.sh script loads the trained model._
+### Running the script
+ * Put images to the input folder.
+ * Use the script as specified below.
+```	./run.sh```
+
+### Differences from the [original script](https://github.com/susheelsk/image-background-removal)
+* Added comments to the code.
+* Added ```tqdm``` progress bar.
+* __Removes background from image without loss of image resolution.__
+* __The script now processes all images from the input folder and saves them to the output folder with the same name.__
+
+### Sample Result:
 Input: 
-![alt text](https://github.com/callmesusheel/image-background-removal/raw/master/sample.jpg "Input")
+![alt text](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/input/1.jpg "Input")
 
 Output: 
-![alt text](https://github.com/callmesusheel/image-background-removal/raw/master/sample_bgremoved.png "Output")
+![alt text](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/output/1.png "Output")
