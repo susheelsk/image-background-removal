@@ -1,0 +1,6 @@
+tqdm==4.43.0
+scipy==1.4.1
+wget==3.2
+numpy==1.18.2
+Pillow==7.0.0
+tensorflow==2.1.0
