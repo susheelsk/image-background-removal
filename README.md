@@ -1,35 +1,48 @@
 # Tool to remove the background from the portrait using Tensorflow
 A tool to remove a background from a portrait image using Tensorflow
 **********************************************************************
-### Setup:
-* Clone repository ```git clone https://github.com/OPHoperHPO/image-background-remove-tool```
-* Run ```./bin/setup.sh``` _This setup.sh script loads the trained model._
-**********************************************************************
-### Dependencies:
-```	tensorflow, pillow, tqdm, numpy, scipy ```
-**********************************************************************
-### Running the script:
- * Put images to the input folder.
- * Run ```run.sh``` for Linux or ```run.bat``` for Windows
- 
- > Note:  _You can remove ```1``` in the ``` run.sh (bat) ```script to speed up image processing, but the quality will be worse_
+### Description:
+The program removes the background from portrait photos
 **********************************************************************
 ### Differences from the [original script](https://github.com/susheelsk/image-background-removal):
+* __Tensorflow 2.0 compatible__
 * Added comments to the code.
 * Added ```tqdm``` progress bar.
 * __Removes background from image without loss of image resolution.__
-* __The script now processes all images from the input folder and saves them to the output folder with the same name.__
+*  __The script now not only processes a single file, but can also process all images from the input folder and save them in the output folder with the same name.__
 * __New sample images.__
+**********************************************************************
+### Dependencies:
+```	wget ``` **for setup.py!**
+```	tensorflow, pillow, tqdm, numpy, scipy ``` **for main.py!**
+**********************************************************************
+### Setup for Windows:
+* Clone this repository
+* Install all the dependencies from **requirements.txt** via ```pip3 install -r requirements.txt```
+* Run ```./setup.bat``` _This setup.bat script loads the trained model._
+### Setup for Linux:
+* Clone repository: ```git clone https://github.com/OPHoperHPO/image-background-remove-tool```
+* Install all the dependencies from **requirements.txt**: ```pip3 install -r requirements.txt```
+* Run ```./setup.sh``` _This setup.sh script loads the trained model._
+**********************************************************************
+### Running the script:
+ * ```python main.py <input_path> <output_path> <model_type>```
+#### Explanation of variables:
+ * `<input_path>` - path to input file or dir.
+ * `<output_path>` - path to output file or dir.
+ * ```<model_type>``` - can be ``` xception_model``` or ``` mobile_net_model```.
+The first model has better quality, but it runs much slower than the second.
+ > Note:  See sample scripts for more information on using the program.
 **********************************************************************
 ### TODO:
 ```
 1) Add a graphical interface. (0% done)
 ```
 ### Sample Result:
-* __More sample images in input and output folders__
+* __More sample images in ``docs/imgs/input/`` and ``docs/imgs/examples/`` folders__
 * Input: 
-* ![alt text](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/input/1.jpg "Input")
+* ![Input](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/input/1.jpg "Input")
 
 * Output: 
-* ![alt text](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/output/1.png "Output")
+* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/1.png "Output")
 **********************************************************************
