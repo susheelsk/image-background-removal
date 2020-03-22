@@ -13,17 +13,19 @@ The program removes the background from portrait photos
 * __New sample images.__
 **********************************************************************
 ### Dependencies:
-```	wget ``` **for setup.py!**
+```	wget ``` **for setup.py!** \
 ```	tensorflow, pillow, tqdm, numpy, scipy ``` **for main.py!**
 **********************************************************************
 ### Setup for Windows:
 * Clone this repository
 * Install all the dependencies from **requirements.txt** via ```pip3 install -r requirements.txt```
-* Run ```./setup.bat``` _This setup.bat script loads the trained model._
+* Run ```./setup.bat``` \
+_This setup.bat script loads the trained model._
 ### Setup for Linux:
 * Clone repository: ```git clone https://github.com/OPHoperHPO/image-background-remove-tool```
 * Install all the dependencies from **requirements.txt**: ```pip3 install -r requirements.txt```
-* Run ```./setup.sh``` _This setup.sh script loads the trained model._
+* Run ```./setup.sh``` \
+_This setup.sh script loads the trained model._
 **********************************************************************
 ### Running the script:
  * ```python main.py <input_path> <output_path> <model_type>```
