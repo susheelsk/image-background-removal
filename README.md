@@ -28,7 +28,7 @@ _This setup.bat script loads the trained model._
 _This setup.sh script loads the trained model._
 **********************************************************************
 ### Running the script:
- * ```python main.py <input_path> <output_path> <model_type>```
+ * ```python3 main.py <input_path> <output_path> <model_type>```
 #### Explanation of variables:
  * `<input_path>` - path to input file or dir.
  * `<output_path>` - path to output file or dir.
