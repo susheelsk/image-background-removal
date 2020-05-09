@@ -40,6 +40,12 @@ The first model has better quality, but it runs much slower than the second.
 ```
 1) Add a graphical interface. (0% done)
 ```
+### 💵 Support me:
+
+You can thank me for developing this project, provide financial support for the development of new projects and buy me a small cup of coffee.☕\
+  Just support me on these platforms: \
+  ⭐[**Boosty**⭐](https://boosty.to/anodev) \
+  ⭐[**DonationAlerts**⭐](https://www.donationalerts.com/r/anodev_development)
 ### 😀 Sample Result:
 * __More sample images in ``docs/imgs/input/`` and ``docs/imgs/examples/`` folders__
 * Input: 
@@ -48,9 +54,4 @@ The first model has better quality, but it runs much slower than the second.
 * Output: 
 * ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/1.png "Output")
 **********************************************************************
-### 💵 Support me:
 
-You can thank me for developing this project, provide financial support for the development of new projects and buy me a small cup of coffee.☕\
-  Just support me on these platforms: \
-  ⭐[**Boosty**⭐](https://boosty.to/anodev) \
-  ⭐[**DonationAlerts**⭐](https://www.donationalerts.com/r/anodev_development)
