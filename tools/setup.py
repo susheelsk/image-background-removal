@@ -24,8 +24,7 @@ License:
 import os
 import gdown
 import tarfile
-from libs.networks import MODELS_NAMES
-
+MODELS_NAMES = ["u2net", "u2netp", "xception_model", "mobile_net_model"]
 class Config:
     """Config object"""
     # general
