@@ -1,2 +1,2 @@
 #!/bin/bash
-cd tools && python3 setup.py
+cd tools && python setup.py
