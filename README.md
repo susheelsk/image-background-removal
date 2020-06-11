@@ -1,9 +1,11 @@
 # 🥧 Image Background Remove Tool 🥧
 Tool for removing background from image using neural networks
 **********************************************************************
+
 ### 📄 Description:
 The program removes the background from photos
 **********************************************************************
+
 ### 🎆 Features:
 * **Added support for new neural networks ([U^2-NET](https://github.com/NathanUA/U-2-Net)) on PyTorch**
 * **Significantly improved output image quality**
@@ -15,6 +17,7 @@ The program removes the background from photos
 *  __Implemented support for the neural network from this [ script](https://github.com/susheelsk/image-background-removal) and improved the result of its work__
 
 **********************************************************************
+
 ### 🧷 Dependencies:
 ```	gdown ``` **for setup.py!** \
 ```	tensorflow, torch, Pillow, tqdm, numpy, scipy, scikit_image ``` **for main.py!**
@@ -23,6 +26,7 @@ PyTorch for `u2net`, `u2netp` \
 TensorFlow for `xception_model`, `mobile_net_model` \
 **TensorFlow models are not recommended for use, since these models have much worse quality and lower image processing speed, also these models are designed solely to remove the background from portrait photos and photos with animals.**
 **********************************************************************
+
 ### 🏷 Setup for Windows:
 * Clone this repository
 * Install all the dependencies from **requirements.txt** via ```pip3 install -r requirements.txt```
@@ -34,8 +38,10 @@ _This setup.bat script loads the trained model._
 * Run ```./setup.sh``` and select the model you need.\
 _This setup.sh script loads the trained model._
 **********************************************************************
+
 ### 🧰 Running the script:
  * ```python3 main.py -i <input_path> -o <output_path> -m <model_type>```
+
 #### Explanation of args:
  * `-i <input_path>` - path to input file or dir.
  * `-o <output_path>` - path to output file or dir.
@@ -45,10 +51,12 @@ and designed to remove the background from PORTRAIT photos or PHOTOS WITH ANIMAL
 [More info about models.](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/MODELS.md)
  > Note:  See example scripts for more information on using the program.
 **********************************************************************
-### ⏳ TODO:
-```
-1) Add a graphical interface. (0% done)
-```
+
+### 👟 Running GUI app:
+```python3 app.py```
+
+**********************************************************************
+
 ### 💵 Support me:
 
 You can thank me for developing this project, provide financial support for the development of new projects and buy me a small cup of coffee.☕\

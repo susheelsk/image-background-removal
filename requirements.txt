@@ -6,3 +6,4 @@ tensorflow==2.2.0
 torch==1.5.0
 gdown==3.11.1
 Pillow==7.1.2
+pywebview==3.2

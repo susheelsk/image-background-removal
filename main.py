@@ -49,6 +49,8 @@ def __save_image_file__(img, file_name, output_path, wmode):
     :param output_path: Output path
     :param wmode: Work mode
     """
+    # create output directory if it doesn't exist
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     if wmode == "file":
         file_name_out = os.path.basename(output_path)
         if file_name_out == '':
@@ -70,24 +72,9 @@ def __save_image_file__(img, file_name, output_path, wmode):
         # Save image
         img.save(os.path.join(output_path, file_name))
 
-
-def cli():
-    """CLI"""
-    parser = argparse.ArgumentParser(description=DESCRIPTION, usage=ARGS_HELP)
-    parser.add_argument('-i', required=True,
-                        help="Path to input file or dir.", action="store", dest="input_path")
-    parser.add_argument('-o', required=True,
-                        help="Path to output file or dir.", action="store", dest="output_path")
-    parser.add_argument('-m', required=False,
-                        help="Model name. Can be {} . U2NET is better to use.".format(MODELS_NAMES),
-                        action="store", dest="model_name", default="u2net")
-    args = parser.parse_args()
-    # Parse arguments
-    input_path = args.input_path
-    output_path = args.output_path
+def process(input_path, output_path, model_name = "u2net"):
     if input_path is None or output_path is None:
         raise Exception("Bad parameters! Please specify input path and output path.")
-    model_name = args.model_name
     model = model_detect(model_name)  # Load model
     if not model:
         logger.warning("Warning! You specified an invalid model type. "
@@ -109,6 +96,23 @@ def cli():
             __save_image_file__(image, file, output_path, wmode)
     else:
         raise Exception("Bad input parameter! Please indicate the correct path to the file or folder.")
+
+def cli():
+    """CLI"""
+    parser = argparse.ArgumentParser(description=DESCRIPTION, usage=ARGS_HELP)
+    parser.add_argument('-i', required=True,
+                        help="Path to input file or dir.", action="store", dest="input_path")
+    parser.add_argument('-o', required=True,
+                        help="Path to output file or dir.", action="store", dest="output_path")
+    parser.add_argument('-m', required=False,
+                        help="Model name. Can be {} . U2NET is better to use.".format(MODELS_NAMES),
+                        action="store", dest="model_name", default="u2net")
+    args = parser.parse_args()
+    # Parse arguments
+    input_path = args.input_path
+    output_path = args.output_path
+    model_name = args.model_name
+    process(input_path, output_path, model_name)
 
 
 if __name__ == "__main__":
