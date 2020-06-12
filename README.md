@@ -65,10 +65,10 @@ You can thank me for developing this project, provide financial support for the 
   Just support me on these platforms: \  
   ⭐[**Boosty**⭐](https://boosty.to/anodev) \  
   ⭐[**DonationAlerts**⭐](https://www.donationalerts.com/r/anodev_development)  
-  *********************************************************************
-  ### Credits: [More info](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/CREDITS.md) 
+*********************************************************************
+### 👪 Credits: [More info](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/CREDITS.md) 
 
- *********************************************************************
+*********************************************************************
 ### 😀 Sample Result:  
 * __More sample images in [docs/imgs/input/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/input) and [docs/imgs/examples/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/examples) folders__  
 * Input:   
