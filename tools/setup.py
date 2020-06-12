@@ -20,11 +20,12 @@ License:
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-
+import sys
+sys.path.append("../")
 import os
 import gdown
 import tarfile
-from . import MODELS_NAMES
+from libs.strings import MODELS_NAMES
 
 
 class Config:
