@@ -50,7 +50,9 @@ def __save_image_file__(img, file_name, output_path, wmode):
     :param wmode: Work mode
     """
     # create output directory if it doesn't exist
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    dir = os.path.dirname(output_path)
+    if dir != '':
+        os.makedirs(dir, exist_ok=True)
     if wmode == "file":
         file_name_out = os.path.basename(output_path)
         if file_name_out == '':
