@@ -1,7 +1,7 @@
 """
 Name: Strings file
 Description: This file contains the strings.
-Version: [release][3.1]
+Version: [release][3.2]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
 Author: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO] .
 License: Apache License 2.0
@@ -21,8 +21,8 @@ License:
    limitations under the License.
 """
 
-from libs.networks import MODELS_NAMES
 NAME = "Image Background Remove Tool"
+MODELS_NAMES = ["u2net", "basnet", "u2netp", "xception_model", "mobile_net_model"]
 DESCRIPTION = "A tool to remove a background from image using Neural Networks"
 LICENSE = "Apache License 2.0"
 ARGS_HELP = """

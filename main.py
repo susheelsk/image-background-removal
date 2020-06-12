@@ -1,7 +1,7 @@
 """
 Name: Background remove tool.
 Description: This file contains the CLI interface.
-Version: [release][3.1]
+Version: [release][3.2]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
 Author: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO] .
 License: Apache License 2.0
@@ -49,6 +49,10 @@ def __save_image_file__(img, file_name, output_path, wmode):
     :param output_path: Output path
     :param wmode: Work mode
     """
+    # create output directory if it doesn't exist
+    dir = os.path.dirname(output_path)
+    if dir != '':
+        os.makedirs(dir, exist_ok=True)
     if wmode == "file":
         file_name_out = os.path.basename(output_path)
         if file_name_out == '':
@@ -61,9 +65,11 @@ def __save_image_file__(img, file_name, output_path, wmode):
                 # Save image
                 img.save(output_path)
             except OSError as e:
-                raise OSError("Error! "
-                              "Please indicate the correct extension of the final file, for example: .png",
-                              "Error: ", e)
+                if str(e) == "cannot write mode RGBA as JPEG":
+                    raise OSError("Error! "
+                                  "Please indicate the correct extension of the final file, for example: .png")
+                else:
+                    raise e
     else:
         # Change file extension to png
         file_name = os.path.splitext(file_name)[0] + '.png'
@@ -71,23 +77,16 @@ def __save_image_file__(img, file_name, output_path, wmode):
         img.save(os.path.join(output_path, file_name))
 
 
-def cli():
-    """CLI"""
-    parser = argparse.ArgumentParser(description=DESCRIPTION, usage=ARGS_HELP)
-    parser.add_argument('-i', required=True,
-                        help="Path to input file or dir.", action="store", dest="input_path")
-    parser.add_argument('-o', required=True,
-                        help="Path to output file or dir.", action="store", dest="output_path")
-    parser.add_argument('-m', required=False,
-                        help="Model name. Can be {} . U2NET is better to use.".format(MODELS_NAMES),
-                        action="store", dest="model_name", default="u2net")
-    args = parser.parse_args()
-    # Parse arguments
-    input_path = args.input_path
-    output_path = args.output_path
+def process(input_path, output_path, model_name="u2net"):
+    """
+    Processes the file.
+    @param input_path: The path to the image / folder with the images to be processed.
+    @param output_path: The path to the save location.
+    @param model_name: Model to use.
+    """
     if input_path is None or output_path is None:
         raise Exception("Bad parameters! Please specify input path and output path.")
-    model_name = args.model_name
+
     model = model_detect(model_name)  # Load model
     if not model:
         logger.warning("Warning! You specified an invalid model type. "
@@ -109,6 +108,27 @@ def cli():
             __save_image_file__(image, file, output_path, wmode)
     else:
         raise Exception("Bad input parameter! Please indicate the correct path to the file or folder.")
+
+
+def cli():
+    """CLI"""
+    parser = argparse.ArgumentParser(description=DESCRIPTION, usage=ARGS_HELP)
+    parser.add_argument('-i', required=True,
+                        help="Path to input file or dir.", action="store", dest="input_path")
+    parser.add_argument('-o', required=True,
+                        help="Path to output file or dir.", action="store", dest="output_path")
+    parser.add_argument('-m', required=False,
+                        help="Model name. Can be {} . U2NET is better to use.".format(MODELS_NAMES),
+                        action="store", dest="model_name", default="u2net")
+    args = parser.parse_args()
+    # Parse arguments
+    input_path = args.input_path
+    output_path = args.output_path
+    model_name = args.model_name
+    if model_name == "test":
+        print(input_path, output_path, model_name)
+    else:
+        process(input_path, output_path, model_name)
 
 
 if __name__ == "__main__":

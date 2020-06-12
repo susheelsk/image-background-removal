@@ -1,2 +1,6 @@
 /models/
 /.idea/
+__pycache__
+/tools/devtools/
+/tests/.pytest_cache/
+/tests/tests_temp/

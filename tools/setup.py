@@ -1,7 +1,7 @@
 """
 Name: Setup file
 Description: This file contains the setup tool code.
-Version: [release][3.1]
+Version: [release][3.2]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
 Author: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO] .
 License: Apache License 2.0
@@ -24,7 +24,9 @@ License:
 import os
 import gdown
 import tarfile
-MODELS_NAMES = ["u2net", "u2netp", "xception_model", "mobile_net_model"]
+from . import MODELS_NAMES
+
+
 class Config:
     """Config object"""
     # general
@@ -38,6 +40,9 @@ class Config:
     # u2net
     u2_url = "https://drive.google.com/uc?id=1ao1ovG1Qtx4b7EoskHXmi2E9rp5CHLcZ"
     u2_dir = os.path.join("..", "models", "u2net")
+    # basnet
+    bn_url = "https://drive.google.com/uc?id=1s52ek_4YTDRt_EOkx1FS53u-vJa0c4nu"
+    bn_dir = os.path.join("..", "models", "basnet")
     # u2netp
     u2p_url = "https://drive.google.com/uc?id=1rbSTGKAE-MTxBYHd-51l2hMOQPT_7EPy"
     u2p_dir = os.path.join("..", "models", "u2netp")
@@ -55,6 +60,8 @@ def prepare():
             os.makedirs(Config.u2_dir)
         if not os.path.exists(Config.u2p_dir):
             os.makedirs(Config.u2p_dir)
+        if not os.path.exists(Config.bn_dir):
+            os.makedirs(Config.bn_dir)
     except BaseException as e:
         print("Error creating model folders! Error:", e)
         exit(1)
@@ -75,6 +82,7 @@ def download():
         gdown.download(Config.xc_url, path_xc)
         gdown.download(Config.u2_url, os.path.join(Config.u2_dir, "u2net.pth"))
         gdown.download(Config.u2p_url, os.path.join(Config.u2p_dir, "u2netp.pth"))
+        gdown.download(Config.bn_url, os.path.join(Config.bn_dir, "basnet.pth"))
         print("Download finished!")
     except BaseException as e:
         print("Error download model archives! Error:", e)
@@ -130,6 +138,7 @@ def setup():
                 if clean():
                     pass
 
+
 def cli():
     print("Choose which model you want to install:\n{}\nall".format('\n'.join(MODELS_NAMES)))
     model_name = input("Enter model name: ")
@@ -139,6 +148,10 @@ def cli():
         if not os.path.exists(Config.u2_dir):
             os.makedirs(Config.u2_dir)
         gdown.download(Config.u2_url, os.path.join(Config.u2_dir, "u2net.pth"))
+    elif model_name == "basnet":
+        if not os.path.exists(Config.bn_dir):
+            os.makedirs(Config.bn_dir)
+        gdown.download(Config.bn_url, os.path.join(Config.bn_dir, "basnet.pth"))
     elif model_name == "u2netp":
         if not os.path.exists(Config.u2p_dir):
             os.makedirs(Config.u2p_dir)
@@ -177,6 +190,7 @@ def cli():
         print("ERROR! You specified an invalid model type! EXIT!")
         exit(1)
     print("Setup finished! :)")
+
 
 if __name__ == "__main__":
     cli()
