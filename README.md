@@ -40,6 +40,9 @@ _This setup.bat script loads the trained model._
 * Install all the dependencies from **requirements.txt**: ```pip3 install -r requirements.txt```  
 * Run ```./setup.sh``` and select the model you need.\  
 _This setup.sh script loads the pre-trained model._  
+**********************************************************************
+### 🖵 Running GUI app:
+```python3 app.py```
 **********************************************************************  
 ### 🧰 Running the script:  
  * ```python3 main.py -i <input_path> -o <output_path> -m <model_type>```  
@@ -53,8 +56,7 @@ and designed to remove the background from PORTRAIT photos or PHOTOS WITH ANIMAL
  > Note:  See example scripts for more information on using the program.  
 **********************************************************************  
 ### ⏳ TODO:  
-```  
-1) Add a graphical interface. (0% done)
+```
 2) Implement support for Mask RCNN. (10% done)
 3) Implement background removal of objects from photos using Bounding Box Detection and built-in neural networks. (45% done) 
 ``` 
