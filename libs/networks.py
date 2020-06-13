@@ -129,27 +129,14 @@ class U2NET:
         :param path: Path to image file
         :return: image tensor, original image shape
         """
-        def aspect_func(num, key):
-            """
-            Function for resizing images while maintaining aspect ratio
-            """
-            return max(min(math.floor(num), math.ceil(num), key=key), 1)
         image_size = 320  # Size of the input and output image for the model
         try:
             image = io.imread(path)  # Load image
         except IOError:
             logger.error('Cannot retrieve image. Please check file: ' + path)
             return False, False
-        w, h = map(math.floor, (image_size, image_size))
-        ratio = image.shape[1] / image.shape[0]
-        if w / h >= ratio:
-            w = aspect_func(h * ratio, key=lambda n: abs(ratio - n / h))
-        else:
-            h = aspect_func(
-                w / ratio, key=lambda n: 0 if n == 0 else abs(ratio - w / n)
-            )
         pil_image = Image.fromarray(image)
-        image = transform.resize(image, (h, w), mode='constant')  # Resize image while maintaining aspect ratio
+        image = transform.resize(image, (image_size, image_size), mode='constant')  # Resize image
         image = self.__ndrarray2tensor__(image)  # Convert image from numpy arr to tensor
         return image, pil_image
 
