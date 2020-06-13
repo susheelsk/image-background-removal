@@ -42,7 +42,7 @@ _This setup.bat script loads the trained model._
 _This setup.sh script loads the pre-trained model._  
 **********************************************************************
 ### 🖵 Running GUI app:
-```python3 app.py```
+```python3 gui.py```
 **********************************************************************  
 ### 🧰 Running the script:  
  * ```python3 main.py -i <input_path> -o <output_path> -m <model_type>```  

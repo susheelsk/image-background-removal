@@ -2,7 +2,7 @@
 ## My Team:
 * ⭐ [Anodev (OPHoperHPO)](https://github.com/OPHoperHPO) - __The main part of the functional__
 ## Contributors:
-* Nothing =(
+* [Munawwar](https://github.com/Munawwar) - GUI
 ## Models authors:
 * [NathanUA](https://github.com/NathanUA/) - [U^2-net(p)](https://github.com/NathanUA/U-2-Net), [BASNet](https://github.com/NathanUA/BASNet) models
 * [susheelsk](https://github.com/susheelsk/image-background-removal) - DeepLabV3 models(xception_model, mobile_net_model) configuration for background removal
