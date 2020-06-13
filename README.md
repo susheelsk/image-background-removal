@@ -22,8 +22,9 @@ The program removes the background from photos
  > [More info about models.](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/MODELS.md)  
 **********************************************************************  
 ### 🧷 Dependencies:  
-```gdown ``` for `setup.py`! \  
-```tensorflow, torch, torchvision Pillow, tqdm, numpy, scipy, scikit_image ``` for `main.py`!
+* ```gdown ``` for `setup.py`! \  
+* ```tensorflow, torch, torchvision, Pillow, tqdm, numpy, scipy, scikit_image ``` for `main.py`!
+* ```tensorflow, torch, torchvision, Pillow, tqdm, numpy, scipy, scikit_image, pywebview``` for `gui.py`
 > Note:  You can choose what to install PyTorch or TensorFlow, based on which model you want to use. \  
 PyTorch for `u2net`, `u2netp` \  
 TensorFlow for `xception_model`, `mobile_net_model` \  
