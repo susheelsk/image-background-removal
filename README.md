@@ -1,5 +1,4 @@
-
-# 🥧 Image Background Remove Tool 🥧  
+# 🥧 Image Background Remove Tool 🥧
 Tool for removing background from image using neural networks  
 **********************************************************************  
 ### 📄 Description:  
@@ -7,7 +6,8 @@ The program removes the background from photos
 **********************************************************************  
 ### 🎆 Features:  
 * **Added support for new neural networks ([U^2-NET](https://github.com/NathanUA/U-2-Net), [BASNet]((https://github.com/NathanUA/BASNet))) on PyTorch**  
-* **Significantly improved output image quality**  
+* **Significantly improved output image quality**
+* **Added GUI by [@Munawwar](https://github.com/Munawwar)** 
 * __Tensorflow 2.0 compatible__  
 * __All models support processing both on the video card and on the processor__  
 * __```tqdm``` progress bar__
@@ -40,6 +40,9 @@ _This setup.bat script loads the trained model._
 * Install all the dependencies from **requirements.txt**: ```pip3 install -r requirements.txt```  
 * Run ```./setup.sh``` and select the model you need.\  
 _This setup.sh script loads the pre-trained model._  
+**********************************************************************
+### 🖵 Running GUI app:
+```python3 gui.py```
 **********************************************************************  
 ### 🧰 Running the script:  
  * ```python3 main.py -i <input_path> -o <output_path> -m <model_type>```  
@@ -53,8 +56,7 @@ and designed to remove the background from PORTRAIT photos or PHOTOS WITH ANIMAL
  > Note:  See example scripts for more information on using the program.  
 **********************************************************************  
 ### ⏳ TODO:  
-```  
-1) Add a graphical interface. (0% done)
+```
 2) Implement support for Mask RCNN. (10% done)
 3) Implement background removal of objects from photos using Bounding Box Detection and built-in neural networks. (45% done) 
 ``` 
