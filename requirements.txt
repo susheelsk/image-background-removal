@@ -1,11 +1,11 @@
-tqdm==4.43.0
 numpy==1.18.2
-pywebview==3.2
-gdown==3.11.1
-torchvision==0.2.2.post3
+scipy==1.4.1
+tqdm==4.43.0
 scikit_image==0.15.0
 torch==1.5.0
-scipy==1.4.1
+torchvision==0.2.2.post3
+pywebview==3.2
+gdown==3.11.1
 tensorflow==2.2.0
 Pillow==7.1.2
-webview==0.1.5
+pywebview==3.2
