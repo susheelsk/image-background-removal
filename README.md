@@ -25,7 +25,7 @@ The program removes the background from photos
  ### 🖼️ Image pre-processing and post-processing methods:
  #### 🔍 Preprocessing methods:
 * `None` - No preprocessing methods used.
-* `bbd-fastrcnn` (**default**) - This image pre-processing technique uses two neural networks ($used_model and Fast RCNN) to first detect the boundaries of objects in a photograph, cut them out, sequentially remove the background from each object in turn and subsequently collect the whole image from them back.
+* `bbd-fastrcnn` (**default**) - This image pre-processing technique uses two neural networks ($used_model and Fast RCNN) to first detect the boundaries of objects in a photograph, cut them out, sequentially remove the background from each object in turn and subsequently collect the entire image from separate parts.
 * `bbmd-maskrcnn` - This image pre-processing technique uses two neural networks ($used_model and Mask RCNN) to first detect the boundaries and masks of objects in a photograph, cut them out, expand the masks by a certain number of pixels, apply them and remove the background from each object in turn and subsequently collect the entire image from separate parts. **So far it works very poorly!**
 
 #### ✂ Post-processing methods:
