@@ -1,4 +1,4 @@
-# 🥧 Image Background Remove Tool 🥧
+# 🥧 Image Background Remove Tool 🥧 ![Test](https://github.com/OPHoperHPO/image-background-remove-tool/workflows/Test/badge.svg?branch=master)
 Tool for removing background from image using neural networks 
 **********************************************************************
 ### 📄 Description:  
