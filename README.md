@@ -87,17 +87,17 @@ You can thank me for developing this project, provide financial support for the 
 **********************************************************************
 ### 😀 Sample Result:  
 * __More sample images in [docs/imgs/input/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/input) and [docs/imgs/examples/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/examples) folders.__  \
-Examples of images from the background are contained in folders in the following format: {model_name} {preprocessing_method_name} {postprocessing_method_name} 
+Examples of images from the background are contained in folders in the following format: `{model_name}/{preprocessing_method_name}/{postprocessing_method_name}`
 * Input:   
 * ![Input](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/input/4.jpg "Input")  
-* Output(u2net/None/rtb-bnb):   
+* Output(u2net/bbd-fastrcnn/rtb-bnb):   
 * ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/u2net/bbd-fastrcnn/rtb-bnb/4.png "Output")
-*  Output(basnet/None/rtb-bnb):   
+*  Output(basnet/bbd-fastrcnn/rtb-bnb):   
 * ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/basnet/bbd-fastrcnn/rtb-bnb/4.png "Output")  
-* Output(u2netp/None/rtb-bnb):   
+* Output(u2netp/bbd-fastrcnn/rtb-bnb):   
 * ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/u2netp/bbd-fastrcnn/rtb-bnb/4.png "Output")  
-* Output(xception_model/None/rtb-bnb):   
+* Output(xception_model/bbd-fastrcnn/rtb-bnb):   
 * ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/xception_model/bbd-fastrcnn/rtb-bnb/4.png "Output")  
-* Output(mobile_net_model/None/rtb-bnb):   
+* Output(mobile_net_model/bbd-fastrcnn/rtb-bnb):   
 * ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/mobile_net_model/bbd-fastrcnn/rtb-bnb/4.png "Output")  
 **********************************************************************
