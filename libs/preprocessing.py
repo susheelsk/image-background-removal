@@ -49,7 +49,7 @@ class BoundingBoxDetectionFastRcnn:
     This image pre-processing technique uses two neural networks ($used_model and Fast RCNN)
     to first detect the boundaries of objects in a photograph,
     cut them out, sequentially remove the background from each object in turn
-    and subsequently collect the whole image from them back.
+    and subsequently collect the entire image from separate parts
     """
 
     def __init__(self):
