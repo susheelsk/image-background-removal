@@ -52,12 +52,16 @@ def model_detect(model_name):
 class U2NET:
     """U^2-Net model interface"""
 
-    import torch
-    from torch.autograd import Variable
-    from libs.u2net import U2NET as U2NET_DEEP
-    from libs.u2net import U2NETP as U2NETP_DEEP
-
     def __init__(self, name="u2net"):
+        import torch
+        from torch.autograd import Variable
+        from libs.u2net import U2NET as U2NET_DEEP
+        from libs.u2net import U2NETP as U2NETP_DEEP
+        self.Variable = Variable
+        self.torch = torch
+        self.U2NET_DEEP = U2NET_DEEP
+        self.U2NETP_DEEP = U2NETP_DEEP
+
         if name == 'u2net':  # Load model
             logger.debug("Loading a U2NET model (176.6 mb) with better quality but slower processing.")
             net = self.U2NET_DEEP()
@@ -189,11 +193,15 @@ class U2NET:
 class BasNet:
     """BasNet model interface"""
 
-    import torch
-    from torch.autograd import Variable
-    from libs.basnet import BASNet as BASNet_DEEP
-
     def __init__(self, name="basnet"):
+        import torch
+        from torch.autograd import Variable
+        from libs.basnet import BASNet as BASNet_DEEP
+
+        self.Variable = Variable
+        self.torch = torch
+        self.BASNet_DEEP = BASNet_DEEP
+
         if name == 'basnet':  # Load model
             logger.debug("Loading a BASNet model.")
             net = self.BASNet_DEEP(3, 1)
@@ -321,11 +329,13 @@ class BasNet:
 
 class TFSegmentation(object):
     """Class to load Deeplabv3 model and run inference."""
-    import scipy.ndimage as ndi
-    import tensorflow as tf
-
     def __init__(self, model_type):
         """Creates and loads pretrained deeplab model."""
+        import scipy.ndimage as ndi
+        import tensorflow as tf
+        self.tf = tf
+        self.ndi = ndi
+
         # Environment init
         self.INPUT_TENSOR_NAME = 'ImageTensor:0'
         self.OUTPUT_TENSOR_NAME = 'SemanticPredictions:0'

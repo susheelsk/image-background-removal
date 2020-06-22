@@ -47,11 +47,15 @@ class RemovingTooTransparentBordersHardAndBlurringHardBordersTwo:
     It is based on the principle of removing too transparent pixels
     and smoothing the borders after removing too transparent pixels.
     """
-    import cv2
-    import skimage
-    import numpy as np
 
     def __init__(self):
+        import cv2
+        import skimage
+        import numpy as np
+        self.cv2 = cv2
+        self.skimage = skimage
+        self.np = np
+
         self.model = None
         self.prep_image = None
         self.orig_image = None
@@ -141,11 +145,15 @@ class RemovingTooTransparentBordersHardAndBlurringHardBorders:
     then sends the processed image back to the neural network, and then processes it again and returns it to the user.
      This method gives the best result in combination with u2net without any preprocessing methods.
     """
-    import cv2
-    import skimage
-    import numpy as np
 
     def __init__(self):
+        import cv2
+        import skimage
+        import numpy as np
+        self.cv2 = cv2
+        self.skimage = skimage
+        self.np = np
+
         self.model = None
         self.prep_image = None
         self.orig_image = None

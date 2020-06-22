@@ -355,10 +355,13 @@ class FastRcnn:
     """
     Fast Rcnn Neural Network to detect objects in the photo.
     """
-    from gluoncv import model_zoo, data
-    from mxnet import nd
 
     def __init__(self):
+        from gluoncv import model_zoo, data
+        from mxnet import nd
+        self.model_zoo = model_zoo
+        self.data = data
+        self.nd = nd
         logger.debug("Loading Fast RCNN neural network")
         self.__net__ = self.model_zoo.get_model('faster_rcnn_resnet50_v1b_voc',
                                                 pretrained=True)  # Download the pre-trained model, if one is missing.
@@ -399,10 +402,14 @@ class MaskRcnn:
     """
     Mask Rcnn Neural Network to detect objects in the photo.
     """
-    from gluoncv import model_zoo, utils, data
-    from mxnet import nd
 
     def __init__(self):
+        from gluoncv import model_zoo, utils, data
+        from mxnet import nd
+        self.model_zoo = model_zoo
+        self.utils = utils
+        self.data = data
+        self.nd = nd
         logger.debug("Loading Mask RCNN neural network")
         self.__net__ = self.model_zoo.get_model('mask_rcnn_resnet50_v1b_coco',
                                                 pretrained=True)  # Download the pre-trained model, if one is missing.
