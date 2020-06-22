@@ -1,4 +1,4 @@
-# 🥧 Image Background Remove Tool 🥧 ![Test](https://github.com/OPHoperHPO/image-background-remove-tool/workflows/Test/badge.svg?branch=master)
+# 🥧 Image Background Remove Tool 🥧 ![Test](https://github.com/OPHoperHPO/image-background-remove-tool/workflows/Test/badge.svg?branch=master) [![](https://camo.githubusercontent.com/52feade06f2fecbf006889a904d221e6a730c194/68747470733a2f2f636f6c61622e72657365617263682e676f6f676c652e636f6d2f6173736574732f636f6c61622d62616467652e737667)](https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/try.ipynb)
 Tool for removing background from image using neural networks 
 **********************************************************************
 ### 📄 Description:  
@@ -15,6 +15,8 @@ The program removes the background from photos
 * __Removes background from image without loss of image resolution__  
 *  __The script not only processes a single file, but can also process all images from the input folder and save them in the output folder with the same name__  
 *  __Implemented support for the neural network from this [ script](https://github.com/susheelsk/image-background-removal) and improved the result of its work__  
+**********************************************************************
+### ⛱ Try this program yourself on [Google Colab](https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/try.ipynb) 
 **********************************************************************
  ### 🎓 Implemented Neural Networks:
 * [U^2-net](https://github.com/NathanUA/U-2-Net)
