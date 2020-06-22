@@ -28,10 +28,17 @@ import os
 
 def gen():
     for model_name in strings.MODELS_NAMES:
-        if not os.path.exists("docs/imgs/examples/{}/".format(model_name)):
-            os.makedirs("docs/imgs/examples/{}/".format(model_name), exist_ok=True)
-        print(model_name)
-        process("docs/imgs/input/", "docs/imgs/examples/{}/".format(model_name), model_name)
+        for preprocess_method_name in strings.PREPROCESS_METHODS:
+            for postprocess_method_name in strings.POSTPROCESS_METHODS:
+                if not os.path.exists("docs/imgs/examples/{}/{}/{}".format(model_name,
+                                                                           preprocess_method_name, postprocess_method_name)):
+                    os.makedirs("docs/imgs/examples/{}/{}/{}".format(model_name,
+                                                                     preprocess_method_name, postprocess_method_name),
+                                exist_ok=True)
+                print(model_name, preprocess_method_name, postprocess_method_name)
+                process("docs/imgs/input/", "docs/imgs/examples/{}/{}/{}".format(model_name,
+                                                                     preprocess_method_name, postprocess_method_name),
+                        model_name, preprocess_method_name, postprocess_method_name)
     return True
 
 

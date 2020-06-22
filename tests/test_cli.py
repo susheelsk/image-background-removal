@@ -24,20 +24,31 @@ import subprocess
 import unittest
 
 
-def cli_call(input, out, model):
+def cli_call_old(input, out, model):
     sub = subprocess.Popen("python3 ../main.py -i {} -o {} -m {}".format(input, out, model), shell=True,
+                           stdout=subprocess.PIPE)
+    return sub.communicate()[0].decode("UTF-8").replace('\n', '')
+
+
+def cli_call(input, out, model, prep="bla", post="bla"):
+    sub = subprocess.Popen("python3 ../main.py -i {} -o {} -m {} -prep {} -postp {}".format(input, out, model, prep,
+                                                                                            post), shell=True,
                            stdout=subprocess.PIPE)
     return sub.communicate()[0].decode("UTF-8").replace('\n', '')
 
 
 class CliTest(unittest.TestCase):
     def test_cli(self):
-        self.assertEqual(cli_call("docs/imgs/input/1.jpg", "docs/imgs/examples/u2netp/", "test"),
-                         "docs/imgs/input/1.jpg docs/imgs/examples/u2netp/ test")
-        self.assertEqual(cli_call("docs/imgs/input/1.jpg", "docs/imgs/examples/u2netp/1.png", "test"),
-                         "docs/imgs/input/1.jpg docs/imgs/examples/u2netp/1.png test")
-        self.assertEqual(cli_call("docs/imgs/input/", "docs/imgs/examples/u2netp/", "test"),
-                         "docs/imgs/input/ docs/imgs/examples/u2netp/ test")
+        self.assertEqual(cli_call_old("docs/imgs/input/1.jpg", "docs/imgs/examples/u2netp/", "test"),
+                         "docs/imgs/input/1.jpg docs/imgs/examples/u2netp/ test None rtb-bnb2")
+        self.assertEqual(cli_call_old("docs/imgs/input/1.jpg", "docs/imgs/examples/u2netp/1.png", "test"),
+                         "docs/imgs/input/1.jpg docs/imgs/examples/u2netp/1.png test None rtb-bnb2")
+        self.assertEqual(cli_call_old("docs/imgs/input/", "docs/imgs/examples/u2netp/", "test"),
+                         "docs/imgs/input/ docs/imgs/examples/u2netp/ test None rtb-bnb2")
+        self.assertEqual(cli_call("docs/imgs/input/1.jpg", "docs/imgs/examples/u2netp/", "test", "BLA-BAL", "daw"),
+                         "docs/imgs/input/1.jpg docs/imgs/examples/u2netp/ test BLA-BAL daw")
+        self.assertEqual(cli_call("docs/imgs/input/1.jpg", "docs/imgs/examples/u2netp/", "test", "dawdwa", "daw"),
+                         "docs/imgs/input/1.jpg docs/imgs/examples/u2netp/ test dawdwa daw")
 
 
 if __name__ == '__main__':

@@ -20,13 +20,29 @@ License:
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-from libs import networks
+from libs import networks, preprocessing, postprocessing, strings
 import unittest
+
+
+class PostprocessMethodCase(unittest.TestCase):
+    def test_postprocess_method(self):
+        for method in strings.POSTPROCESS_METHODS:
+            method = postprocessing.method_detect(method)
+            if method is False:
+                self.fail("Unknown model in POSTPROCESS_METHODS!!!")
+
+
+class PreprocessMethodCase(unittest.TestCase):
+    def test_preprocess_method(self):
+        for method in strings.PREPROCESS_METHODS:
+            method = preprocessing.method_detect(method)
+            if method is False:
+                self.fail("Unknown model in PREPROCESS_METHODS !!!")
 
 
 class ModelsCase(unittest.TestCase):
     def test_models(self):
-        for model_name in networks.strings.MODELS_NAMES:
+        for model_name in strings.MODELS_NAMES:
             try:
                 model = networks.model_detect(model_name)
             except FileNotFoundError:

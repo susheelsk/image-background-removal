@@ -26,6 +26,8 @@ import tqdm
 import logging
 from libs.strings import *
 from libs.networks import model_detect
+import libs.preprocessing as preprocessing
+import libs.postprocessing as postprocessing
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
@@ -50,9 +52,9 @@ def __save_image_file__(img, file_name, output_path, wmode):
     :param wmode: Work mode
     """
     # create output directory if it doesn't exist
-    dir = os.path.dirname(output_path)
-    if dir != '':
-        os.makedirs(dir, exist_ok=True)
+    folder = os.path.dirname(output_path)
+    if folder != '':
+        os.makedirs(folder, exist_ok=True)
     if wmode == "file":
         file_name_out = os.path.basename(output_path)
         if file_name_out == '':
@@ -77,12 +79,15 @@ def __save_image_file__(img, file_name, output_path, wmode):
         img.save(os.path.join(output_path, file_name))
 
 
-def process(input_path, output_path, model_name="u2net"):
+def process(input_path, output_path, model_name="u2net",
+            preprocessing_method_name="bbd-fastrcnn", postprocessing_method_name="rtb-bnb"):
     """
     Processes the file.
-    @param input_path: The path to the image / folder with the images to be processed.
-    @param output_path: The path to the save location.
-    @param model_name: Model to use.
+    :param input_path: The path to the image / folder with the images to be processed.
+    :param output_path: The path to the save location.
+    :param model_name: Model to use.
+    :param postprocessing_method_name: Method for image preprocessing
+    :param preprocessing_method_name: Method for image post-processing
     """
     if input_path is None or output_path is None:
         raise Exception("Bad parameters! Please specify input path and output path.")
@@ -94,17 +99,18 @@ def process(input_path, output_path, model_name="u2net"):
                        "(u2net)")
         model_name = "u2net"  # If the model line is wrong, select the model with better quality.
         model = model_detect(model_name)  # Load model
-
+    preprocessing_method = preprocessing.method_detect(preprocessing_method_name)
+    postprocessing_method = postprocessing.method_detect(postprocessing_method_name)
     wmode = __work_mode__(input_path)  # Get work mode
     if wmode == "file":  # File work mode
-        image = model.process_image(input_path)
+        image = model.process_image(input_path, preprocessing_method, postprocessing_method)
         __save_image_file__(image, os.path.basename(input_path), output_path, wmode)
     elif wmode == "dir":  # Dir work mode
         # Start process
         files = os.listdir(input_path)
         for file in tqdm.tqdm(files, ascii=True, desc='Remove Background', unit='image'):
             file_path = os.path.join(input_path, file)
-            image = model.process_image(file_path)
+            image = model.process_image(file_path, preprocessing_method, postprocessing_method)
             __save_image_file__(image, file, output_path, wmode)
     else:
         raise Exception("Bad input parameter! Please indicate the correct path to the file or folder.")
@@ -120,15 +126,26 @@ def cli():
     parser.add_argument('-m', required=False,
                         help="Model name. Can be {} . U2NET is better to use.".format(MODELS_NAMES),
                         action="store", dest="model_name", default="u2net")
+    parser.add_argument('-prep', required=False,
+                        help="Preprocessing method. Can be {} . `bbd-fastrcnn` is better to use."
+                        .format(PREPROCESS_METHODS),
+                        action="store", dest="preprocessing_method_name", default="bbd-fastrcnn")
+    parser.add_argument('-postp', required=False,
+                        help="Postprocessing method. Can be {} ."
+                             " `rtb-bnb` is better to use.".format(POSTPROCESS_METHODS),
+                        action="store", dest="postprocessing_method_name", default="rtb-bnb")
     args = parser.parse_args()
     # Parse arguments
     input_path = args.input_path
     output_path = args.output_path
     model_name = args.model_name
+    preprocessing_method_name = args.preprocessing_method_name
+    postprocessing_method_name = args.postprocessing_method_name
+
     if model_name == "test":
-        print(input_path, output_path, model_name)
+        print(input_path, output_path, model_name, preprocessing_method_name, postprocessing_method_name)
     else:
-        process(input_path, output_path, model_name)
+        process(input_path, output_path, model_name, preprocessing_method_name, postprocessing_method_name)
 
 
 if __name__ == "__main__":
