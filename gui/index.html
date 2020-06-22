@@ -9517,6 +9517,8 @@
                 <h3><i class="material-icons" style="font-size: 32px;">settings</i>Settings:</h3>
                 <ul class="menus">
                     <li class="models" style="margin: 2;"><strong>Model:</strong></li>
+                    <li class="preprocessing_methods" style="margin: 2;"><strong>Preprocessing Method:</strong></li>
+                    <li class="postprocessing_methods" style="margin: 2;"><strong>Postprocessing Method:</strong></li>
                 </ul>
             </div>
             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" style="background: #026d00;" data-goto="home"><i class="material-icons">home</i> Go Back</button>
@@ -9525,6 +9527,8 @@
             window.app = {
                 fileUploadButton: document.getElementById("imageFile"),
                 getModel: () => document.querySelector('input[name="model"]:checked').value,
+                getPreprocessingMethod: () => document.querySelector('input[name="preprocessing_method"]:checked').value,
+                getPostprocessingMethod: () => document.querySelector('input[name="postprocessing_method"]:checked').value,
             };
             window.app.fileUploadButton.addEventListener("click", () => {
                 pywebview.api.openFileDialog();

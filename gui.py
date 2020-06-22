@@ -27,7 +27,7 @@ import subprocess
 import threading
 import webview
 from main import process
-from libs.strings import MODELS_NAMES
+from libs.strings import MODELS_NAMES, PREPROCESS_METHODS, POSTPROCESS_METHODS
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ def show_error(w, e):
 
 
 # noinspection PyMissingOrEmptyDocstring
-def worker_thread(win, input_files, model):
+def worker_thread(win, input_files, model, preprocessing_method, postprocessing_method):
     logger.debug('Processing started ...')
     for i, file in enumerate(input_files):
         (file_path, file_name) = os.path.split(file)
@@ -62,7 +62,7 @@ def worker_thread(win, input_files, model):
             + str(i + 1) + ' of ' + str(len(input_files)) + " ...'"
         )
         try:
-            process(file, output_file, model)
+            process(file, output_file, model, preprocessing_method, postprocessing_method)
         except BaseException as e:
             show_error(win, e)
     win.evaluate_js("window.app.fileUploadButton.textContent = 'Select photos'")
@@ -76,6 +76,82 @@ def onWindowStart(win2):
     Window Start Event listener
     @param win2: Window object
     """
+    # TODO: Make a universal function for adding parameters to the settings page.
+    def addPostprocessingMethods():
+        """
+        Adds postprocessing methods to the postprocessing methods selection list.
+        """
+
+        def __add_method__(method: str):
+            if not method == POSTPROCESS_METHODS[0]:
+                win2.evaluate_js("""
+                 function createElementFromHTML(htmlString) {
+                         var div = document.createElement('div');
+                         div.innerHTML = htmlString.trim();
+
+                         // Change this to div.childNodes to support multiple top-level nodes
+                         return div.firstChild; 
+                       }
+                       var models = document.querySelector('.postprocessing_methods');
+                       var rbut = createElementFromHTML('<label style="margin-left:16;" class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="MODELD"><input  id="MODELD" class="mdl-radio__button MODELD" type="radio" name="postprocessing_method" value="MODELD" /><span class="mdl-radio__label">MODELD</span></label>')
+                       models.appendChild(rbut)
+                       componentHandler.upgradeDom()
+                       """.replace("MODELD", method))
+            else:
+                win2.evaluate_js("""
+                   function createElementFromHTML(htmlString) {
+                           var div = document.createElement('div');
+                           div.innerHTML = htmlString.trim();
+
+                           // Change this to div.childNodes to support multiple top-level nodes
+                           return div.firstChild; 
+                         }
+                         var models = document.querySelector('.postprocessing_methods');
+                         var rbut = createElementFromHTML('<label style="margin-left:16;" class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="MODELD"><input  id="MODELD" class="mdl-radio__button MODELD" type="radio" name="postprocessing_method" value="MODELD" checked /><span class="mdl-radio__label">MODELD</span></label>')
+                         models.appendChild(rbut)
+                         componentHandler.upgradeDom()
+                         """.replace("MODELD", method))
+
+        for i in POSTPROCESS_METHODS:
+            __add_method__(i)
+
+    def addPreprocessingMethods():
+        """
+        Adds preprocessing methods to the preprocessing methods selection list.
+        """
+
+        def __add_method__(method: str):
+            if not method == PREPROCESS_METHODS[0]:
+                win2.evaluate_js("""
+              function createElementFromHTML(htmlString) {
+                      var div = document.createElement('div');
+                      div.innerHTML = htmlString.trim();
+
+                      // Change this to div.childNodes to support multiple top-level nodes
+                      return div.firstChild; 
+                    }
+                    var models = document.querySelector('.preprocessing_methods');
+                    var rbut = createElementFromHTML('<label style="margin-left:16;" class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="MODELD"><input  id="MODELD" class="mdl-radio__button MODELD" type="radio" name="preprocessing_method" value="MODELD" /><span class="mdl-radio__label">MODELD</span></label>')
+                    models.appendChild(rbut)
+                    componentHandler.upgradeDom()
+                    """.replace("MODELD", method))
+            else:
+                win2.evaluate_js("""
+                function createElementFromHTML(htmlString) {
+                        var div = document.createElement('div');
+                        div.innerHTML = htmlString.trim();
+
+                        // Change this to div.childNodes to support multiple top-level nodes
+                        return div.firstChild; 
+                      }
+                      var models = document.querySelector('.preprocessing_methods');
+                      var rbut = createElementFromHTML('<label style="margin-left:16;" class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="MODELD"><input  id="MODELD" class="mdl-radio__button MODELD" type="radio" name="preprocessing_method" value="MODELD" checked /><span class="mdl-radio__label">MODELD</span></label>')
+                      models.appendChild(rbut)
+                      componentHandler.upgradeDom()
+                      """.replace("MODELD", method))
+
+        for i in PREPROCESS_METHODS:
+            __add_method__(i)
 
     def addModels():
         """
@@ -123,13 +199,15 @@ def onWindowStart(win2):
 
         input_files = win2.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=True, file_types=file_types)
         logger.debug(input_files)
-
+        preprocessing_method = win2.evaluate_js("window.app.getPreprocessingMethod()")
+        postprocessing_method = win2.evaluate_js("window.app.getPostprocessingMethod()")
         model = win2.evaluate_js("window.app.getModel()")
         logger.debug('Use model: {}'.format(model))
 
         if input_files is not None:
             win2.evaluate_js("window.app.fileUploadButton.disabled = true")
-            w_th = threading.Thread(target=worker_thread, args=(win2, input_files, model,))
+            w_th = threading.Thread(target=worker_thread, args=(win2, input_files, model,
+                                                                preprocessing_method, postprocessing_method,))
             w_th.start()
             w_th.join()
             win2.evaluate_js("window.app.fileUploadButton.disabled = false")
@@ -138,6 +216,8 @@ def onWindowStart(win2):
     win2.expose(openFileDialog)
     if win2.loaded:
         addModels()
+        addPreprocessingMethods()
+        addPostprocessingMethods()
 
 
 def open_folder(path):
