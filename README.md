@@ -26,7 +26,7 @@ The program removes the background from photos
  #### 🔍 Preprocessing methods:
 * `None` - No preprocessing methods used.
 * `bbd-fastrcnn` (**default**) - This image pre-processing technique uses two neural networks ($used_model and Fast RCNN) to first detect the boundaries of objects in a photograph, cut them out, sequentially remove the background from each object in turn and subsequently collect the whole image from them back.
-* `bbmd-maskrcnn` - This image pre-processing technique uses two neural networks ($used_model and Mask RCNN) to first detect the boundaries and masks of objects in a photograph, cut them out, expand the masks by a certain number of pixels, apply them and remove the background from each object in turn and subsequently collect the entire image from separate partsю **So far it works very poorly!**
+* `bbmd-maskrcnn` - This image pre-processing technique uses two neural networks ($used_model and Mask RCNN) to first detect the boundaries and masks of objects in a photograph, cut them out, expand the masks by a certain number of pixels, apply them and remove the background from each object in turn and subsequently collect the entire image from separate parts. **So far it works very poorly!**
 
 #### ✂ Post-processing methods:
 * `No` - No post-processing methods used.
@@ -35,11 +35,11 @@ The program removes the background from photos
 **********************************************************************
 ### 🧷 Dependencies:  
 * **See** `requirements.txt`
-> Note:  You can choose what to install PyTorch or TensorFlow, based on which model you want to use. 
-PyTorch for `u2net`, `u2netp`  
-TensorFlow for `xception_model`, `mobile_net_model` 
-Mxnet and Gluoncv are used for image preprocessing methods and are installed optionally.
-**Also, to speed up image processing by performing all the calculations on the video card, install separately special versions of the dependencies (`tensorflow, torch, mxnet, gluoncv and others`) designed to work with your video card.** 
+> Note:  You can choose what to install PyTorch or TensorFlow, based on which model you want to use. \
+PyTorch for `u2net`, `u2netp`  \
+TensorFlow for `xception_model`, `mobile_net_model`  \
+Mxnet and Gluoncv are used for image preprocessing methods and are installed optionally. \
+**Also, to speed up image processing by performing all the calculations on the video card, install separately special versions of the dependencies (`tensorflow, torch, mxnet, gluoncv and others`) designed to work with your video card.** \
 **TensorFlow models are not recommended for use, since these models have much worse quality and lower image processing speed, also these models are designed solely to remove the background from portrait photos and photos with animals.**
 **********************************************************************
 ### 🏷 Setup for Windows:  
@@ -65,9 +65,9 @@ _This setup.sh script loads the pre-trained model._
 * `-o <output_path>` - path to output file or dir.
 * `-prep <preprocessing_method>` - Preprocessing method. Can be `bbd-fastrcnn` or `bbmd-maskrcnn` or `None` . `bbd-fastrcnn` is better to use.
 * `-postp <postprocessing_method>` - Postprocessing method. Can be `rtb-bnb` or `rtb-bnb2` or `No` . `rtb-bnb` is better to use.
-* `-m <model_type>` - can be `u2net` or `basnet` or `u2netp` or `xception_model` or `mobile_net_model`. `u2net` is better to use. 
+* `-m <model_type>` - can be `u2net` or `basnet` or `u2netp` or `xception_model` or `mobile_net_model`. `u2net` is better to use. \
 **DeepLab** models (`xception_model` or `mobile_net_model`) are **outdated** 
-and designed to remove the background from **PORTRAIT** photos or **PHOTOS WITH ANIMALS!** 
+and designed to remove the background from **PORTRAIT** photos or **PHOTOS WITH ANIMALS!** \
 [More info about models.](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/MODELS.md)  
  > Note:  See example scripts for more information on using the program.  
 **********************************************************************
@@ -80,13 +80,13 @@ and designed to remove the background from **PORTRAIT** photos or **PHOTOS WITH 
 ### 👪 Credits: [More info](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/CREDITS.md) 
 **********************************************************************
 ### 💵 Support me:  
-You can thank me for developing this project, provide financial support for the development of new projects and buy me a small cup of coffee.☕
-  Just support me on these platforms:   
-  ⭐[**Boosty**⭐](https://boosty.to/anodev)   
+You can thank me for developing this project, provide financial support for the development of new projects and buy me a small cup of coffee.☕ \
+  Just support me on these platforms:    \
+  ⭐[**Boosty**⭐](https://boosty.to/anodev)   \
   ⭐[**DonationAlerts**⭐](https://www.donationalerts.com/r/anodev_development)  
 **********************************************************************
 ### 😀 Sample Result:  
-* __More sample images in [docs/imgs/input/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/input) and [docs/imgs/examples/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/examples) folders.__ 
+* __More sample images in [docs/imgs/input/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/input) and [docs/imgs/examples/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/examples) folders.__  \
 Examples of images from the background are contained in folders in the following format: {model_name} {preprocessing_method_name} {postprocessing_method_name} 
 * Input:   
 * ![Input](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/input/4.jpg "Input")  
