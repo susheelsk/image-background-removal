@@ -91,13 +91,13 @@ Examples of images from the background are contained in folders in the following
 * Input:   
 * ![Input](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/input/4.jpg "Input")  
 * Output(u2net/None/rtb-bnb):   
-* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/u2net/4.png "Output")
-*  Output(basnet):   
-* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/basnet/4.png "Output")  
-* Output(u2netp):   
-* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/u2netp/4.png "Output")  
-* Output(xception_model):   
-* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/xception_model/4.png "Output")  
-* Output(mobile_net_model):   
-* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/mobile_net_model/4.png "Output")  
+* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/u2net/bbd-fastrcnn/rtb-bnb/4.png "Output")
+*  Output(basnet/None/rtb-bnb):   
+* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/basnet/bbd-fastrcnn/rtb-bnb/4.png "Output")  
+* Output(u2netp/None/rtb-bnb):   
+* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/u2netp/bbd-fastrcnn/rtb-bnb/4.png "Output")  
+* Output(xception_model/None/rtb-bnb):   
+* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/xception_model/bbd-fastrcnn/rtb-bnb/4.png "Output")  
+* Output(mobile_net_model/None/rtb-bnb):   
+* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/mobile_net_model/bbd-fastrcnn/rtb-bnb/4.png "Output")  
 **********************************************************************
