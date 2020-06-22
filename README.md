@@ -1,11 +1,11 @@
 # 🥧 Image Background Remove Tool 🥧
-Tool for removing background from image using neural networks  
+Tool for removing background from image using neural networks 
 **********************************************************************
 ### 📄 Description:  
 The program removes the background from photos  
 **********************************************************************
 ### 🎆 Features:  
-* **Added support for new neural networks ([U^2-NET](https://github.com/NathanUA/U-2-Net), [BASNet]((https://github.com/NathanUA/BASNet))) on PyTorch**  
+* **Added support for new neural networks ([U^2-NET](https://github.com/NathanUA/U-2-Net), [BASNet]((https://github.com/NathanUA/BASNet)) on PyTorch**  
 * **Significantly improved output image quality**
 * **Added GUI by [@Munawwar](https://github.com/Munawwar)** 
 * __Tensorflow 2.0 compatible__  
@@ -35,23 +35,23 @@ The program removes the background from photos
 **********************************************************************
 ### 🧷 Dependencies:  
 * **See** `requirements.txt`
-> Note:  You can choose what to install PyTorch or TensorFlow, based on which model you want to use. \  
-PyTorch for `u2net`, `u2netp` \  
-TensorFlow for `xception_model`, `mobile_net_model` \
+> Note:  You can choose what to install PyTorch or TensorFlow, based on which model you want to use. 
+PyTorch for `u2net`, `u2netp`  
+TensorFlow for `xception_model`, `mobile_net_model` 
 Mxnet and Gluoncv are used for image preprocessing methods and are installed optionally.
-**Also, to speed up image processing by performing all the calculations on the video card, install separately special versions of the dependencies (`tensorflow, torch, mxnet, gluoncv and others`) designed to work with your video card.** \
+**Also, to speed up image processing by performing all the calculations on the video card, install separately special versions of the dependencies (`tensorflow, torch, mxnet, gluoncv and others`) designed to work with your video card.** 
 **TensorFlow models are not recommended for use, since these models have much worse quality and lower image processing speed, also these models are designed solely to remove the background from portrait photos and photos with animals.**
 **********************************************************************
 ### 🏷 Setup for Windows:  
 * Clone this repository  
 * Install all the dependencies from **requirements.txt** via ```pip3 install -r requirements.txt```  
-* Run ```./setup.bat``` \  
+* Run ```./setup.bat``` 
 _This setup.bat script loads the trained model._  
 **********************************************************************
 ### 🏷 Setup for Linux:  
 * Clone repository: ```git clone https://github.com/OPHoperHPO/image-background-remove-tool```  
 * Install all the dependencies from **requirements.txt**: ```pip3 install -r requirements.txt```  
-* Run ```./setup.sh``` and select the model you need.\  
+* Run ```./setup.sh``` and select the model you need.
 _This setup.sh script loads the pre-trained model._  
 **********************************************************************
 ### 🖵 Running GUI app:
@@ -80,14 +80,14 @@ and designed to remove the background from **PORTRAIT** photos or **PHOTOS WITH 
 ### 👪 Credits: [More info](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/CREDITS.md) 
 **********************************************************************
 ### 💵 Support me:  
-You can thank me for developing this project, provide financial support for the development of new projects and buy me a small cup of coffee.☕\  
-  Just support me on these platforms: \  
-  ⭐[**Boosty**⭐](https://boosty.to/anodev) \  
+You can thank me for developing this project, provide financial support for the development of new projects and buy me a small cup of coffee.☕
+  Just support me on these platforms:   
+  ⭐[**Boosty**⭐](https://boosty.to/anodev)   
   ⭐[**DonationAlerts**⭐](https://www.donationalerts.com/r/anodev_development)  
 **********************************************************************
 ### 😀 Sample Result:  
-* __More sample images in [docs/imgs/input/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/input) and [docs/imgs/examples/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/examples) folders.__ \
-Examples of images from the background are contained in folders in the following format: {model_name} {preprocessing_method_name} {postprocessing_method_name} \
+* __More sample images in [docs/imgs/input/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/input) and [docs/imgs/examples/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/examples) folders.__ 
+Examples of images from the background are contained in folders in the following format: {model_name} {preprocessing_method_name} {postprocessing_method_name} 
 * Input:   
 * ![Input](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/input/4.jpg "Input")  
 * Output(u2net/None/rtb-bnb):   
