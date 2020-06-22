@@ -3,7 +3,7 @@ numpy==1.18.2
 tqdm==4.43.0
 torch==1.5.0
 torchvision==0.2.2.post3
-opencv_contrib_python==3.4.2.17
+opencv_contrib_python==4.2.0.34
 scipy==1.4.1
 tensorflow==2.2.0
 gluoncv==0.7.0
