@@ -22,9 +22,10 @@ License:
 """
 import logging
 import time
+
 import numpy as np
 from PIL import Image
-from skimage import io
+
 from libs.strings import PREPROCESS_METHODS
 
 logger = logging.getLogger(__name__)
@@ -376,11 +377,16 @@ class FastRcnn:
         """
         if isinstance(data_input, str):
             try:
-                image = io.imread(data_input)  # Load image if there is a path
+                data_input = Image.open(data_input)
+                # Fix https://github.com/OPHoperHPO/image-background-remove-tool/issues/19
+                data_input = data_input.convert("RGB")
+                image = np.array(data_input)  # Convert PIL image to numpy arr
             except IOError:
                 logger.error('Cannot retrieve image. Please check file: ' + data_input)
                 return False, False
         else:
+            # Fix https://github.com/OPHoperHPO/image-background-remove-tool/issues/19
+            data_input = data_input.convert("RGB")
             image = np.array(data_input)  # Convert PIL image to numpy arr
         x, resized_image = self.data.transforms.presets.rcnn.transform_test(self.nd.array(image))
         return x, image, resized_image
@@ -424,11 +430,16 @@ class MaskRcnn:
         """
         if isinstance(data_input, str):
             try:
-                image = io.imread(data_input)  # Load image if there is a path
+                data_input = Image.open(data_input)
+                # Fix https://github.com/OPHoperHPO/image-background-remove-tool/issues/19
+                data_input = data_input.convert("RGB")
+                image = np.array(data_input)  # Convert PIL image to numpy arr
             except IOError:
                 logger.error('Cannot retrieve image. Please check file: ' + data_input)
                 return False, False
         else:
+            # Fix https://github.com/OPHoperHPO/image-background-remove-tool/issues/19
+            data_input = data_input.convert("RGB")
             image = np.array(data_input)  # Convert PIL image to numpy arr
         x, resized_image = self.data.transforms.presets.rcnn.transform_test(self.nd.array(image))
         return x, image, resized_image
