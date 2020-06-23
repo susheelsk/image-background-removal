@@ -24,9 +24,10 @@ import os
 import logging
 import platform
 import subprocess
-import threading
 import webview
+import threading
 from main import process
+import multiprocessing
 from libs.strings import MODELS_NAMES, PREPROCESS_METHODS, POSTPROCESS_METHODS
 
 logging.basicConfig(level=logging.DEBUG)
@@ -62,7 +63,11 @@ def worker_thread(win, input_files, model, preprocessing_method, postprocessing_
             + str(i + 1) + ' of ' + str(len(input_files)) + " ...'"
         )
         try:
-            process(file, output_file, model, preprocessing_method, postprocessing_method)
+            proc = multiprocessing.Process(target=process,
+                                           args=(file, output_file, model,
+                                                 preprocessing_method, postprocessing_method,))
+            proc.start()
+            proc.join()
         except BaseException as e:
             show_error(win, e)
     win.evaluate_js("window.app.fileUploadButton.textContent = 'Select photos'")
