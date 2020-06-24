@@ -33,19 +33,19 @@ class Config:
     # general
     arc_name = "model.tar.gz"
     # mobile_net_model
-    mn_url = "http://download.tensorflow.org/models/deeplabv3_mnv2_pascal_train_aug_2018_01_29.tar.gz"
+    mn_url = "https://github.com/OPHoperHPO/image-background-remove-tool/releases/download/3.2/deeplabv3_mnv2_pascal_train_aug_2018_01_29.tar.gz"
     mn_dir = os.path.join("..", "models", "mobile_net_model")
     # xception_model
-    xc_url = "http://download.tensorflow.org/models/deeplabv3_pascal_train_aug_2018_01_04.tar.gz"
+    xc_url = "https://github.com/OPHoperHPO/image-background-remove-tool/releases/download/3.2/deeplabv3_pascal_train_aug_2018_01_04.tar.gz"
     xc_dir = os.path.join("..", "models", "xception_model")
     # u2net
-    u2_url = "https://drive.google.com/uc?id=1ao1ovG1Qtx4b7EoskHXmi2E9rp5CHLcZ"
+    u2_url = "https://github.com/OPHoperHPO/image-background-remove-tool/releases/download/3.2/u2net.pth"
     u2_dir = os.path.join("..", "models", "u2net")
     # basnet
-    bn_url = "https://drive.google.com/uc?id=1s52ek_4YTDRt_EOkx1FS53u-vJa0c4nu"
+    bn_url = "https://github.com/OPHoperHPO/image-background-remove-tool/releases/download/3.2/basnet.pth"
     bn_dir = os.path.join("..", "models", "basnet")
     # u2netp
-    u2p_url = "https://drive.google.com/uc?id=1rbSTGKAE-MTxBYHd-51l2hMOQPT_7EPy"
+    u2p_url = "https://github.com/OPHoperHPO/image-background-remove-tool/releases/download/3.2/u2netp.pth"
     u2p_dir = os.path.join("..", "models", "u2netp")
 
 
