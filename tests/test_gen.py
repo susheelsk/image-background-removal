@@ -23,28 +23,53 @@ License:
 import unittest
 from libs import strings
 from main import process
+import multiprocessing
 import os
 
 
-def gen():
+def run(test, i, o, m, prep, postp):
+    try:
+        process(i, o, m, prep, postp)
+    except BaseException as e:
+        test.fail("TESTING FAILED!\n"
+                  "PARAMS:\n"
+                  "model_name: {}\n"
+                  "input_path: {}\n"
+                  "output_path: {}\n"
+                  "preprocessing_method: {}\n"
+                  "postprocessing_method: {}\n"
+                  "Error: {}\n".format(m, i, o, prep, postp, str(e)))
+        exit(1)
+    exit(0)
+
+
+def gen(test):
     for model_name in strings.MODELS_NAMES:
         for preprocess_method_name in strings.PREPROCESS_METHODS:
             for postprocess_method_name in strings.POSTPROCESS_METHODS:
                 if not os.path.exists("docs/imgs/examples/{}/{}/{}".format(model_name,
-                                                                           preprocess_method_name, postprocess_method_name)):
+                                                                           preprocess_method_name,
+                                                                           postprocess_method_name)):
                     os.makedirs("docs/imgs/examples/{}/{}/{}".format(model_name,
                                                                      preprocess_method_name, postprocess_method_name),
                                 exist_ok=True)
                 print(model_name, preprocess_method_name, postprocess_method_name)
-                process("docs/imgs/input/", "docs/imgs/examples/{}/{}/{}".format(model_name,
-                                                                     preprocess_method_name, postprocess_method_name),
-                        model_name, preprocess_method_name, postprocess_method_name)
+                proc = multiprocessing.Process(target=run,
+                                               args=(test, "docs/imgs/input/",
+                                                     "docs/imgs/examples/{}/{}/{}".format(model_name,
+                                                                                          preprocess_method_name,
+                                                                                          postprocess_method_name),
+                                                     model_name, preprocess_method_name, postprocess_method_name,))
+                proc.start()
+                proc.join()
+                if proc.exitcode == 1:
+                    return False
     return True
 
 
 class GenTest(unittest.TestCase):
     def test_generator(self):
-        self.assertEqual(gen(), True)
+        self.assertEqual(gen(self), True)
 
 
 if __name__ == '__main__':
