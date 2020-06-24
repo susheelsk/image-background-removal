@@ -5,7 +5,7 @@ Tool for removing background from image using neural networks
 The program removes the background from photos  
 **********************************************************************
 ### 🎆 Features:  
-* **Added support for new neural networks ([U^2-NET](https://github.com/NathanUA/U-2-Net), [BASNet]((https://github.com/NathanUA/BASNet)) on PyTorch**  
+* **Added support for new neural networks ([U^2-NET](https://github.com/NathanUA/U-2-Net), [BASNet](https://github.com/NathanUA/BASNet)) on PyTorch**  
 * **Significantly improved output image quality**
 * **Added GUI by [@Munawwar](https://github.com/Munawwar)** 
 * __Tensorflow 2.0 compatible__  
