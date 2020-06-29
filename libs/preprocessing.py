@@ -1,7 +1,7 @@
 """
 Name: Pre-processing class file
 Description: This file contains pre-processing classes.
-Version: [release][3.2]
+Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
 Author: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO] .
 License: Apache License 2.0
@@ -58,6 +58,7 @@ class BoundingBoxDetectionFastRcnn:
         self.model = None
         self.prep_image = None
         self.orig_image = None
+        self.foreground = "auto"
 
     @staticmethod
     def trans_paste(bg_img, fg_img, box=(0, 0)):
@@ -152,9 +153,23 @@ class BoundingBoxDetectionFastRcnn:
                 for obj in objects:
                     border = obj[1]
                     obj_crop = orig_image.crop(border)
-                    # TODO: make a special algorithm to improve the removal of background from images with people.
-                    if obj[0] == "person":
+                    if self.foreground == "auto":
                         obj_img = model.process_image(obj_crop)
+                    elif self.foreground == "person":
+                        if obj[0] == "person":
+                            obj_img = model.process_image(obj_crop)
+                        else:
+                            obj_img = Image.new("RGBA", obj_crop.size)
+                    elif self.foreground == "product":
+                        if obj[0] != "person":
+                            obj_img = model.process_image(obj_crop)
+                        else:
+                            obj_img = Image.new("RGBA", obj_crop.size)
+                    elif self.foreground in self.__fast_rcnn__.class_names:
+                        if obj[0] == self.foreground:
+                            obj_img = model.process_image(obj_crop)
+                        else:
+                            obj_img = Image.new("RGBA", obj_crop.size)
                     else:
                         obj_img = model.process_image(obj_crop)
                     obj_images.append([obj_img, obj])
@@ -181,6 +196,7 @@ class BoundingBoxDetectionWithMaskMaskRcnn:
         self.model = None
         self.prep_image = None
         self.orig_image = None
+        self.foreground = "auto"
 
     @staticmethod
     def __mask_extend__(mask, indent=10):
@@ -335,12 +351,25 @@ class BoundingBoxDetectionWithMaskMaskRcnn:
                 for obj in objects:
                     extended_mask = self.__mask_extend__(obj[2])
                     obj_masked = self.__apply_mask__(orig_image, extended_mask)
-
                     border = obj[1]
                     obj_crop_masked = obj_masked.crop(border)
-                    # TODO: make a special algorithm to improve the removal of background from images with people.
-                    if obj[0] == "person":
+                    if self.foreground == "auto":
                         obj_img = model.process_image(obj_crop_masked)
+                    elif self.foreground == "person":
+                        if obj[0] == "person":
+                            obj_img = model.process_image(obj_crop_masked)
+                        else:
+                            obj_img = Image.new("RGBA", obj_crop_masked.size)
+                    elif self.foreground == "product":
+                        if obj[0] != "person":
+                            obj_img = model.process_image(obj_crop_masked)
+                        else:
+                            obj_img = Image.new("RGBA", obj_crop_masked.size)
+                    elif self.foreground in self.__mask_rcnn__.class_names:
+                        if obj[0] == self.foreground:
+                            obj_img = model.process_image(obj_crop_masked)
+                        else:
+                            obj_img = Image.new("RGBA", obj_crop_masked.size)
                     else:
                         obj_img = model.process_image(obj_crop_masked)
                     obj_images.append([obj_img, obj])

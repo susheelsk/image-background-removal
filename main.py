@@ -79,8 +79,8 @@ def __save_image_file__(img, file_name, output_path, wmode):
         img.save(os.path.join(output_path, file_name))
 
 
-def process(input_path, output_path, model_name="u2net",
-            preprocessing_method_name="bbd-fastrcnn", postprocessing_method_name="rtb-bnb"):
+def process(input_path, output_path, model_name=MODELS_NAMES[0],
+            preprocessing_method_name=PREPROCESS_METHODS[0], postprocessing_method_name=POSTPROCESS_METHODS[0]):
     """
     Processes the file.
     :param input_path: The path to the image / folder with the images to be processed.
@@ -125,15 +125,15 @@ def cli():
                         help="Path to output file or dir.", action="store", dest="output_path")
     parser.add_argument('-m', required=False,
                         help="Model name. Can be {} . U2NET is better to use.".format(MODELS_NAMES),
-                        action="store", dest="model_name", default="u2net")
+                        action="store", dest="model_name", default=MODELS_NAMES[0])
     parser.add_argument('-prep', required=False,
                         help="Preprocessing method. Can be {} . `bbd-fastrcnn` is better to use."
                         .format(PREPROCESS_METHODS),
-                        action="store", dest="preprocessing_method_name", default="bbd-fastrcnn")
+                        action="store", dest="preprocessing_method_name", default=PREPROCESS_METHODS[0])
     parser.add_argument('-postp', required=False,
                         help="Postprocessing method. Can be {} ."
                              " `rtb-bnb` is better to use.".format(POSTPROCESS_METHODS),
-                        action="store", dest="postprocessing_method_name", default="rtb-bnb")
+                        action="store", dest="postprocessing_method_name", default=POSTPROCESS_METHODS[0])
     args = parser.parse_args()
     # Parse arguments
     input_path = args.input_path
