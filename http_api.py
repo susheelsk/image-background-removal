@@ -123,7 +123,7 @@ def add_margin(pil_img, top, right, bottom, left, color):
 @app.route("/api/removebg", methods=["POST"])
 def removebg():
     """
-    API метод для удаления фона с изображения.
+    API method for removing background from image.
     :return: Image or error or zip file
     """
     h = dict(request.headers)
