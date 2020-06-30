@@ -22,6 +22,7 @@ License:
 """
 import subprocess
 import unittest
+from libs.strings import *
 
 
 def cli_call_old(input, out, model):
@@ -40,11 +41,15 @@ def cli_call(input, out, model, prep="bla", post="bla"):
 class CliTest(unittest.TestCase):
     def test_cli(self):
         self.assertEqual(cli_call_old("docs/imgs/input/1.jpg", "docs/imgs/examples/u2netp/", "test"),
-                         "docs/imgs/input/1.jpg docs/imgs/examples/u2netp/ test None rtb-bnb2")
+                         "docs/imgs/input/1.jpg docs/imgs/examples/u2netp/ test {} {}".format(PREPROCESS_METHODS[0],
+                                                                                              POSTPROCESS_METHODS[0]))
         self.assertEqual(cli_call_old("docs/imgs/input/1.jpg", "docs/imgs/examples/u2netp/1.png", "test"),
-                         "docs/imgs/input/1.jpg docs/imgs/examples/u2netp/1.png test None rtb-bnb2")
+                         "docs/imgs/input/1.jpg docs/imgs/examples/u2netp/1.png test {} {}".format(
+                             PREPROCESS_METHODS[0],
+                             POSTPROCESS_METHODS[0]))
         self.assertEqual(cli_call_old("docs/imgs/input/", "docs/imgs/examples/u2netp/", "test"),
-                         "docs/imgs/input/ docs/imgs/examples/u2netp/ test None rtb-bnb2")
+                         "docs/imgs/input/ docs/imgs/examples/u2netp/ test {} {}".format(PREPROCESS_METHODS[0],
+                                                                                         POSTPROCESS_METHODS[0]))
         self.assertEqual(cli_call("docs/imgs/input/1.jpg", "docs/imgs/examples/u2netp/", "test", "BLA-BAL", "daw"),
                          "docs/imgs/input/1.jpg docs/imgs/examples/u2netp/ test BLA-BAL daw")
         self.assertEqual(cli_call("docs/imgs/input/1.jpg", "docs/imgs/examples/u2netp/", "test", "dawdwa", "daw"),
