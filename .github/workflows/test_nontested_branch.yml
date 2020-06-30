@@ -34,7 +34,7 @@ jobs:
     - name: Test with pytest
       run: |
         cd tests
-        cp *.py ../
+        mv *.py ../
         cd ..
         pytest
     - name: Packing a docs folder in a zip archive
