@@ -47,21 +47,17 @@ def checkImage(image):
 
     """
     if len(image.shape) > 2:
-        print("ERROR: non-binary image (RGB)")
-        sys.exit()
+        return False
 
     smallest = image.min(axis=0).min(axis=0)  # lowest pixel value: 0 (black)
     largest = image.max(axis=0).max(axis=0)  # highest pixel value: 1 (white)
 
     if smallest == 0 and largest == 0:
-        print("ERROR: non-binary image (all black)")
-        sys.exit()
+        return False
     elif smallest == 255 and largest == 255:
-        print("ERROR: non-binary image (all white)")
-        sys.exit()
+        return False
     elif smallest > 0 or largest < 255:
-        print("ERROR: non-binary image (grayscale)")
-        sys.exit()
+        return False
     else:
         return True
 
@@ -132,38 +128,41 @@ def trimap(image, name, size, number, erosion=False):
                 the last argument is optional; i.e., how many iterations will the image get eroded
     Output    : a trimap
     """
-    checkImage(image)
-    row = image.shape[0]
-    col = image.shape[1]
-    pixels = 2 * size + 1  ## Double and plus 1 to have an odd-sized kernel
-    kernel = np.ones((pixels, pixels), np.uint8)  ## Pixel of extension I get
+    result = checkImage(image)
+    if result:
+        row = image.shape[0]
+        col = image.shape[1]
+        pixels = 2 * size + 1  ## Double and plus 1 to have an odd-sized kernel
+        kernel = np.ones((pixels, pixels), np.uint8)  ## Pixel of extension I get
 
-    if erosion is not False:
-        erosion = int(erosion)
-        erosion_kernel = np.ones((3, 3), np.uint8)  ## Design an odd-sized erosion kernel
-        image = cv2.erode(image, erosion_kernel, iterations=erosion)  ## How many erosion do you expect
-        image = np.where(image > 0, 255, image)  ## Any gray-clored pixel becomes white (smoothing)
-        # Error-handler to prevent entire foreground annihilation
-        if cv2.countNonZero(image) == 0:
-            print("ERROR: foreground has been entirely eroded")
-            sys.exit()
+        if erosion is not False:
+            erosion = int(erosion)
+            erosion_kernel = np.ones((3, 3), np.uint8)  ## Design an odd-sized erosion kernel
+            image = cv2.erode(image, erosion_kernel, iterations=erosion)  ## How many erosion do you expect
+            image = np.where(image > 0, 255, image)  ## Any gray-clored pixel becomes white (smoothing)
+            # Error-handler to prevent entire foreground annihilation
+            if cv2.countNonZero(image) == 0:
+                print("ERROR: foreground has been entirely eroded")
+                sys.exit()
 
-    dilation = cv2.dilate(image, kernel, iterations=1)
+        dilation = cv2.dilate(image, kernel, iterations=1)
 
-    dilation = np.where(dilation == 255, 127, dilation)  ## WHITE to GRAY
-    remake = np.where(dilation != 127, 0, dilation)  ## Smoothing
-    remake = np.where(image > 127, 200, dilation)  ## mark the tumor inside GRAY
+        dilation = np.where(dilation == 255, 127, dilation)  ## WHITE to GRAY
+        remake = np.where(dilation != 127, 0, dilation)  ## Smoothing
+        remake = np.where(image > 127, 200, dilation)  ## mark the tumor inside GRAY
 
-    remake = np.where(remake < 127, 0, remake)  ## Embelishment
-    remake = np.where(remake > 200, 0, remake)  ## Embelishment
-    remake = np.where(remake == 200, 255, remake)  ## GRAY to WHITE
+        remake = np.where(remake < 127, 0, remake)  ## Embelishment
+        remake = np.where(remake > 200, 0, remake)  ## Embelishment
+        remake = np.where(remake == 200, 255, remake)  ## GRAY to WHITE
 
-    #############################################
-    # Ensures only three pixel values available #
-    # TODO: Optimization with Cython            #
-    #############################################
-    for i in range(0, row):
-        for j in range(0, col):
-            if (remake[i, j] != 0 and remake[i, j] != 255):
-                remake[i, j] = 127
-    return remake
+        #############################################
+        # Ensures only three pixel values available #
+        # TODO: Optimization with Cython            #
+        #############################################
+        for i in range(0, row):
+            for j in range(0, col):
+                if remake[i, j] != 0 and remake[i, j] != 255:
+                    remake[i, j] = 127
+        return remake
+    else:
+        return False

@@ -293,7 +293,10 @@ class FBAMatting:
         mask = self.np.array(self.__extact_alpha_channel__(png))
         mask = self.__remove_too_transparent_borders__(mask)
         trimap = self.trimap(mask, "", 50, 2, erosion=True)
-        return Image.fromarray(trimap)
+        if not isinstance(trimap, bool):
+            return Image.fromarray(trimap)
+        else:
+            return False
 
     def run(self, _, image, orig_image):
         """
@@ -303,9 +306,12 @@ class FBAMatting:
         :param orig_image: Source image
         """
         trimap = self.__png2trimap__(image)
-        mask = self.__fba__.process_image(orig_image, trimap)
-        image = self.__process_mask__(orig_image, mask)
-        return image
+        if not isinstance(trimap, bool):  # If something is wrong with trimap, skip processing
+            mask = self.__fba__.process_image(orig_image, trimap)
+            image = self.__process_mask__(orig_image, mask)
+            return image
+        else:
+            return image
 
     @staticmethod
     def __apply_mask__(image, mask):
@@ -372,7 +378,7 @@ class FBAMattingNeural:
         self.torch = torch
 
         logger.debug("Loading FBA Matting neural network")
-        self.model = build_model(self.Config)
+        self.model = build_model(self.Config)   # Initialize the model
         self.model.eval()
 
     def __numpy2torch__(self, x):
@@ -419,13 +425,13 @@ class FBAMattingNeural:
         logger.debug('Start!')
         image = self.__load_image__(image)
         trimap = self.__load_image__(trimap)
-        image_size = image.size
+        w, h = image.size
         # Reduce image size to increase processing speed.
-        if image_size[0] > 1024 or image_size[1] > 1024:
+        if w > 1024 or h > 1024:
             image.thumbnail((1024, 1024))
             trimap.thumbnail((1024, 1024))
         alpha = self.__get_output__(image, trimap)
-        alpha.resize(image_size)
+        alpha = alpha.resize((w, h))
         logger.debug('Finished! Time Spent: {}'.format(str(time.time() - start_time)))
         return alpha
 
