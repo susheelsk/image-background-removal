@@ -26,13 +26,13 @@ from libs.strings import *
 
 
 def cli_call_old(input, out, model):
-    sub = subprocess.Popen("python3 ../main.py -i {} -o {} -m {}".format(input, out, model), shell=True,
+    sub = subprocess.Popen("python3 ./main.py -i {} -o {} -m {}".format(input, out, model), shell=True,
                            stdout=subprocess.PIPE)
     return sub.communicate()[0].decode("UTF-8").replace('\n', '')
 
 
 def cli_call(input, out, model, prep="bla", post="bla"):
-    sub = subprocess.Popen("python3 ../main.py -i {} -o {} -m {} -prep {} -postp {}".format(input, out, model, prep,
+    sub = subprocess.Popen("python3 ./main.py -i {} -o {} -m {} -prep {} -postp {}".format(input, out, model, prep,
                                                                                             post), shell=True,
                            stdout=subprocess.PIPE)
     return sub.communicate()[0].decode("UTF-8").replace('\n', '')
