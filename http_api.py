@@ -22,11 +22,13 @@ License:
 """
 
 # Built-in libraries
+import argparse
 import base64
 import io
 import os
 import time
 import zipfile
+import sys
 from copy import deepcopy
 
 # 3rd party libraries
@@ -43,12 +45,33 @@ from libs.preprocessing import method_detect as preprocessing_detect
 from libs.strings import MODELS_NAMES, POSTPROCESS_METHODS, PREPROCESS_METHODS
 
 
+# parse args and set defaults
+parser = argparse.ArgumentParser(description="HTTP API to remove background from images", usage="")
+parser.add_argument('-m', required=False,
+                        help="Model name. Can be {} . U2NET is better to use.".format(MODELS_NAMES),
+                        action="store", dest="model_name", default=MODELS_NAMES[0] # "u2net"
+)
+parser.add_argument("-auth", type=str2bool, nargs='?',
+                        const=True, default=False,
+                        dest="auth",
+                        help="Enable or Disable the authentication"
+)
+parser.add_argument('-port', required=False,
+                        help="Port",
+                        action="store", dest="port", default=5000
+)
+parser.add_argument('-host', required=False,
+                        help="Host",
+                        action="store", dest="host", default="127.0.0.1"
+)
+args = parser.parse_args()
+
 class Config:
     """Config object"""
-    model = MODELS_NAMES[0]  # "u2net"
+    model = args.model_name
     prep_method = PREPROCESS_METHODS[0]  # "None"
     post_method = POSTPROCESS_METHODS[0]  # "fba"
-    auth = True  # Token Client Authentication
+    auth = args.auth  # Token Client Authentication
     admin_token = "admin"  # Admin token
     allowed_tokens = ["test"]  # All allowed tokens
 
@@ -525,6 +548,16 @@ def add_margin(pil_img, top, right, bottom, left, color):
     result.paste(pil_img, (left, top))
     return result
 
+# @link https://stackoverflow.com/a/43357954/3443137
+def str2bool(v):
+    if isinstance(v, bool):
+       return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host=args.host, port=args.port)
