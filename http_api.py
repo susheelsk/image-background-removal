@@ -65,14 +65,24 @@ parser.add_argument('-host', required=False,
                         help="Host",
                         action="store", dest="host", default="127.0.0.1"
 )
+parser.add_argument('-prep', required=False,
+                        help="Preprocessing method. Can be {} . `bbd-fastrcnn` is better to use."
+                        .format(PREPROCESS_METHODS),
+                        action="store", dest="prep", default=PREPROCESS_METHODS[0])
+parser.add_argument('-postp', required=False,
+                        help="Postprocessing method. Can be {} ."
+                             " `rtb-bnb` is better to use.".format(POSTPROCESS_METHODS),
+                        action="store", dest="postp", default=POSTPROCESS_METHODS[0])
 args = parser.parse_args()
 
 class Config:
     """Config object"""
     model = args.model_name
-    prep_method = PREPROCESS_METHODS[0]  # "None"
-    post_method = POSTPROCESS_METHODS[0]  # "fba"
+    prep_method = args.prep  # "None"
+    post_method = args.postp  # "fba"
     auth = args.auth  # Token Client Authentication
+    port = args.port # 5000
+    host = args.host # "127.0.0.1
     admin_token = "admin"  # Admin token
     allowed_tokens = ["test"]  # All allowed tokens
 
@@ -550,4 +560,4 @@ def add_margin(pil_img, top, right, bottom, left, color):
     return result
 
 if __name__ == '__main__':
-    app.run(host=args.host, port=args.port)
+    app.run(host=config.host, port=config.port)
