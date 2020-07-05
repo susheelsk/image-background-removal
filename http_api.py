@@ -43,6 +43,7 @@ from libs.networks import model_detect
 from libs.postprocessing import method_detect as postprocessing_detect
 from libs.preprocessing import method_detect as preprocessing_detect
 from libs.strings import MODELS_NAMES, POSTPROCESS_METHODS, PREPROCESS_METHODS
+from libs.args import str2bool
 
 
 # parse args and set defaults
@@ -121,7 +122,7 @@ def removebg():
         headers[key.lower()] = val
     if "x-api-key" in headers.keys() or config.auth is False:
         if headers["x-api-key"] in config.allowed_tokens \
-                or headers["x-api-key"] == config.admin_token or config.auth is False:
+                or config.auth is False or headers["x-api-key"] == config.admin_token:
             if "content-type" in headers.keys():
                 if "multipart/form-data" in request.content_type:
                     try:
@@ -172,7 +173,7 @@ def status():
         val = h[key]
         headers[key.lower()] = val
     if "x-api-key" in headers.keys() or config.auth is False:
-        if headers["x-api-key"] == config.admin_token or config.auth is False:
+        if config.auth is False or headers["x-api-key"] == config.admin_token:
             this = psutil.Process(os.getpid())
             data = {
                 "status": {
@@ -547,17 +548,6 @@ def add_margin(pil_img, top, right, bottom, left, color):
     result = Image.new(pil_img.mode, (new_width, new_height), color)
     result.paste(pil_img, (left, top))
     return result
-
-# @link https://stackoverflow.com/a/43357954/3443137
-def str2bool(v):
-    if isinstance(v, bool):
-       return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 if __name__ == '__main__':
     app.run(host=args.host, port=args.port)

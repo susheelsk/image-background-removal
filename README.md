@@ -60,8 +60,20 @@ _This setup.bat script loads the trained model._
 * Run ```./setup.sh``` and select the model you need.
 _This setup.sh script loads the pre-trained model._  
 **********************************************************************
-### 🖵 Running GUI app:
+### 🖵 Running the GUI app:
 ```python3 gui.py```
+**********************************************************************
+### 🖵 Running the HTTP API server:
+```python3 http_api.py```
+
+Example query:
+
+```bash
+curl -H 'X-API-Key: test'                      \
+       -F 'image_file=@/home/user/test.jpg'                \
+       -f http://localhost:5000/api/removebg -o no-bg.png
+```
+
 **********************************************************************
 ### 🧰 Running the script:  
  * ```python3 main.py -i <input_path> -o <output_path> -m <model_type> -prep <preprocessing_method> -postp <postprocessing_method>```  
