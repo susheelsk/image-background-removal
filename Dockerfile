@@ -11,7 +11,7 @@ RUN pip3 install --no-cache-dir -r requirements_http.txt
 
 COPY . .
 
-RUN (cd tools && python3 setup.py u2net)
+RUN (cd tools && python3 setup.py all)
 
 
 
