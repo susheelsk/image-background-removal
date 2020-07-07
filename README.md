@@ -98,7 +98,9 @@ docker build --tag image-background-removal-tool:latest .
 
 Start a container from the image
 ```bash
-docker run --rm -p 5000:5000 \
+docker run -d --restart \
+ --name image-background-removal-tool-http-api \
+ -p 5000:5000 \
  -e HOST=0.0.0.0   \
  -e PORT=5000  \
  -e AUTH=false  \
