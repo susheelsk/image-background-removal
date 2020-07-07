@@ -120,19 +120,17 @@ def cli():
     """CLI"""
     parser = argparse.ArgumentParser(description=DESCRIPTION, usage=ARGS_HELP)
     parser.add_argument('-i', required=True,
-                        help="Path to input file or dir.", action="store", dest="input_path")
+                        help=ARGS["-i"][1], action="store", dest="input_path")
     parser.add_argument('-o', required=True,
-                        help="Path to output file or dir.", action="store", dest="output_path")
+                        help=ARGS["-o"][1], action="store", dest="output_path")
     parser.add_argument('-m', required=False,
-                        help="Model name. Can be {} . U2NET is better to use.".format(MODELS_NAMES),
+                        help=ARGS["-m"][1],
                         action="store", dest="model_name", default=MODELS_NAMES[0])
     parser.add_argument('-prep', required=False,
-                        help="Preprocessing method. Can be {} . `bbd-fastrcnn` is better to use."
-                        .format(PREPROCESS_METHODS),
+                        help=ARGS["-prep"][1],
                         action="store", dest="preprocessing_method_name", default=PREPROCESS_METHODS[0])
     parser.add_argument('-postp', required=False,
-                        help="Postprocessing method. Can be {} ."
-                             " `rtb-bnb` is better to use.".format(POSTPROCESS_METHODS),
+                        help=ARGS["-postp"][1],
                         action="store", dest="postprocessing_method_name", default=POSTPROCESS_METHODS[0])
     args = parser.parse_args()
     # Parse arguments

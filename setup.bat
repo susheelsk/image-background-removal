@@ -1,2 +1,2 @@
 cd tools
-python setup.py
+python3 setup.py

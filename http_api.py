@@ -1,9 +1,9 @@
 """
-Name: http Flask API
+Name: Http Flask API
 Description: This file contains an interface for interacting with this tool through http requests.
 Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
-Authors: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO].
+Authors: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO], Pubkey [https://github.com/pubkey].
 License: Apache License 2.0
 License:
    Copyright 2020 OPHoperHPO
@@ -28,8 +28,9 @@ import io
 import os
 import time
 import zipfile
-import sys
+import multiprocessing
 from copy import deepcopy
+
 
 # 3rd party libraries
 import psutil
@@ -42,61 +43,67 @@ from flask_cors import CORS
 from libs.networks import model_detect
 from libs.postprocessing import method_detect as postprocessing_detect
 from libs.preprocessing import method_detect as preprocessing_detect
-from libs.strings import MODELS_NAMES, POSTPROCESS_METHODS, PREPROCESS_METHODS
+from libs.strings import MODELS_NAMES, POSTPROCESS_METHODS, PREPROCESS_METHODS, ARGS
 from libs.args import str2bool
-
 
 # parse args and set defaults
 parser = argparse.ArgumentParser(description="HTTP API to remove background from images", usage="")
 parser.add_argument('-m', required=False,
-                        help="Model name. Can be {} . U2NET is better to use.".format(MODELS_NAMES),
-                        action="store", dest="model_name", default=MODELS_NAMES[0] # "u2net"
-)
+                    help=ARGS["-m"][1],
+                    action="store", dest="model_name", default=MODELS_NAMES[0]
+                    )
 parser.add_argument("-auth", type=str2bool, nargs='?',
-                        const=True, default=False,
-                        dest="auth",
-                        help="Enable or Disable the authentication"
-)
+                    const=True, default=False,
+                    dest="auth",
+                    help="Enable or Disable the authentication"
+                    )
 parser.add_argument('-port', required=False,
-                        help="Port",
-                        action="store", dest="port", default=5000
-)
+                    help="Port",
+                    action="store", dest="port", default=5000
+                    )
 parser.add_argument('-host', required=False,
-                        help="Host",
-                        action="store", dest="host", default="127.0.0.1"
-)
+                    help="Host",
+                    action="store", dest="host", default="0.0.0.0"
+                    )
 parser.add_argument('-prep', required=False,
-                        help="Preprocessing method. Can be {} . `bbd-fastrcnn` is better to use."
-                        .format(PREPROCESS_METHODS),
-                        action="store", dest="prep", default=PREPROCESS_METHODS[0])
+                    help=ARGS["-prep"][1],
+                    action="store", dest="prep", default=PREPROCESS_METHODS[0])
 parser.add_argument('-postp', required=False,
-                        help="Postprocessing method. Can be {} ."
-                             " `rtb-bnb` is better to use.".format(POSTPROCESS_METHODS),
-                        action="store", dest="postp", default=POSTPROCESS_METHODS[0])
+                    help=ARGS["-postp"][1],
+                    action="store", dest="postp", default=POSTPROCESS_METHODS[0])
 args = parser.parse_args()
 
-class Config:
-    """Config object"""
-    model = args.model_name
-    prep_method = args.prep  # "None"
-    post_method = args.postp  # "fba"
-    auth = args.auth  # Token Client Authentication
-    port = args.port # 5000
-    host = args.host # "127.0.0.1
-    admin_token = "admin"  # Admin token
-    allowed_tokens = ["test"]  # All allowed tokens
-
+if "IS_DOCKER_CONTAINER" in os.environ.keys():
+    class Config:
+        """Config object"""
+        model = os.environ["MODEL"]  # u2net
+        prep_method = os.environ["PREPROCESSING"]  # None
+        post_method = os.environ["POSTPROCESSING"]  # fba
+        auth = os.environ["AUTH"]  # Token Client Authentication
+        port = int(os.environ["PORT"])  # 5000
+        host = os.environ["HOST"]  # "127.0.0.1
+        admin_token = os.environ["ADMIN_TOKEN"]  # Admin token
+        allowed_tokens = list(os.environ["ALLOWED_TOKENS_PYTHON_ARR"])  # All allowed tokens
+        procs_num_max = 1  # The maximum number of processes that can process a request
+else:
+    class Config:
+        """Config object"""
+        model = args.model_name  # u2net
+        prep_method = args.prep  # None
+        post_method = args.postp  # fba
+        auth = args.auth  # Token Client Authentication
+        port = args.port  # 5000
+        host = args.host  # "127.0.0.1
+        admin_token = "admin"  # Admin token
+        allowed_tokens = ["test"]  # All allowed tokens
+        procs_num_max = 1  # The maximum number of processes that can process a request
 
 # Init vars
 config = Config()  # Init config object
 app = Flask(__name__)  # Init flask app
 CORS(app)  # Enable Cross-origin resource sharing
 start_time = time.time()  # This time is needed to get uptime
-
-# Tool initialization
-prep_method = preprocessing_detect(config.prep_method)
-post_method = postprocessing_detect(config.post_method)
-model = model_detect(config.model)
+procs = 0  # Number of running processes
 
 default_settings = \
     {  # API settings by default. See https://www.remove.bg/api for more details.
@@ -125,6 +132,7 @@ def removebg():
     API method for removing background from image.
     :return: Image or error or zip file
     """
+    global procs
     h = dict(request.headers)
     headers = dict()
     for key in h:
@@ -142,8 +150,18 @@ def removebg():
                             params[key] = data[key]
                     except BaseException:
                         return error_dict("Something went wrong"), 400
-                    return process_remove_bg(params, request)
-
+                    if procs >= config.procs_num_max:
+                        while procs >= config.procs_num_max:
+                            pass
+                    if procs < config.procs_num_max:
+                        procs += 1
+                        q = multiprocessing.Queue()
+                        proc = multiprocessing.Process(target=process_remove_bg,
+                                                       args=(params, request, q, False,))
+                        proc.start()
+                        proc.join()
+                        procs -= 1
+                    return q.get()
                 elif request.content_type == "application/x-www-form-urlencoded":
                     try:
                         params = deepcopy(default_settings)
@@ -152,7 +170,18 @@ def removebg():
                             params[key] = data[key]
                     except BaseException:
                         return error_dict("Something went wrong"), 400
-                    return process_remove_bg(params, request, is_json_or_www_encoded=True)
+                    if procs >= config.procs_num_max:
+                        while procs >= config.procs_num_max:
+                            pass
+                    if procs < config.procs_num_max:
+                        procs += 1
+                        q = multiprocessing.Queue()
+                        proc = multiprocessing.Process(target=process_remove_bg,
+                                                       args=(params, request, q, True,))
+                        proc.start()
+                        proc.join()
+                        procs -= 1
+                    return q.get()
                 elif request.content_type == "application/json":
                     try:
                         params = deepcopy(default_settings)
@@ -161,7 +190,18 @@ def removebg():
                             params[key] = data[key]
                     except BaseException:
                         return error_dict("Something went wrong"), 400
-                    return process_remove_bg(params, request, is_json_or_www_encoded=True)
+                    if procs >= config.procs_num_max:
+                        while procs >= config.procs_num_max:
+                            pass
+                    if procs < config.procs_num_max:
+                        procs += 1
+                        q = multiprocessing.Queue()
+                        proc = multiprocessing.Process(target=process_remove_bg,
+                                                       args=(params, request, q, True,))
+                        proc.start()
+                        proc.join()
+                        procs -= 1
+                    return q.get()
                 else:
                     return error_dict("Invalid request content type"), 400
             else:
@@ -240,15 +280,23 @@ def error_dict(error_text: str):
     return resp
 
 
+# TODO Make a queue for processing requests and a method for quickly changing models and methods of image processing
+# TODO Move initialization somewhere else
 # noinspection PyBroadException
-def process_remove_bg(params, request, is_json_or_www_encoded=False):
+def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
     """
     Handles a request to the removebg api method
     :param params: parameters
     :param request: flask request
+    :param queue: Queue for sending a response
     :param is_json_or_www_encoded: is "json" or "x-www-form-urlencoded" content-type
     :return:
     """
+    # Tool initialization
+    prep_method = preprocessing_detect(config.prep_method)
+    post_method = postprocessing_detect(config.post_method)
+    model = model_detect(config.model)
+
     image_loaded = False
     image = None
     if "image_file_b64" in params.keys() and image_loaded is False:
@@ -257,7 +305,8 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
             try:
                 image = Image.open(io.BytesIO(base64.b64decode(value)))
             except BaseException:
-                return error_dict("Error decode image!"), 400
+                queue.put((error_dict("Error decode image!"), 400))
+                exit(0)
             image_loaded = True
         else:
             if "image_url" in params.keys() and image_loaded is False:
@@ -267,14 +316,17 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
                         image = Image.open(io.BytesIO(requests.get(value).content))
                         image_loaded = True
                     except BaseException:
-                        return error_dict("Error download image!"), 400
+                        queue.put((error_dict("Error download image!"), 400))
+                        exit(0)
     if not is_json_or_www_encoded:
         if image_loaded is False:
             if 'image_file' not in request.files:
-                return error_dict("File not found"), 400
+                queue.put((error_dict("File not found"), 400))
+                exit(0)
             image = request.files['image_file'].read()
             if len(image) == 0:
-                return error_dict("Empty image"), 400
+                queue.put((error_dict("Empty image"), 400))
+                exit(0)
             image = Image.open(io.BytesIO(image))  # Convert bytes to PIL image
 
     if "size" in params.keys():
@@ -305,31 +357,38 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
                     try:
                         coord = int(coord)
                     except BaseException:
-                        return error_dict("Error converting roi coordinate string to number!"), 400
+                        queue.put((error_dict("Error converting roi coordinate string to number!"), 400))
+                        exit(0)
                     if (i == 0 or i == 2) and coord > image.size[0]:
-                        return error_dict(
-                            "The roi coordinate cannot be larger than the image size."), 400
+                        queue.put((error_dict(
+                            "The roi coordinate cannot be larger than the image size."), 400))
+                        exit(0)
                     elif (i == 1 or i == 3) and coord > image.size[1]:
-                        return error_dict(
-                            "The roi coordinate cannot be larger than the image size."), 400
+                        queue.put((error_dict(
+                            "The roi coordinate cannot be larger than the image size."), 400))
+                        exit(0)
                     roi_box[i] = int(coord)
                 elif "%" in coord:
                     coord = coord.replace("%", "")
                     try:
                         coord = int(coord)
                     except BaseException:
-                        return error_dict("Error converting roi coordinate string to number!"), 400
+                        queue.put((error_dict("Error converting roi coordinate string to number!"), 400))
+                        exit(0)
                     if coord > 100:
-                        return error_dict("The coordinate cannot be more than 100%"), 400
+                        queue.put((error_dict("The coordinate cannot be more than 100%"), 400))
+                        exit(0)
                     elif coord < 0:
-                        return error_dict("Coordinate cannot be less than 0%"), 400
+                        queue.put((error_dict("Coordinate cannot be less than 0%"), 400))
+                        exit(0)
                     if i == 0 or i == 2:
                         coord = int(image.size[0] * coord / 100)
                     elif i == 1 or i == 3:
                         coord = int(image.size[1] * coord / 100)
                     roi_box[i] = coord
                 else:
-                    return error_dict("Something wrong with roi coordinates!"), 400
+                    queue.put((error_dict("Something wrong with roi coordinates!"), 400))
+                    exit(0)
 
     new_image = image.copy()
     new_image = new_image.crop(roi_box)
@@ -346,11 +405,14 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
             try:
                 value = int(value)
             except BaseException:
-                return error_dict("Error converting scale string to number!"), 400
+                queue.put((error_dict("Error converting scale string to number!"), 400))
+                exit(0)
             if value > 100:
-                return error_dict("The scale cannot be more than 100%"), 400
+                queue.put((error_dict("The scale cannot be more than 100%"), 400))
+                exit(0)
             elif value <= 0:
-                return error_dict("scale cannot be less than 1%"), 400
+                queue.put((error_dict("scale cannot be less than 1%"), 400))
+                exit(0)
             new_image.thumbnail((int(image.size[0] * value / 100),
                                  int(image.size[1] * value / 100)), resample=Image.ANTIALIAS)
             scaled = True
@@ -365,11 +427,13 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
                     try:
                         crop_margin = int(crop_margin)
                     except BaseException:
-                        return error_dict("Error converting crop_margin string to number!"), 400
+                        queue.put((error_dict("Error converting crop_margin string to number!"), 400))
+                        exit(0)
                     crop_margin = abs(crop_margin)
                     if crop_margin > 500:
-                        return error_dict(
-                            "The crop_margin cannot be larger than the original image size."), 400
+                        queue.put((error_dict(
+                            "The crop_margin cannot be larger than the original image size."), 400))
+                        exit(0)
                     new_image = add_margin(new_image, crop_margin,
                                            crop_margin, crop_margin, crop_margin, (0, 0, 0, 0))
                 elif "%" in crop_margin:
@@ -377,11 +441,14 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
                     try:
                         crop_margin = int(crop_margin)
                     except BaseException:
-                        return error_dict("Error converting crop_margin string to number!"), 400
+                        queue.put((error_dict("Error converting crop_margin string to number!"), 400))
+                        exit(0)
                     if crop_margin > 100:
-                        return error_dict("The crop_margin cannot be more than 100%"), 400
+                        queue.put((error_dict("The crop_margin cannot be more than 100%"), 400))
+                        exit(0)
                     elif crop_margin < 0:
-                        return error_dict("Crop_margin cannot be less than 0%"), 400
+                        queue.put((error_dict("Crop_margin cannot be less than 0%"), 400))
+                        exit(0)
                     new_image = add_margin(new_image, int(new_image.size[1] * crop_margin / 100),
                                            int(new_image.size[0] * crop_margin / 100),
                                            int(new_image.size[1] * crop_margin / 100),
@@ -397,11 +464,14 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
                         try:
                             value = int(value)
                         except BaseException:
-                            return error_dict("Error converting position string to number!"), 400
+                            queue.put((error_dict("Error converting position string to number!"), 400))
+                            exit(0)
                         if value > 100:
-                            return error_dict("The position cannot be more than 100%"), 400
+                            queue.put((error_dict("The position cannot be more than 100%"), 400))
+                            exit(0)
                         elif value < 0:
-                            return error_dict("position cannot be less than 0%"), 400
+                            queue.put((error_dict("position cannot be less than 0%"), 400))
+                            exit(0)
                         new_image = trans_paste(Image.new("RGBA", image.size), new_image,
                                                 (int(image.size[0] * value / 100),
                                                  int(image.size[1] * value / 100)))
@@ -412,13 +482,17 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
                         try:
                             val = int(val)
                         except BaseException:
-                            return error_dict("Error converting position string to number!"), 400
+                            queue.put((error_dict("Error converting position string to number!"), 400))
+                            exit(0)
                         if val < 0:
-                            return error_dict("position cannot be less than 0px"), 400
+                            queue.put((error_dict("position cannot be less than 0px"), 400))
+                            exit(0)
                         if i == 0 and val > image.size[0]:
-                            return error_dict("position cannot be greater than image size"), 400
+                            queue.put((error_dict("position cannot be greater than image size"), 400))
+                            exit(0)
                         elif i == 1 and val > image.size[1]:
-                            return error_dict("position cannot be greater than image size"), 400
+                            queue.put((error_dict("position cannot be greater than image size"), 400))
+                            exit(0)
                         value[i] = val
                     new_image = trans_paste(Image.new("RGBA", image.size), new_image,
                                             (value[0], value[1]))
@@ -441,7 +515,8 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
                         try:
                             color = ImageColor.getcolor("#" + value, "RGB")
                         except BaseException:
-                            return error_dict("Error converting bg_color string to color tuple!"), 400
+                            queue.put((error_dict("Error converting bg_color string to color tuple!"), 400))
+                            exit(0)
                     bg = Image.new("RGBA", new_image.size, color)
                     bg = trans_paste(bg, new_image, (0, 0))
                     new_image = bg.copy()
@@ -452,7 +527,8 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
                     try:
                         bg = Image.open(io.BytesIO(requests.get(value).raw))
                     except BaseException:
-                        return error_dict("Error download background image!"), 400
+                        queue.put((error_dict("Error download background image!"), 400))
+                        exit(0)
                     bg = bg.resize(new_image.size)
                     bg = trans_paste(bg, new_image, (0, 0))
                     new_image = bg.copy()
@@ -461,7 +537,8 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
                 if "bg_image_file" in request.files and bg_chaged is False:
                     bg = request.files['image_file'].read()
                     if len(bg) == 0:
-                        return error_dict("Empty background image"), 400
+                        queue.put((error_dict("Empty background image"), 400))
+                        exit(0)
                     bg = Image.open(io.BytesIO(bg))  # Convert bytes to PIL image
                     bg = bg.resize(new_image.size)
                     bg = trans_paste(bg, new_image, (0, 0))
@@ -478,7 +555,8 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
             resp.headers["X-Type"] = "other"
             resp.headers["X-Width"] = new_image.size[0]
             resp.headers["X-Height"] = new_image.size[1]
-            return resp
+            queue.put((resp))
+            exit(0)
         elif value == "zip":
             mask = __extact_alpha_channel__(new_image)
             mask_buff = io.BytesIO()
@@ -506,7 +584,8 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
             response.headers["X-Type"] = "other"  # TODO: Associate this with an object classifier
             response.headers["X-Width"] = new_image.size[0]
             response.headers["X-Height"] = new_image.size[1]
-            return response
+            queue.put((response))
+            exit(0)
         else:
             buff = io.BytesIO()
             new_image.save(buff, 'PNG')
@@ -516,7 +595,8 @@ def process_remove_bg(params, request, is_json_or_www_encoded=False):
             resp.headers["X-Type"] = "other"  # TODO: Associate this with an object classifier
             resp.headers["X-Width"] = new_image.size[0]
             resp.headers["X-Height"] = new_image.size[1]
-            return resp
+            queue.put((resp))
+            exit(0)
 
 
 def trans_paste(bg_img, fg_img, box=(0, 0)):
@@ -558,6 +638,7 @@ def add_margin(pil_img, top, right, bottom, left, color):
     result = Image.new(pil_img.mode, (new_width, new_height), color)
     result.paste(pil_img, (left, top))
     return result
+
 
 if __name__ == '__main__':
     app.run(host=config.host, port=config.port)
