@@ -3,7 +3,7 @@ Name: Args file
 Description: This file contains helper methods for parsing the arguments
 Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
-Author: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO] .
+Author: Pubkey [https://github.com/pubkey].
 License: Apache License 2.0
 License:
    Copyright 2020 OPHoperHPO
