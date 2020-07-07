@@ -62,23 +62,23 @@ Mxnet and Gluoncv are used for image preprocessing methods and are installed opt
 > _This setup.sh script loads the pre-trained model._ \
 > The program was tested on python version 3.7.3
 **********************************************************************
-### GUI screenshot:
+### 🖼️ GUI screenshot:
 ![](/docs/imgs/screenshots/gui.png)
 **********************************************************************
 ### 🖵 Running the GUI app:
 ```python3 gui.py```
 **********************************************************************
-### 🖵 Running the HTTP API server:
+### 📦 Running the HTTP API server:
 
-With defaults:
-
+#### 🧲 With defaults:
 ```python3 http_api.py```
 
-With custom arguments:
+#### 🧲 With custom arguments:
 
 ```python3 http_api.py -auth false -port 5000 -host 0.0.0.0 -m u2net```
 
-Example usage with curl:
+
+#### ⏩ Example usage with curl:
 ```bash
 curl -H 'X-API-Key: test'                                   \
        -F 'image_file=@/home/user/test.jpg'                 \
@@ -86,17 +86,15 @@ curl -H 'X-API-Key: test'                                   \
        -f http://localhost:5000/api/removebg -o no-bg.png
 ```
 
-### 🖵 Running the HTTP API server via docker:
-
-Using the API via docker is a fast and non-complex way to have a working API. The docker image uses `u2net` as default and runs without authentication.
-
-Build the docker image
-
+### 📦 Running the HTTP API server via docker:
+Using the API via docker is a **fast** and non-complex way to have a working API.  \
+The docker image uses `u2net` as default and runs without authentication.
+#### 🔨 Building your own image:
+* Build the docker image
 ```bash
 docker build --tag image-background-removal-tool:latest .
 ```
-
-Start a container from the image
+* Start a container from the image
 ```bash
 docker run -d --restart unless-stopped \
  --name image-background-removal-tool-http-api \
@@ -144,7 +142,7 @@ You can thank me for developing this project, provide financial support for the 
   ⭐[**Boosty**⭐](https://boosty.to/anodev)   \
   ⭐[**DonationAlerts**⭐](https://www.donationalerts.com/r/anodev_development)  
 **********************************************************************
-### 😀 Sample Result:  
+### 🖼️ Sample Result:
 * __More sample images in [docs/imgs/input/](docs/imgs/input) and [docs/imgs/examples/](docs/imgs/examples) folders.__  \
 Examples of images from the background are contained in folders in the following format: `{model_name}/{preprocessing_method_name}/{postprocessing_method_name}`
 * Input:   
