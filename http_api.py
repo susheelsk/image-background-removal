@@ -22,11 +22,13 @@ License:
 """
 
 # Built-in libraries
+import argparse
 import base64
 import io
 import os
 import time
 import zipfile
+import sys
 from copy import deepcopy
 
 # 3rd party libraries
@@ -41,14 +43,46 @@ from libs.networks import model_detect
 from libs.postprocessing import method_detect as postprocessing_detect
 from libs.preprocessing import method_detect as preprocessing_detect
 from libs.strings import MODELS_NAMES, POSTPROCESS_METHODS, PREPROCESS_METHODS
+from libs.args import str2bool
 
+
+# parse args and set defaults
+parser = argparse.ArgumentParser(description="HTTP API to remove background from images", usage="")
+parser.add_argument('-m', required=False,
+                        help="Model name. Can be {} . U2NET is better to use.".format(MODELS_NAMES),
+                        action="store", dest="model_name", default=MODELS_NAMES[0] # "u2net"
+)
+parser.add_argument("-auth", type=str2bool, nargs='?',
+                        const=True, default=False,
+                        dest="auth",
+                        help="Enable or Disable the authentication"
+)
+parser.add_argument('-port', required=False,
+                        help="Port",
+                        action="store", dest="port", default=5000
+)
+parser.add_argument('-host', required=False,
+                        help="Host",
+                        action="store", dest="host", default="127.0.0.1"
+)
+parser.add_argument('-prep', required=False,
+                        help="Preprocessing method. Can be {} . `bbd-fastrcnn` is better to use."
+                        .format(PREPROCESS_METHODS),
+                        action="store", dest="prep", default=PREPROCESS_METHODS[0])
+parser.add_argument('-postp', required=False,
+                        help="Postprocessing method. Can be {} ."
+                             " `rtb-bnb` is better to use.".format(POSTPROCESS_METHODS),
+                        action="store", dest="postp", default=POSTPROCESS_METHODS[0])
+args = parser.parse_args()
 
 class Config:
     """Config object"""
-    model = MODELS_NAMES[0]  # "u2net"
-    prep_method = PREPROCESS_METHODS[0]  # "None"
-    post_method = POSTPROCESS_METHODS[0]  # "fba"
-    auth = True  # Token Client Authentication
+    model = args.model_name
+    prep_method = args.prep  # "None"
+    post_method = args.postp  # "fba"
+    auth = args.auth  # Token Client Authentication
+    port = args.port # 5000
+    host = args.host # "127.0.0.1
     admin_token = "admin"  # Admin token
     allowed_tokens = ["test"]  # All allowed tokens
 
@@ -98,7 +132,7 @@ def removebg():
         headers[key.lower()] = val
     if "x-api-key" in headers.keys() or config.auth is False:
         if headers["x-api-key"] in config.allowed_tokens \
-                or headers["x-api-key"] == config.admin_token or config.auth is False:
+                or config.auth is False or headers["x-api-key"] == config.admin_token:
             if "content-type" in headers.keys():
                 if "multipart/form-data" in request.content_type:
                     try:
@@ -149,7 +183,7 @@ def status():
         val = h[key]
         headers[key.lower()] = val
     if "x-api-key" in headers.keys() or config.auth is False:
-        if headers["x-api-key"] == config.admin_token or config.auth is False:
+        if config.auth is False or headers["x-api-key"] == config.admin_token:
             this = psutil.Process(os.getpid())
             data = {
                 "status": {
@@ -525,6 +559,5 @@ def add_margin(pil_img, top, right, bottom, left, color):
     result.paste(pil_img, (left, top))
     return result
 
-
 if __name__ == '__main__':
-    app.run()
+    app.run(host=config.host, port=config.port)

@@ -149,7 +149,17 @@ def setup():
 def cli():
     MODELS_NAMES.append("fba_matting")  # TODO Rewrite setup tool
     print("Choose which model you want to install:\n{}\nall".format('\n'.join(MODELS_NAMES)))
-    model_name = input("Enter model name: ")
+
+    print("Number of arguments:  ", len(sys.argv))
+    print("Argument List:", str(sys.argv))
+
+    if len(sys.argv) == 2:
+        model_name = sys.argv[1]
+    else:
+        model_name = input("Enter model name: ")
+
+    print("model_name: ", model_name)
+
     if model_name == "all":
         setup()
     elif model_name == "fba_matting":

@@ -60,8 +60,43 @@ _This setup.bat script loads the trained model._
 * Run ```./setup.sh``` and select the model you need.
 _This setup.sh script loads the pre-trained model._  
 **********************************************************************
-### 🖵 Running GUI app:
+### 🖵 Running the GUI app:
 ```python3 gui.py```
+**********************************************************************
+### 🖵 Running the HTTP API server:
+
+With defaults:
+
+```python3 http_api.py```
+
+With custom arguments:
+
+```python3 http_api.py -auth false -port 5000 -host 0.0.0.0 -m u2net```
+
+Example usage with curl:
+```bash
+curl -H 'X-API-Key: test'                                   \
+       -F 'image_file=@/home/user/test.jpg'                 \
+       -F 'size=auto'                                       \ # oneOf 'preview', 'medium', 'hd', 'auto'
+       -f http://localhost:5000/api/removebg -o no-bg.png
+```
+
+### 🖵 Running the HTTP API server via docker:
+
+Using the API via docker is a fast and non-complex way to have a working API. The docker image uses `u2net` as default and runs without authentication.
+
+Build the docker image
+
+```bash
+docker build --tag image-background-removal-tool:latest .
+```
+
+Start a container from the image
+```bash
+docker run --rm -p 5000:5000 image-background-removal-tool:latest
+```
+
+
 **********************************************************************
 ### 🧰 Running the script:  
  * ```python3 main.py -i <input_path> -o <output_path> -m <model_type> -prep <preprocessing_method> -postp <postprocessing_method>```  
