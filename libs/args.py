@@ -20,7 +20,7 @@ License:
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-
+from argparse import ArgumentTypeError
 
 def str2bool(v):
     """
@@ -34,4 +34,4 @@ def str2bool(v):
     elif v.lower() in ('no', 'false', 'f', 'n', '0'):
         return False
     else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
+        raise ArgumentTypeError('Boolean value expected.')
