@@ -143,7 +143,7 @@ You can thank me for developing this project, provide financial support for the 
   ⭐[**DonationAlerts**⭐](https://www.donationalerts.com/r/anodev_development)  
 **********************************************************************
 ### 🖼️ Sample Result:
-* __More sample images in [docs/imgs/input/](docs/imgs/input) and [docs/imgs/examples/](docs/imgs/examples) folders.__  \
+* **More sample images in [docs/imgs/input/](docs/imgs/input) and [docs/imgs/examples/](docs/imgs/examples) folders.**  \
 Examples of images from the background are contained in folders in the following format: `{model_name}/{preprocessing_method_name}/{postprocessing_method_name}`
 * Input:   
 * ![Input](/docs/imgs/input/4.jpg)
