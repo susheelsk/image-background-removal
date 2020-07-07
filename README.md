@@ -5,7 +5,7 @@ Tool for removing background from image using neural networks
 The program removes the background from photos  
 **********************************************************************
 ### 🎆 Features:  
-* **Added support for new neural networks ([U^2-NET](https://github.com/NathanUA/U-2-Net), [BASNet]((https://github.com/NathanUA/BASNet)) on PyTorch**  
+* **Added support for new neural networks ([U^2-NET](https://github.com/NathanUA/U-2-Net), [BASNet]((https://github.com/NathanUA/BASNet)) on PyTorch**
 * **Significantly improved output image quality**
 * **Removes background from hair**
 * **Added flask http api, fully compatible with `remove.bg` api libraries. Just change the `endpoint url` and voila!**
@@ -51,14 +51,19 @@ Mxnet and Gluoncv are used for image preprocessing methods and are installed opt
 ### 🏷 Setup for Windows:  
 * Clone this repository  
 * Install all the dependencies from **requirements.txt** via ```pip3 install -r requirements.txt```  
-* Run ```./setup.bat``` 
-_This setup.bat script loads the trained model._  
+* Run ```./setup.bat```
+> _This setup.bat script loads the trained model._  \
+> The program was tested on python version 3.7.3
 **********************************************************************
 ### 🏷 Setup for Linux:  
 * Clone repository: ```git clone https://github.com/OPHoperHPO/image-background-remove-tool```  
 * Install all the dependencies from **requirements.txt**: ```pip3 install -r requirements.txt```  
 * Run ```./setup.sh``` and select the model you need.
-_This setup.sh script loads the pre-trained model._  
+> _This setup.sh script loads the pre-trained model._ \
+> The program was tested on python version 3.7.3
+**********************************************************************
+### GUI screenshot:
+![](/docs/imgs/screenshots/gui.png)
 **********************************************************************
 ### 🖵 Running the GUI app:
 ```python3 gui.py```
@@ -93,7 +98,17 @@ docker build --tag image-background-removal-tool:latest .
 
 Start a container from the image
 ```bash
-docker run --rm -p 5000:5000 image-background-removal-tool:latest
+docker run --rm -p 5000:5000 \
+ -e HOST=0.0.0.0   \
+ -e PORT=5000  \
+ -e AUTH=false  \
+ -e MODEL=u2net  \
+ -e PREPROCESSING=None  \
+ -e POSTPROCESSING=fba  \
+ -e ADMIN_TOKEN=admin  \
+ -e ALLOWED_TOKENS_PYTHON_ARR=["test"]  \
+ -e IS_DOCKER_CONTAINER=true  \
+image-background-removal-tool:latest
 ```
 
 
@@ -128,18 +143,18 @@ You can thank me for developing this project, provide financial support for the 
   ⭐[**DonationAlerts**⭐](https://www.donationalerts.com/r/anodev_development)  
 **********************************************************************
 ### 😀 Sample Result:  
-* __More sample images in [docs/imgs/input/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/input) and [docs/imgs/examples/](https://github.com/OPHoperHPO/image-background-remove-tool/tree/master/docs/imgs/examples) folders.__  \
+* __More sample images in [docs/imgs/input/](docs/imgs/input) and [docs/imgs/examples/](docs/imgs/examples) folders.__  \
 Examples of images from the background are contained in folders in the following format: `{model_name}/{preprocessing_method_name}/{postprocessing_method_name}`
 * Input:   
-* ![Input](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/input/4.jpg "Input")  
+* ![Input](/docs/imgs/input/4.jpg)
 * Output(u2net/None/fba):
-* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/u2net/None/fba/4.png "Output")
+* ![Output](/docs/imgs/examples/u2net/None/fba/4.png "Output")
 *  Output(basnet/None/fba):
-* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/basnet/None/fba/4.png "Output")
+* ![Output](/docs/imgs/examples/basnet/None/fba/4.png "Output")
 * Output(u2netp/None/fba):
-* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/u2netp/None/fba/4.png "Output")
+* ![Output](/docs/imgs/examples/u2netp/None/fba/4.png "Output")
 * Output(xception_model/None/fba):
-* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/xception_model/None/fba/4.png "Output")
+* ![Output](/docs/imgs/examples/xception_model/None/fba/4.png "Output")
 * Output(mobile_net_model/None/fba):
-* ![Output](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/imgs/examples/mobile_net_model/None/fba/4.png "Output")
+* ![Output](/docs/imgs/examples/mobile_net_model/None/fba/4.png "Output")
 **********************************************************************

@@ -31,7 +31,6 @@ import zipfile
 import multiprocessing
 from copy import deepcopy
 
-
 # 3rd party libraries
 import psutil
 import requests
@@ -79,9 +78,9 @@ if "IS_DOCKER_CONTAINER" in os.environ.keys():
         model = os.environ["MODEL"]  # u2net
         prep_method = os.environ["PREPROCESSING"]  # None
         post_method = os.environ["POSTPROCESSING"]  # fba
-        auth = os.environ["AUTH"]  # Token Client Authentication
+        auth = str2bool(os.environ["AUTH"])  # Token Client Authentication
         port = int(os.environ["PORT"])  # 5000
-        host = os.environ["HOST"]  # "127.0.0.1
+        host = os.environ["HOST"]  # 0.0.0.0
         admin_token = os.environ["ADMIN_TOKEN"]  # Admin token
         allowed_tokens = list(os.environ["ALLOWED_TOKENS_PYTHON_ARR"])  # All allowed tokens
         procs_num_max = 1  # The maximum number of processes that can process a request
@@ -93,7 +92,7 @@ else:
         post_method = args.postp  # fba
         auth = args.auth  # Token Client Authentication
         port = args.port  # 5000
-        host = args.host  # "127.0.0.1
+        host = args.host  # 0.0.0.0
         admin_token = "admin"  # Admin token
         allowed_tokens = ["test"]  # All allowed tokens
         procs_num_max = 1  # The maximum number of processes that can process a request
