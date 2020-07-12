@@ -158,7 +158,6 @@ def removebg():
                         proc = multiprocessing.Process(target=process_remove_bg,
                                                        args=(params, request, q, False,))
                         proc.start()
-                        proc.join()
                         procs -= 1
                     return q.get()
                 elif request.content_type == "application/x-www-form-urlencoded":
@@ -178,7 +177,6 @@ def removebg():
                         proc = multiprocessing.Process(target=process_remove_bg,
                                                        args=(params, request, q, True,))
                         proc.start()
-                        proc.join()
                         procs -= 1
                     return q.get()
                 elif request.content_type == "application/json":
@@ -198,7 +196,6 @@ def removebg():
                         proc = multiprocessing.Process(target=process_remove_bg,
                                                        args=(params, request, q, True,))
                         proc.start()
-                        proc.join()
                         procs -= 1
                     return q.get()
                 else:
