@@ -71,11 +71,13 @@ class U2NET:
         else:
             raise Exception("Unknown u2net model!")
         try:
+            project_dir = os.path.join(os.path.dirname(__file__), "..")
             if self.torch.cuda.is_available():
-                net.load_state_dict(self.torch.load(os.path.join("models", name, name + '.pth')))
+                net.load_state_dict(self.torch.load(os.path.join(project_dir, "models", name, name + ".pth")))
                 net.cuda()
             else:
-                net.load_state_dict(self.torch.load(os.path.join("models", name, name + '.pth'), map_location="cpu"))
+                net.load_state_dict(self.torch.load(os.path.join(project_dir, "models", name, name + ".pth"), map_location="cpu"))
+
         except FileNotFoundError:
             raise FileNotFoundError("No pre-trained model found! Run setup.sh or setup.bat to download it!")
         net.eval()
