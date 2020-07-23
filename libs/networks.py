@@ -71,7 +71,7 @@ class U2NET:
         else:
             raise Exception("Unknown u2net model!")
         try:
-            project_dir = os.path.join(os.path.dirname(__file__), "..")
+            project_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
             if self.torch.cuda.is_available():
                 net.load_state_dict(self.torch.load(os.path.join(project_dir, "models", name, name + ".pth")))
                 net.cuda()
