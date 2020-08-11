@@ -1,12 +1,8 @@
 pywebview==3.2
 numpy==1.18.5
 tqdm==4.48.2
-torch==1.5.1 ; sys_platform == "linux"
-https://download.pytorch.org/whl/cpu/torch-1.5.1%2Bcpu-cp38-cp38-win_amd64.whl ; sys_platform == "win32"
-torch==1.5.1  ; sys_platform == "darwin"
-https://download.pytorch.org/whl/cpu/torchvision-0.7.0%2Bcpu-cp38-cp38-win_amd64.whl ; sys_platform == "win32"
-torchvision==0.7.0 ; sys_platform == "linux"
-torchvision==0.7.0 ; sys_platform == "darwin"
+torch==1.6.0 --find-links https://download.pytorch.org/whl/torch_stable.html
+torchvision==0.7.0 --find-links https://download.pytorch.org/whl/torch_stable.html
 opencv_contrib_python==4.2.0.34
 gluoncv==0.7.0
 gdown==3.12.0
