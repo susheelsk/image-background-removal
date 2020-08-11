@@ -1,5 +1,5 @@
 pywebview==3.2
-numpy==1.19.1
+numpy==1.18.5
 tqdm==4.48.2
 torch==1.6.0
 torchvision==0.7.0
