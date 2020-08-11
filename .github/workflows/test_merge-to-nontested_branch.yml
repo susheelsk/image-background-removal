@@ -61,7 +61,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install numpy
           pip install flake8 pytest
-          pip install -r requirements.txt
+          pip install -f https://download.pytorch.org/whl/torch_stable.html -r requirements.txt
       - name: Download models
         run: |
           python setup.py --model all
