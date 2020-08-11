@@ -1,7 +1,7 @@
 pywebview==3.2
 numpy==1.18.5
 tqdm==4.48.2
-torch==1.6.0
+torch==1.5.1
 torchvision==0.7.0
 opencv_contrib_python==4.2.0.34
 gluoncv==0.7.0
