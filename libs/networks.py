@@ -3,7 +3,7 @@ Name: Neural networks file.
 Description: This file contains neural network classes.
 Version: [release][3.2]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
-Author: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO] .
+Author: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 License: Apache License 2.0
 License:
    Copyright 2020 OPHoperHPO
@@ -20,25 +20,29 @@ License:
    See the License for the specific language governing permissions and
    limitations under the License.
 """
+# Built-in libraries
 import logging
 import os
 import time
 
+# Third party libraries
 import numpy as np
 from PIL import Image
 from skimage import io, transform
 
+# Libraries of this project
 from libs import strings
 
 logger = logging.getLogger(__name__)
+models_dir = os.path.join(os.path.dirname(__file__), "..", "models")  # Absolute path to the models folder
 
 
 def model_detect(model_name):
     """Detects which model to use and returns its object"""
     models_names = strings.MODELS_NAMES
     if model_name in models_names:
-        if model_name == "xception_model" or model_name == "mobile_net_model":
-            return TFSegmentation(model_name)
+        if model_name == "deeplabv3":
+            return DeeplabV3()
         elif "u2net" in model_name:
             return U2NET(model_name)
         elif "basnet" == model_name:
@@ -61,7 +65,7 @@ class U2NET:
         self.torch = torch
         self.U2NET_DEEP = U2NET_DEEP
         self.U2NETP_DEEP = U2NETP_DEEP
-
+        self.model_name = "u2net"
         if name == 'u2net':  # Load model
             logger.debug("Loading a U2NET model (176.6 mb) with better quality but slower processing.")
             net = self.U2NET_DEEP()
@@ -72,10 +76,10 @@ class U2NET:
             raise Exception("Unknown u2net model!")
         try:
             if self.torch.cuda.is_available():
-                net.load_state_dict(self.torch.load(os.path.join("models", name, name + '.pth')))
+                net.load_state_dict(self.torch.load(os.path.join(models_dir, name, name + '.pth')))
                 net.cuda()
             else:
-                net.load_state_dict(self.torch.load(os.path.join("models", name, name + '.pth'), map_location="cpu"))
+                net.load_state_dict(self.torch.load(os.path.join(models_dir, name, name + '.pth'), map_location="cpu"))
         except FileNotFoundError:
             raise FileNotFoundError("No pre-trained model found! Run setup.sh or setup.bat to download it!")
         net.eval()
@@ -91,14 +95,17 @@ class U2NET:
         """
         if isinstance(data, str):
             logger.debug("Load image: {}".format(data))
+
         image, org_image = self.__load_image__(data)  # Load image
         if image is False or org_image is False:
             return False
+
         if preprocessing:  # If an algorithm that preprocesses is specified,
             # then this algorithm should immediately remove the background
             image = preprocessing.run(self, image, org_image)
         else:
             image = self.__get_output__(image, org_image)  # If this is not, then just remove the background
+
         if postprocessing:  # If a postprocessing algorithm is specified, we send it an image without a background
             image = postprocessing.run(self, image, org_image)
         return image
@@ -139,16 +146,20 @@ class U2NET:
         :return: image tensor, original pil image
         """
         image_size = 320  # Size of the input and output image for the model
+
         if isinstance(data, str):
             try:
-                image = io.imread(data)  # Load image if there is a path
+                image = Image.open(data)  # Load image if there is a path
             except IOError:
                 logger.error('Cannot retrieve image. Please check file: ' + data)
                 return False, False
-            pil_image = Image.fromarray(image)
+            pil_image = image.copy()
+            image = np.array(image)
+
         else:
             image = np.array(data)  # Convert PIL image to numpy arr
-            pil_image = data
+            pil_image = data.copy()
+
         image = transform.resize(image, (image_size, image_size), mode='constant')  # Resize image
         image = self.__ndrarray2tensor__(image)  # Convert image from numpy arr to tensor
         return image, pil_image
@@ -197,7 +208,7 @@ class BasNet:
         import torch
         from torch.autograd import Variable
         from libs.basnet import BASNet as BASNet_DEEP
-
+        self.model_name = "basnet"
         self.Variable = Variable
         self.torch = torch
         self.BASNet_DEEP = BASNet_DEEP
@@ -209,10 +220,10 @@ class BasNet:
             raise Exception("Unknown BASNet model")
         try:
             if self.torch.cuda.is_available():
-                net.load_state_dict(self.torch.load(os.path.join("models", name, name + '.pth')))
+                net.load_state_dict(self.torch.load(os.path.join(models_dir, name, name + '.pth')))
                 net.cuda()
             else:
-                net.load_state_dict(self.torch.load(os.path.join("models", name, name + '.pth'), map_location="cpu"))
+                net.load_state_dict(self.torch.load(os.path.join(models_dir, name, name + '.pth'), map_location="cpu"))
         except FileNotFoundError:
             raise FileNotFoundError("No pre-trained model found! Run setup.sh or setup.bat to download it!")
         net.eval()
@@ -228,14 +239,17 @@ class BasNet:
         """
         if isinstance(data, str):
             logger.debug("Load image: {}".format(data))
+
         image, orig_image = self.__load_image__(data)  # Load image
         if image is False or orig_image is False:
             return False
+
         if preprocessing:  # If an algorithm that preprocesses is specified,
             # then this algorithm should immediately remove the background
             image = preprocessing.run(self, image, orig_image)
         else:
             image = self.__get_output__(image, orig_image)  # If this is not, then just remove the background
+
         if postprocessing:  # If a postprocessing algorithm is specified, we send it an image without a background
             image = postprocessing.run(self, image, orig_image)
         return image
@@ -285,7 +299,7 @@ class BasNet:
             pil_image = Image.fromarray(image)
         else:
             image = np.array(data)  # Convert PIL image to numpy arr
-            pil_image = data
+            pil_image = data.copy()
         image = transform.resize(image, (image_size, image_size), mode='constant')  # Resize image
         image = self.__ndrarray2tensor__(image)  # Convert image from numpy arr to tensor
         return image, pil_image
@@ -327,39 +341,24 @@ class BasNet:
         return mask
 
 
-class TFSegmentation(object):
-    """Class to load Deeplabv3 model and run inference."""
-    def __init__(self, model_type):
+class DeeplabV3(object):
+    """Class to load Deeplabv3 model."""
+
+    def __init__(self):
         """Creates and loads pretrained deeplab model."""
-        import scipy.ndimage as ndi
-        import tensorflow as tf
-        self.tf = tf
-        self.ndi = ndi
+        import torch
+        from torchvision import transforms
+        self.torch = torch
+        self.transforms = transforms
+        self.model_name = "deeplabv3"
+        self.model = torch.hub.load('pytorch/vision:v0.6.0', 'deeplabv3_resnet101', pretrained=True)
+        self.model.eval()
+        self.preprocess = self.transforms.Compose([
+            self.transforms.ToTensor(),
+            self.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
 
-        # Environment init
-        self.INPUT_TENSOR_NAME = 'ImageTensor:0'
-        self.OUTPUT_TENSOR_NAME = 'SemanticPredictions:0'
-        self.INPUT_SIZE = 513
-        self.FROZEN_GRAPH_NAME = 'frozen_inference_graph'
-        # Start load process
-        self.graph = self.tf.Graph()
-        try:
-            graph_def = self.tf.compat.v1.GraphDef.FromString(open(os.path.join("models", model_type, "model",
-                                                                                "frozen_inference_graph.pb"),
-                                                                   "rb").read())
-        except FileNotFoundError:
-            raise FileNotFoundError("No pre-trained model found! Run setup.sh or setup.bat to download it!")
-        logger.warning("Loading a DeepLab model ({})! "
-                       "This is an outdated model with poorer image quality and processing time."
-                       "Better use the U2NET model instead of this one!".format(model_type))
-        if graph_def is None:
-            raise RuntimeError('Cannot find inference graph in tar archive.')
-        with self.graph.as_default():
-            self.tf.import_graph_def(graph_def, name='')
-        self.sess = self.tf.compat.v1.Session(graph=self.graph)
-
-    @staticmethod
-    def __load_image__(data):
+    def __load_image__(self, data):
         """
         Loads an image file for other processing
         :param data: Path to image file or PIL image
@@ -367,13 +366,14 @@ class TFSegmentation(object):
         """
         if isinstance(data, str):
             try:
-                image = Image.open(data)  # Load image if there is a path
+                orig_image = Image.open(data)  # Load image if there is a path
             except IOError:
                 logger.error('Cannot retrieve image. Please check file: ' + data)
                 return False
         else:
-            image = data
-        return image, image
+            orig_image = data.copy()
+
+        return orig_image.copy(), orig_image
 
     def process_image(self, data, preprocessing=None, postprocessing=None):
         """
@@ -397,64 +397,37 @@ class TFSegmentation(object):
             image = postprocessing.run(self, image, org_image)
         return image
 
-    def __get_output__(self, image, _=None):
+    def __get_output__(self, image, orig_image):
         """
         Returns output from a neural network
         :param image: Prepared Image
-        :param _: Not used argument for compatibility with pre-processing module
+        :param orig_image: Original PIL image
         :return: Image without background
         """
         start_time = time.time()  # Time counter
-        seg_map = self.__predict__(image)
+        mask = self.__predict__(image)
         logger.debug('Finished mask creation')
-        image = image.convert('RGB')
+        empty = Image.new("RGBA", orig_image.size)
+        final_image = Image.composite(orig_image, empty, mask)
         logger.debug("Mask overlay completed")
-        image = self.__draw_segment__(image, seg_map)
         logger.debug("Finished! Time spent: {}".format(time.time() - start_time))
-        return image
+        return final_image
 
     def __predict__(self, image):
-        """Image processing."""
-        # Get image size
-        width, height = image.size
-        # Calculate scale value
-        resize_ratio = 1.0 * self.INPUT_SIZE / max(width, height)
-        # Calculate future image size
-        target_size = (int(resize_ratio * width), int(resize_ratio * height))
-        # Resize image
-        resized_image = image.convert('RGB').resize(target_size, Image.ANTIALIAS)
-        # Send image to model
-        batch_seg_map = self.sess.run(
-            self.OUTPUT_TENSOR_NAME,
-            feed_dict={self.INPUT_TENSOR_NAME: [np.asarray(resized_image)]})
-        # Get model output
-        seg_map = batch_seg_map[0]
-        # Get new image size and original image size
-        width, height = resized_image.size
-        width2, height2 = image.size
-        # Calculate scale
-        scale_w = width2 / width
-        scale_h = height2 / height
-        # Zoom numpy array for original image
-        seg_map = self.ndi.zoom(seg_map, (scale_h, scale_w))
-        return seg_map
-
-    @staticmethod
-    def __draw_segment__(image, alpha_channel):
-        """Postprocessing. Returns complete image."""
-        # Get image size
-        width, height = image.size
-        # Create empty numpy array
-        dummy_img = np.zeros([height, width, 4], dtype=np.uint8)
-        # Create alpha layer from model output
-        for x in range(width):
-            for y in range(height):
-                color = alpha_channel[y, x]
-                (r, g, b) = image.getpixel((x, y))
-                if color == 0:
-                    dummy_img[y, x, 3] = 0
-                else:
-                    dummy_img[y, x] = [r, g, b, 255]
-        # Restore image object from numpy array
-        img = Image.fromarray(dummy_img)
-        return img
+        """Mask prediction."""
+        w, h = image.size
+        if w > 768 or h > 768:
+            image.thumbnail((768, 768))
+        input_tensor = self.preprocess(image)
+        input_batch = input_tensor.unsqueeze(0)  # create a mini-batch as expected by the model
+        # move the input and model to GPU for speed if available
+        if self.torch.cuda.is_available():
+            input_batch = input_batch.to('cuda')
+            self.model.to('cuda')
+        with self.torch.no_grad():
+            output = self.model(input_batch)['out'][0]
+        output_predictions = output.argmax(0)
+        # Converting the neural network prediction result into a mask
+        mask = Image.fromarray(output_predictions.byte().cpu().numpy() * 255).resize((w, h))
+        mask = mask.convert("L")
+        return mask

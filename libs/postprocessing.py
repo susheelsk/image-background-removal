@@ -3,7 +3,7 @@ Name: Post-processing class file
 Description: This file contains post-processing classes.
 Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
-Author: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO] .
+Author: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 License: Apache License 2.0
 License:
    Copyright 2020 OPHoperHPO
@@ -26,6 +26,7 @@ import os
 from PIL import Image
 from PIL import ImageFilter
 from libs.strings import POSTPROCESS_METHODS
+from libs.networks import models_dir
 
 logger = logging.getLogger(__name__)
 
@@ -108,14 +109,8 @@ class RemovingTooTransparentBordersHardAndBlurringHardBordersTwo:
         :return: Processed mask
         """
         mask = self.np.array(mask.convert("L"))
-        height, weight = mask.shape
-        for h in range(height):
-            for w in range(weight):
-                val = mask[h, w]
-                if val > tranp_val:
-                    mask[h, w] = 255
-                else:
-                    mask[h, w] = 0
+        mask = self.np.where(mask > tranp_val, mask, 0)
+        mask = self.np.where(mask <= tranp_val, mask, 255)
         return Image.fromarray(mask)
 
     def run(self, model, image, orig_image):
@@ -207,14 +202,8 @@ class RemovingTooTransparentBordersHardAndBlurringHardBorders:
         :return: Processed mask
         """
         mask = self.np.array(mask.convert("L"))
-        height, weight = mask.shape
-        for h in range(height):
-            for w in range(weight):
-                val = mask[h, w]
-                if val > tranp_val:
-                    mask[h, w] = 255
-                else:
-                    mask[h, w] = 0
+        mask = self.np.where(mask > tranp_val, mask, 0)
+        mask = self.np.where(mask <= tranp_val, mask, 255)
         return Image.fromarray(mask)
 
     def run(self, _, image, orig_image):
@@ -251,22 +240,15 @@ class FBAMatting:
 
         self.__fba__ = FBAMattingNeural()
 
-    @staticmethod
-    def __remove_too_transparent_borders__(mask, tranp_val=231):
+    def __remove_too_transparent_borders__(self, mask, tranp_val=231):
         """
         Marks all pixels in the mask with a transparency greater than tranp_val as opaque.
         Pixels with transparency less than tranp_val, as fully transparent
         :param tranp_val: Integer value.
         :return: Processed mask
         """
-        height, weight = mask.shape
-        for h in range(height):
-            for w in range(weight):
-                val = mask[h, w]
-                if val > tranp_val:
-                    mask[h, w] = 255
-                else:
-                    mask[h, w] = 0
+        mask = self.np.where(mask > tranp_val, mask, 0)
+        mask = self.np.where(mask <= tranp_val, mask, 255)
         return mask
 
     @staticmethod
@@ -284,28 +266,36 @@ class FBAMatting:
         bg.paste(alpha, mask=alpha)
         return bg.convert("L")
 
-    def __png2trimap__(self, png):
+    def __png2trimap__(self, png, model_name):
         """
         Calculates trimap from png image.
         :param png: PIL RGBA Image
         :return: PIL trimap
+        :model_name: Model name (deeplabv3 or u2net or etc.)
         """
         mask = self.np.array(self.__extact_alpha_channel__(png))
-        mask = self.__remove_too_transparent_borders__(mask)
-        trimap = self.trimap(mask, "", 50, 2, erosion=True)
+        if model_name == "deeplabv3":
+            trimap = self.trimap(mask, "", 50, 2, erosion=12)
+        else:
+            mask = self.__remove_too_transparent_borders__(mask)
+            trimap = self.trimap(mask, "", 50, 2, erosion=1)
         if not isinstance(trimap, bool):
             return Image.fromarray(trimap)
         else:
             return False
 
-    def run(self, _, image, orig_image):
+    def run(self, model, image, orig_image):
         """
         Runs an image post-processing algorithm to improve background removal quality.
-        :param _: The class of the neural network used to remove the background.
+        :param model: The class of the neural network used to remove the background.
         :param image: Image without background
         :param orig_image: Source image
         """
-        trimap = self.__png2trimap__(image)
+        w, h = image.size
+        if w > 1024 or h > 1024:
+            image.thumbnail((1024, 1024))
+        trimap = self.__png2trimap__(image, model.model_name)
+        trimap = trimap.resize((w, h))
         if not isinstance(trimap, bool):  # If something is wrong with trimap, skip processing
             mask = self.__fba__.process_image(orig_image, trimap)
             image = self.__process_mask__(orig_image, mask)
@@ -332,21 +322,17 @@ class FBAMatting:
         :param mask: Mask PIL Image
         :return: Finished image
         """
-        # TODO Move the following algorithm from GIMP to this function.
-        # Algorithm:
-        # 1) Alpha channel in the selection
-        # 2) Invert the selection
-        # 3) Feather the selection (5px)
-        # 4) Delete the selection
         image = self.__apply_mask__(orig_image, mask)
-        # Image Border Improvement Algorithm # TODO Replace it with the algorithm described above
+
+        # Image Border Improvement Algorithm
         mask = 255 - self.np.array(mask)  # Invert mask
         mask_unsh = Image.fromarray(mask).filter(ImageFilter.UnsharpMask(5, 120, 3))
         image_unsh = self.__apply_mask__(image, mask_unsh)
         new_mask = self.__extact_alpha_channel__(image_unsh)
         new_mask = Image.fromarray(self.__remove_too_transparent_borders__(255 - self.np.array(new_mask), 0))
         image = self.__apply_mask__(image, new_mask)
-        image = self.np.array(image) - self.np.array(image_unsh) # The similarity of the "grain extraction" mode in GIMP
+        image = self.np.array(image) - self.np.array(
+            image_unsh)  # The similarity of the "grain extraction" mode in GIMP
 
         # image = self.color_correction(image)  # TODO Make RGB color correction around the edges
         image = Image.fromarray(image)
@@ -362,7 +348,8 @@ class FBAMattingNeural:
         """FBA Matting config"""
         encoder = "resnet50_GN_WS"
         decoder = "fba_decoder"
-        weights = os.path.join("models", "fba_matting", "fba_matting.pth")
+        weights = os.path.join(models_dir,
+                               "fba_matting", "fba_matting.pth")
 
     def __init__(self):
         import cv2
@@ -378,7 +365,7 @@ class FBAMattingNeural:
         self.torch = torch
 
         logger.debug("Loading FBA Matting neural network")
-        self.model = build_model(self.Config)   # Initialize the model
+        self.model = build_model(self.Config)  # Initialize the model
         self.model.eval()
 
     def __numpy2torch__(self, x):

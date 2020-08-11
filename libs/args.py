@@ -3,7 +3,7 @@ Name: Args file
 Description: This file contains helper methods for parsing the arguments
 Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
-Author: Pubkey [https://github.com/pubkey].
+Author: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 License: Apache License 2.0
 License:
    Copyright 2020 OPHoperHPO
@@ -22,13 +22,14 @@ License:
 """
 from argparse import ArgumentTypeError
 
+
 def str2bool(v):
     """
     Used to parse boolean args
-    @link https://stackoverflow.com/a/43357954/3443137
+    :link https://stackoverflow.com/a/43357954/3443137
     """
     if isinstance(v, bool):
-       return v
+        return v
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
         return True
     elif v.lower() in ('no', 'false', 'f', 'n', '0'):

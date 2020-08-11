@@ -2,7 +2,7 @@
 Name: BASNet lib
 Description: The main module of the neural network.
 Source url: https://github.com/NathanUA/BASNet
-Modified by Anodev (OPHoperHPO)[https://github.com/OPHoperHPO].
+Modified by Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 License: MIT License
 License:
     Copyright (c) 2019 Xuebin Qin

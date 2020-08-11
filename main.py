@@ -1,9 +1,9 @@
 """
-Name: Background remove tool.
+Name: Background removal tool.
 Description: This file contains the CLI interface.
-Version: [release][3.2]
+Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
-Author: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO] .
+Author: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 License: Apache License 2.0
 License:
    Copyright 2020 OPHoperHPO
@@ -20,67 +20,44 @@ License:
    See the License for the specific language governing permissions and
    limitations under the License.
 """
+# Built-in libraries
 import argparse
-import os
-import tqdm
 import logging
+from pathlib import Path
+
+# 3rd party libraries
+import tqdm
+
+# Libraries of this project
 from libs.strings import *
-from libs.networks import model_detect
+import libs.networks as networks
 import libs.preprocessing as preprocessing
 import libs.postprocessing as postprocessing
+
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
 
-def __work_mode__(path: str):
-    """Determines the desired mode of operation"""
-    if os.path.isfile(path):  # Input is file
-        return "file"
-    if os.path.isdir(path):  # Input is dir
-        return "dir"
-    else:
-        return "no"
-
-
-def __save_image_file__(img, file_name, output_path, wmode):
+def __save_image_file__(img, file_path: Path, output_path: Path):
     """
     Saves the PIL image to a file
     :param img: PIL image
-    :param file_name: File name
-    :param output_path: Output path
-    :param wmode: Work mode
+    :param file_path: File path object
+    :param output_path: Output path object
     """
     # create output directory if it doesn't exist
-    folder = os.path.dirname(output_path)
-    if folder != '':
-        os.makedirs(folder, exist_ok=True)
-    if wmode == "file":
-        file_name_out = os.path.basename(output_path)
-        if file_name_out == '':
-            # Change file extension to png
-            file_name = os.path.splitext(file_name)[0] + '.png'
-            # Save image
-            img.save(os.path.join(output_path, file_name))
-        else:
-            try:
-                # Save image
-                img.save(output_path)
-            except OSError as e:
-                if str(e) == "cannot write mode RGBA as JPEG":
-                    raise OSError("Error! "
-                                  "Please indicate the correct extension of the final file, for example: .png")
-                else:
-                    raise e
-    else:
-        # Change file extension to png
-        file_name = os.path.splitext(file_name)[0] + '.png'
-        # Save image
-        img.save(os.path.join(output_path, file_name))
+    if not output_path.exists():
+        output_path.mkdir()
+    if output_path.is_file():
+        img.save(output_path.with_suffix(".png"))
+    elif output_path.is_dir():
+        img.save(output_path.joinpath(file_path.stem + ".png"))
 
 
 def process(input_path, output_path, model_name=MODELS_NAMES[0],
-            preprocessing_method_name=PREPROCESS_METHODS[0], postprocessing_method_name=POSTPROCESS_METHODS[0]):
+            preprocessing_method_name=PREPROCESS_METHODS[0],
+            postprocessing_method_name=POSTPROCESS_METHODS[0], recursive=False):
     """
     Processes the file.
     :param input_path: The path to the image / folder with the images to be processed.
@@ -88,62 +65,112 @@ def process(input_path, output_path, model_name=MODELS_NAMES[0],
     :param model_name: Model to use.
     :param postprocessing_method_name: Method for image preprocessing
     :param preprocessing_method_name: Method for image post-processing
+    :param recursive: Recursive image search in folder
     """
     if input_path is None or output_path is None:
         raise Exception("Bad parameters! Please specify input path and output path.")
 
-    model = model_detect(model_name)  # Load model
+    model = networks.model_detect(model_name)  # Load model
+
     if not model:
         logger.warning("Warning! You specified an invalid model type. "
                        "For image processing, the model with the best processing quality will be used. "
-                       "(u2net)")
-        model_name = "u2net"  # If the model line is wrong, select the model with better quality.
-        model = model_detect(model_name)  # Load model
+                       "({})".format(MODELS_NAMES[0]))
+        model_name = MODELS_NAMES[0]  # If the model line is wrong, select the model with better quality.
+        model = networks.model_detect(model_name)  # Load model
+
     preprocessing_method = preprocessing.method_detect(preprocessing_method_name)
     postprocessing_method = postprocessing.method_detect(postprocessing_method_name)
-    wmode = __work_mode__(input_path)  # Get work mode
-    if wmode == "file":  # File work mode
-        image = model.process_image(input_path, preprocessing_method, postprocessing_method)
-        __save_image_file__(image, os.path.basename(input_path), output_path, wmode)
-    elif wmode == "dir":  # Dir work mode
-        # Start process
-        files = os.listdir(input_path)
-        for file in tqdm.tqdm(files, ascii=True, desc='Remove Background', unit='image'):
-            file_path = os.path.join(input_path, file)
-            image = model.process_image(file_path, preprocessing_method, postprocessing_method)
-            __save_image_file__(image, file, output_path, wmode)
-    else:
-        raise Exception("Bad input parameter! Please indicate the correct path to the file or folder.")
+    output_path = Path(output_path)
+
+    if isinstance(input_path, str):
+        input_path = Path(input_path)
+        if input_path.is_file():
+            image = model.process_image(str(input_path.absolute()), preprocessing_method, postprocessing_method)
+            __save_image_file__(image, input_path, output_path)
+
+        elif input_path.is_dir():
+            if not recursive:
+                gen_ext = [input_path.glob("*.{}".format(e)) for e in SUPPORTED_EXTENSIONS]
+            else:
+                gen_ext = [input_path.rglob("*.{}".format(e)) for e in SUPPORTED_EXTENSIONS]
+            files = []
+            for gen in gen_ext:
+                for f in gen:
+                    files.append(f)
+            files = set(files)
+            for file in tqdm.tqdm(files, ascii=True, desc='Remove Background', unit='image'):
+                image = model.process_image(str(file.absolute()), preprocessing_method, postprocessing_method)
+                __save_image_file__(image, file, output_path)
+        else:
+            raise Exception("Bad input parameter! Please indicate the correct path to the file or folder.")
+    elif isinstance(input_path, list):
+        if len(input_path) == 1:
+            input_path = Path(input_path[0])
+
+            if input_path.is_file():
+                image = model.process_image(str(input_path.absolute()), preprocessing_method, postprocessing_method)
+                __save_image_file__(image, input_path, output_path)
+
+            elif input_path.is_dir():
+                if not recursive:
+                    gen_ext = [input_path.glob("*.{}".format(e)) for e in SUPPORTED_EXTENSIONS]
+                else:
+                    gen_ext = [input_path.rglob("*.{}".format(e)) for e in SUPPORTED_EXTENSIONS]
+                files = []
+                for gen in gen_ext:
+                    for f in gen:
+                        files.append(f)
+                files = set(files)
+                for file in tqdm.tqdm(files, ascii=True, desc='Remove Background', unit='image'):
+                    image = model.process_image(str(file.absolute()), preprocessing_method, postprocessing_method)
+                    __save_image_file__(image, file, output_path)
+            else:
+                raise Exception("Bad input parameter! Please indicate the correct path to the file or folder.")
+        else:
+            files = []
+            for in_p in input_path:
+                input_path_p = Path(in_p)
+                if input_path_p.is_file():
+                    files.append(input_path_p)
+                elif input_path_p.is_dir():
+                    if not recursive:
+                        gen_ext = [input_path_p.glob("*.{}".format(e)) for e in SUPPORTED_EXTENSIONS]
+                    else:
+                        gen_ext = [input_path_p.rglob("*.{}".format(e)) for e in SUPPORTED_EXTENSIONS]
+                    for gen in gen_ext:
+                        for f in gen:
+                            files.append(f)
+            files = set(files)
+            for file in tqdm.tqdm(files, ascii=True, desc='Remove Background', unit='image'):
+                image = model.process_image(str(file.absolute()), preprocessing_method, postprocessing_method)
+                __save_image_file__(image, file, output_path)
 
 
 def cli():
     """CLI"""
     parser = argparse.ArgumentParser(description=DESCRIPTION, usage=ARGS_HELP)
-    parser.add_argument('-i', required=True,
+
+    parser.add_argument('-i', required=True, nargs="+",
                         help=ARGS["-i"][1], action="store", dest="input_path")
     parser.add_argument('-o', required=True,
                         help=ARGS["-o"][1], action="store", dest="output_path")
     parser.add_argument('-m', required=False,
                         help=ARGS["-m"][1],
                         action="store", dest="model_name", default=MODELS_NAMES[0])
-    parser.add_argument('-prep', required=False,
-                        help=ARGS["-prep"][1],
+    parser.add_argument('-pre', required=False,
+                        help=ARGS["-pre"][1],
                         action="store", dest="preprocessing_method_name", default=PREPROCESS_METHODS[0])
-    parser.add_argument('-postp', required=False,
-                        help=ARGS["-postp"][1],
+    parser.add_argument('-post', required=False,
+                        help=ARGS["-post"][1],
                         action="store", dest="postprocessing_method_name", default=POSTPROCESS_METHODS[0])
+    parser.add_argument('--recursive', required=False, default=False,
+                        help=ARGS['--recursive'][1], action="store_true", dest="recursive")
     args = parser.parse_args()
-    # Parse arguments
-    input_path = args.input_path
-    output_path = args.output_path
-    model_name = args.model_name
-    preprocessing_method_name = args.preprocessing_method_name
-    postprocessing_method_name = args.postprocessing_method_name
 
-    if model_name == "test":
-        print(input_path, output_path, model_name, preprocessing_method_name, postprocessing_method_name)
-    else:
-        process(input_path, output_path, model_name, preprocessing_method_name, postprocessing_method_name)
+    process(args.input_path, args.output_path,
+            args.model_name, args.preprocessing_method_name,
+            args.postprocessing_method_name, args.recursive)
 
 
 if __name__ == "__main__":

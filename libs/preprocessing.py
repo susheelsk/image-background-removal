@@ -3,7 +3,7 @@ Name: Pre-processing class file
 Description: This file contains pre-processing classes.
 Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
-Author: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO] .
+Author: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 License: Apache License 2.0
 License:
    Copyright 2020 OPHoperHPO
@@ -38,10 +38,59 @@ def method_detect(method: str):
             return BoundingBoxDetectionWithMaskMaskRcnn()
         elif method == "bbd-fastrcnn":
             return BoundingBoxDetectionFastRcnn()
+        # elif method == "midas":  # This preprocessing method will be added in the future!
+        #     return MiDaS()
         else:
             return None
     else:
         return False
+
+# This preprocessing method will be added in the future!
+# Todo Refine this method.
+# class MiDaS:
+#     def __init__(self):
+#         import torch
+#         self.torch = torch
+#         midas = torch.hub.load("intel-isl/MiDaS", "MiDaS")
+#         self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+#         midas.to(self.device)
+#         midas.eval()
+#         midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
+#         self.transform = midas_transforms.default_transform
+#         self.net = midas
+#
+#     def run(self, model, prep_image, orig_image):
+#         temp_image = np.array(orig_image)
+#         input_batch = self.transform(temp_image).to(self.device)
+#         with self.torch.no_grad():
+#             prediction = self.net(input_batch)
+#
+#             prediction = self.torch.nn.functional.interpolate(
+#                 prediction.unsqueeze(1),
+#                 size=temp_image.shape[:2],
+#                 mode="bicubic",
+#                 align_corners=False,
+#             ).squeeze()
+#         mask = Image.fromarray(self.generate_binary_mask(temp_image.shape, prediction.cpu().numpy()))
+#         mask = mask.convert("L")
+#         empty = Image.new("RGB", orig_image.size)
+#         image = Image.composite(orig_image, empty, mask)
+#         cmp_img, _ = model.__load_image__(image)
+#         img = model.__get_output__(cmp_img, orig_image)
+#         return img
+#
+#     @staticmethod
+#     def generate_binary_mask(img_shape, prediction):
+#         val = np.mean(prediction)
+#         a = np.where(prediction > val, prediction, 0)
+#         new = np.empty((img_shape[0], img_shape[1]))
+#         for h in range(a.shape[0]):
+#             for w in range(a.shape[1]):
+#                 if a[h][w] > val:
+#                     new[h][w] = 255
+#                 else:
+#                     new[h][w] = 0
+#         return new
 
 
 class BoundingBoxDetectionFastRcnn:

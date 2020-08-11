@@ -1,9 +1,9 @@
 """
-Name: Http Flask API
+Name: HTTP Flask API
 Description: This file contains an interface for interacting with this tool through http requests.
 Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
-Authors: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO], Pubkey [https://github.com/pubkey].
+Author: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 License: Apache License 2.0
 License:
    Copyright 2020 OPHoperHPO
@@ -25,10 +25,10 @@ License:
 import argparse
 import base64
 import io
+import multiprocessing
 import os
 import time
 import zipfile
-import multiprocessing
 from copy import deepcopy
 
 # 3rd party libraries
@@ -38,19 +38,16 @@ from PIL import Image, ImageColor
 from flask import Flask, request, send_file, jsonify, make_response
 from flask_cors import CORS
 
+
 # Libraries of this project
+from libs.args import str2bool
 from libs.networks import model_detect
 from libs.postprocessing import method_detect as postprocessing_detect
 from libs.preprocessing import method_detect as preprocessing_detect
 from libs.strings import MODELS_NAMES, POSTPROCESS_METHODS, PREPROCESS_METHODS, ARGS
-from libs.args import str2bool
 
 # parse args and set defaults
 parser = argparse.ArgumentParser(description="HTTP API to remove background from images", usage="")
-parser.add_argument('-m', required=False,
-                    help=ARGS["-m"][1],
-                    action="store", dest="model_name", default=MODELS_NAMES[0]
-                    )
 parser.add_argument("-auth", type=str2bool, nargs='?',
                     const=True, default=False,
                     dest="auth",
@@ -64,12 +61,17 @@ parser.add_argument('-host', required=False,
                     help="Host",
                     action="store", dest="host", default="0.0.0.0"
                     )
-parser.add_argument('-prep', required=False,
-                    help=ARGS["-prep"][1],
-                    action="store", dest="prep", default=PREPROCESS_METHODS[0])
-parser.add_argument('-postp', required=False,
-                    help=ARGS["-postp"][1],
-                    action="store", dest="postp", default=POSTPROCESS_METHODS[0])
+parser.add_argument('-pre', required=False,
+                    help=ARGS["-pre"][1],
+                    action="store", dest="pre", default=PREPROCESS_METHODS[0])
+parser.add_argument('-post', required=False,
+                    help=ARGS["-post"][1],
+                    action="store", dest="post", default=POSTPROCESS_METHODS[0])
+parser.add_argument('-m', required=False,
+                    help=ARGS["-m"][1],
+                    action="store", dest="model_name", default=MODELS_NAMES[0]
+                    )
+
 args = parser.parse_args()
 
 if "IS_DOCKER_CONTAINER" in os.environ.keys():
@@ -88,8 +90,8 @@ else:
     class Config:
         """Config object"""
         model = args.model_name  # u2net
-        prep_method = args.prep  # None
-        post_method = args.postp  # fba
+        prep_method = args.pre  # None
+        post_method = args.post  # fba
         auth = args.auth  # Token Client Authentication
         port = args.port  # 5000
         host = args.host  # 0.0.0.0

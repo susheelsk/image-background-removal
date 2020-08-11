@@ -3,7 +3,7 @@ Name: GUI
 Description: This file contains the GUI interface.
 Version: [release][3.2]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
-Authors: Munawwar [https://github.com/Munawwar], Anodev (OPHoperHPO)[https://github.com/OPHoperHPO].
+Authors: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 License: Apache License 2.0
 License:
    Copyright 2020 OPHoperHPO
@@ -246,7 +246,7 @@ def getfile(filename: str):
     """
     dir1 = os.path.dirname(__file__)
     path = os.path.join(dir1, filename)
-    with open(path) as f:
+    with open(path, encoding="utf8") as f:
         content = f.read()
     return content
 

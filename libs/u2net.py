@@ -2,7 +2,7 @@
 Name: U^2-Net lib
 Description: The main module of the neural network.
 Source url: https://github.com/NathanUA/U-2-Net
-Modified by Anodev (OPHoperHPO)[https://github.com/OPHoperHPO] .
+Modified by Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 Changes:
 1. Optimized library imports, now exclusively modules needed by the program are used.
 2. Updated obsolete PyTorch code.
