@@ -47,6 +47,9 @@ class Config:
     # u2netp
     u2p_url = "https://github.com/OPHoperHPO/image-background-remove-tool/releases/download/3.2/u2netp.pth"
     u2p_dir = os.path.join("..", "models", "u2netp")
+    # fba
+    fba_url = "https://github.com/OPHoperHPO/image-background-remove-tool/releases/download/3.2/fba_matting.pth"
+    fba_dir = os.path.join("..", "models", "fba_matting")
 
 
 def prepare():
@@ -63,6 +66,8 @@ def prepare():
             os.makedirs(Config.u2p_dir)
         if not os.path.exists(Config.bn_dir):
             os.makedirs(Config.bn_dir)
+        if not os.path.exists(Config.fba_dir):
+            os.makedirs(Config.fba_dir)
     except BaseException as e:
         print("Error creating model folders! Error:", e)
         exit(1)
@@ -84,6 +89,7 @@ def download():
         gdown.download(Config.u2_url, os.path.join(Config.u2_dir, "u2net.pth"), quiet=False)
         gdown.download(Config.u2p_url, os.path.join(Config.u2p_dir, "u2netp.pth"), quiet=False)
         gdown.download(Config.bn_url, os.path.join(Config.bn_dir, "basnet.pth"), quiet=False)
+        gdown.download(Config.fba_url, os.path.join(Config.fba_dir, "fba_matting.pth"), quiet=False)
         print("Download finished!")
     except BaseException as e:
         print("Error download model archives! Error:", e)
@@ -141,10 +147,25 @@ def setup():
 
 
 def cli():
+    MODELS_NAMES.append("fba_matting")  # TODO Rewrite setup tool
     print("Choose which model you want to install:\n{}\nall".format('\n'.join(MODELS_NAMES)))
-    model_name = input("Enter model name: ")
+
+    print("Number of arguments:  ", len(sys.argv))
+    print("Argument List:", str(sys.argv))
+
+    if len(sys.argv) == 2:
+        model_name = sys.argv[1]
+    else:
+        model_name = input("Enter model name: ")
+
+    print("model_name: ", model_name)
+
     if model_name == "all":
         setup()
+    elif model_name == "fba_matting":
+        if not os.path.exists(Config.fba_dir):
+            os.makedirs(Config.fba_dir)
+        gdown.download(Config.fba_url, os.path.join(Config.fba_dir, "fba_matting.pth"), quiet=False)
     elif model_name == "u2net":
         if not os.path.exists(Config.u2_dir):
             os.makedirs(Config.u2_dir)

@@ -29,16 +29,16 @@ def main():
     subprocess.check_call("cd ../../tests && ./run_tests.sh", shell=True)
 
     # Remove dependencies, create new ones
-    os.remove("../../requirements.txt")
+    os.remove("../../requirements_http.txt")
     subprocess.check_call("cd ../../ && pipreqs .", shell=True)
-    with open("../../requirements.txt", "r") as f:
+    with open("../../requirements_http.txt", "r") as f:
         data = f.read()
     data = data.split("\n")
     data.remove("skimage==0.0")
     for i, val in enumerate(data):
         if val == "webview==0.1.5":
             data[i] = "pywebview==3.2"
-    with open("../../requirements.txt", "w") as f:
+    with open("../../requirements_http.txt", "w") as f:
         f.write('\n'.join(data))
     if os.path.exists("../../tests/requirements.txt"):
         os.remove("../../tests/requirements.txt")

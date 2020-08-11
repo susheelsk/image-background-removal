@@ -1,7 +1,7 @@
 """
 Name: Strings file
 Description: This file contains the strings.
-Version: [release][3.2]
+Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
 Author: Anodev (OPHoperHPO)[https://github.com/OPHoperHPO] .
 License: Apache License 2.0
@@ -23,25 +23,31 @@ License:
 
 NAME = "Image Background Remove Tool"
 MODELS_NAMES = ["u2net", "basnet", "u2netp", "xception_model", "mobile_net_model"]
-PREPROCESS_METHODS = ["bbd-fastrcnn", "bbmd-maskrcnn", "None"]
-POSTPROCESS_METHODS = ["rtb-bnb", "rtb-bnb2", "No"]
+PREPROCESS_METHODS = ["None", "bbmd-maskrcnn", "bbd-fastrcnn"]
+POSTPROCESS_METHODS = ["fba", "rtb-bnb", "rtb-bnb2", "No"]
 DESCRIPTION = "A tool to remove a background from image using Neural Networks"
 LICENSE = "Apache License 2.0"
-ARGS_HELP = """
-{}
+ARGS = {
+    "-i": ["<input_path>", "Path to input file or dir."],
+    "-o": ["<output_path>", "Path to output file or dir."],
+    "-m": ["<model_type>", "Can be {}. u2net is better to use.\n"
+                           "\t\t\t\t  DeepLab models (xception_model or mobile_net_model) are outdated\n"
+                           "\t\t\t\t  and designed to remove the background from PORTRAIT photos or PHOTOS WITH "
+                           "ANIMALS! "
+                           "".format(' or '.join(MODELS_NAMES))],
+    "-prep": ["<preprocessing_method>", "Preprocessing method. Can be {} . "
+                                        "`{}` is better to use.".format(' or '.join(PREPROCESS_METHODS),
+                                                                        PREPROCESS_METHODS[0])],
+    "-postp": ["<postprocessing_method>", "Postprocessing method. Can be {} . "
+                                          "`{}` is better to use.".format(' or '.join(POSTPROCESS_METHODS),
+                                                                          POSTPROCESS_METHODS[0])],
+}
+ARGS_HELP = """{}
 {}
 License: {}
 Running the script:
-python3 main.py -i <input_path> -o <output_path> -m <model_type> -prep <preprocessing_method> -postp <postprocessing_method>
+python3 main.py {}
 Explanation of args:
--i <input_path> - path to input file or dir.
--o <output_path> - path to output file or dir.
--prep <preprocessing_method> - Preprocessing method. Can be {} . `bbd-fastrcnn` is better to use.
--postp <postprocessing_method> - Postprocessing method. Can be {} . `rtb-bnb` is better to use.
--m <model_type> - can be {}. u2net is better to use. 
-DeepLab models (xception_model or mobile_net_model) are outdated 
-and designed to remove the background from PORTRAIT photos or PHOTOS WITH ANIMALS! 
-""".format(NAME, DESCRIPTION, LICENSE,
-           ' or '.join(MODELS_NAMES),
-           ' or '.join(PREPROCESS_METHODS),
-           ' or '.join(POSTPROCESS_METHODS))
+{}
+""".format(NAME, DESCRIPTION, LICENSE, ' '.join([i + " " + ARGS[i][0] for i in ARGS]),
+           '\n'.join([i + " " + ARGS[i][0] + ' - ' + ARGS[i][1] for i in ARGS]))
