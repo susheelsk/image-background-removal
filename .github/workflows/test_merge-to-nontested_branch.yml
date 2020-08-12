@@ -76,7 +76,7 @@ jobs:
           cd tests
           mv *.py ../
           cd ..
-          pytest
+          pytest -s -v
       - name: Packing a docs folder in a zip archive
         run: |
           zip -r docs.zip ./docs/

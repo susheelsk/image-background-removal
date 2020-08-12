@@ -82,7 +82,8 @@ def gen(test):
                     try:
                         sub = cli_call(str(input_path.absolute()), str(path.absolute()), model_name,
                                        preprocess_method_name, postprocess_method_name, python=sys.executable)
-                        test.fail(sub.communicate()[0].decode("UTF-8"))
+                        sub_ret = sub.communicate()[0].decode("UTF-8")
+                        print(sub_ret)
                         if sub.returncode == 1:
                             test.fail("TESTING FAILED!\n"
                                       "PARAMS:\n"
@@ -94,7 +95,7 @@ def gen(test):
                                       "Error: {}\n".format(model_name, str(input_path.absolute()),
                                                            str(path.absolute()), preprocess_method_name,
                                                            postprocess_method_name,
-                                                           str(sub.communicate()[0].decode("UTF-8"))))
+                                                           str(sub_ret)))
                             return False
                     except BaseException as e:
                         print(e)
@@ -102,7 +103,9 @@ def gen(test):
                 if sys.platform == "darwin":
                     try:
                         sub = cli_call(str(input_path.absolute()), str(path.absolute()), model_name,
-                                       preprocess_method_name, postprocess_method_name)
+                                       preprocess_method_name, postprocess_method_name, python=sys.executable)
+                        sub_ret = sub.communicate()[0].decode("UTF-8")
+                        print(sub_ret)
                         if sub.returncode == 1:
                             test.fail("TESTING FAILED!\n"
                                       "PARAMS:\n"
@@ -114,7 +117,7 @@ def gen(test):
                                       "Error: {}\n".format(model_name, str(input_path.absolute()),
                                                            str(path.absolute()), preprocess_method_name,
                                                            postprocess_method_name,
-                                                           str(sub.communicate()[0].decode("UTF-8"))))
+                                                           str(sub_ret)))
                             return False
                     except BaseException as e:
                         print(e)
