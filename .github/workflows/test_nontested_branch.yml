@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.7, 3.8]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -36,7 +36,7 @@ jobs:
         cd tests
         mv *.py ../
         cd ..
-        pytest
+        pytest -s -v
     - name: Packing a docs folder in a zip archive
       run: |
         zip -r docs.zip ./docs/
@@ -49,7 +49,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.7, 3.8]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -61,7 +61,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install numpy
           pip install flake8 pytest
-          pip install -r requirements.txt
+          pip install -f https://download.pytorch.org/whl/torch_stable.html -r requirements.txt
       - name: Download models
         run: |
           python setup.py --model all
@@ -76,20 +76,12 @@ jobs:
           cd tests
           mv *.py ../
           cd ..
-          pytest
-      - name: Packing a docs folder in a zip archive
-        run: |
-          zip -r docs.zip ./docs/
-      - name: Upload docs folder
-        uses: actions/upload-artifact@v1
-        with:
-          name: generated_docs_examples.zip
-          path: docs.zip
+          pytest -s -v
   test_macos:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.7, 3.8]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -116,12 +108,4 @@ jobs:
           cd tests
           mv *.py ../
           cd ..
-          pytest
-      - name: Packing a docs folder in a zip archive
-        run: |
-          zip -r docs.zip ./docs/
-      - name: Upload docs folder
-        uses: actions/upload-artifact@v1
-        with:
-          name: generated_docs_examples.zip
-          path: docs.zip
+          pytest -s -v

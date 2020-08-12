@@ -5,11 +5,11 @@ on:
     branches: [ latest ]
 
 jobs:
-  build:
+  test_ubuntu:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.7, 3.8]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -36,7 +36,7 @@ jobs:
         cd tests
         mv *.py ../
         cd ..
-        pytest
+        pytest -s -v
     - name: Packing a docs folder in a zip archive
       run: |
         zip -r docs.zip ./docs/
@@ -45,3 +45,67 @@ jobs:
       with:
         name: generated_docs_examples.zip
         path: docs.zip
+  test_windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy
+          pip install flake8 pytest
+          pip install -f https://download.pytorch.org/whl/torch_stable.html -r requirements.txt
+      - name: Download models
+        run: |
+          python setup.py --model all
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Test with pytest
+        run: |
+          cd tests
+          mv *.py ../
+          cd ..
+          pytest -s -v
+  test_macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy
+          pip install flake8 pytest
+          pip install -r requirements.txt
+      - name: Download models
+        run: |
+          python setup.py --model all
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Test with pytest
+        run: |
+          cd tests
+          mv *.py ../
+          cd ..
+          pytest -s -v
