@@ -24,7 +24,7 @@ import unittest
 from libs import strings
 from main import process
 import multiprocessing
-import os
+from pathlib import Path
 
 
 def run(i, o, m, prep, postp):
@@ -44,22 +44,17 @@ def run(i, o, m, prep, postp):
 
 
 def gen(test):
+    input_path = Path("docs/imgs/input/")
     for model_name in strings.MODELS_NAMES:
         for preprocess_method_name in strings.PREPROCESS_METHODS:
             for postprocess_method_name in strings.POSTPROCESS_METHODS:
-                if not os.path.exists("docs/imgs/examples/{}/{}/{}".format(model_name,
-                                                                           preprocess_method_name,
-                                                                           postprocess_method_name)):
-                    os.makedirs("docs/imgs/examples/{}/{}/{}".format(model_name,
-                                                                     preprocess_method_name, postprocess_method_name),
-                                exist_ok=True)
+                path = Path("docs/imgs/examples/{}/{}/{}".format(model_name, preprocess_method_name, postprocess_method_name))
+                if not path.exists():
+                    path.mkdir(parents=True, exist_ok=True)
                 print(model_name, preprocess_method_name, postprocess_method_name)
                 try:
                     proc = multiprocessing.Process(target=run,
-                                                   args=("docs/imgs/input/",
-                                                         "docs/imgs/examples/{}/{}/{}".format(model_name,
-                                                                                              preprocess_method_name,
-                                                                                              postprocess_method_name),
+                                                   args=(input_path, path,
                                                          model_name, preprocess_method_name, postprocess_method_name,))
                     proc.start()
                     proc.join()
