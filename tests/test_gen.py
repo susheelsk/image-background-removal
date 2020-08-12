@@ -29,6 +29,7 @@ import unittest
 from libs import strings
 from main import process
 
+
 def run(test, i, o, m, prep, postp):
     try:
         process(i, o, m, prep, postp)
@@ -44,11 +45,13 @@ def run(test, i, o, m, prep, postp):
         exit(1)
     exit(0)
 
-def cli_call(input, out, model, prep="bla", post="bla"):
-    sub = subprocess.Popen("python3 main.py -i {} -o {} -m {} -pre {} -post {}".format(input, out, model, prep,
-                                                                                            post), shell=True,
+
+def cli_call(input, out, model, prep="bla", post="bla", python="python3"):
+    sub = subprocess.Popen("{} main.py -i {} -o {} -m {} -pre {} -post {}".format(python, input, out, model, prep,
+                                                                                  post), shell=True,
                            stdout=subprocess.PIPE)
     return sub
+
 
 def gen(test):
     input_path = Path("docs/imgs/input/")
@@ -78,8 +81,7 @@ def gen(test):
                 if sys.platform == "win32":
                     try:
                         sub = cli_call(str(input_path.absolute()), str(path.absolute()), model_name,
-                                        preprocess_method_name, postprocess_method_name)
-                        test.fail(sub.communicate()[0].decode("UTF-8"))
+                                       preprocess_method_name, postprocess_method_name, python=sys.executable)
                         if sub.returncode == 1:
                             test.fail("TESTING FAILED!\n"
                                       "PARAMS:\n"
@@ -90,7 +92,8 @@ def gen(test):
                                       "postprocessing_method: {}\n"
                                       "Error: {}\n".format(model_name, str(input_path.absolute()),
                                                            str(path.absolute()), preprocess_method_name,
-                                                           postprocess_method_name, str(sub.communicate()[0].decode("UTF-8"))))
+                                                           postprocess_method_name,
+                                                           str(sub.communicate()[0].decode("UTF-8"))))
                             return False
                     except BaseException as e:
                         print(e)
@@ -98,8 +101,7 @@ def gen(test):
                 if sys.platform == "darwin":
                     try:
                         sub = cli_call(str(input_path.absolute()), str(path.absolute()), model_name,
-                                        preprocess_method_name, postprocess_method_name)
-                        test.fail(sub.communicate()[0].decode("UTF-8"))
+                                       preprocess_method_name, postprocess_method_name)
                         if sub.returncode == 1:
                             test.fail("TESTING FAILED!\n"
                                       "PARAMS:\n"
@@ -110,7 +112,8 @@ def gen(test):
                                       "postprocessing_method: {}\n"
                                       "Error: {}\n".format(model_name, str(input_path.absolute()),
                                                            str(path.absolute()), preprocess_method_name,
-                                                           postprocess_method_name, str(sub.communicate()[0].decode("UTF-8"))))
+                                                           postprocess_method_name,
+                                                           str(sub.communicate()[0].decode("UTF-8"))))
                             return False
                     except BaseException as e:
                         print(e)
