@@ -27,11 +27,11 @@ import multiprocessing
 import os
 
 
-def run(test, i, o, m, prep, postp):
+def run(i, o, m, prep, postp):
     try:
         process(i, o, m, prep, postp)
     except BaseException as e:
-        test.fail("TESTING FAILED!\n"
+        print("TESTING FAILED!\n"
                   "PARAMS:\n"
                   "model_name: {}\n"
                   "input_path: {}\n"
@@ -56,7 +56,7 @@ def gen(test):
                 print(model_name, preprocess_method_name, postprocess_method_name)
                 try:
                     proc = multiprocessing.Process(target=run,
-                                                   args=(test, "docs/imgs/input/",
+                                                   args=("docs/imgs/input/",
                                                          "docs/imgs/examples/{}/{}/{}".format(model_name,
                                                                                               preprocess_method_name,
                                                                                               postprocess_method_name),
