@@ -88,26 +88,42 @@ curl -H 'X-API-Key: test'                                   \
 ## 📦 Running the HTTP API server via docker:
 Using the API via docker is a **fast** and non-complex way to have a working API.  \
 The docker image uses `u2net` as default and runs without authentication.
+### 💻 Using an already built image from DockerHub: 
+```bash
+docker run -d --restart unless-stopped \
+ --name image-background-remove-tool \
+ -p 5000:5000 \
+ -e HOST='0.0.0.0'   \
+ -e PORT='5000'  \
+ -e AUTH='false'  \
+ -e MODEL='u2net'  \
+ -e PREPROCESSING='None'  \
+ -e POSTPROCESSING='fba'  \
+ -e ADMIN_TOKEN='admin'  \
+ -e ALLOWED_TOKENS_PYTHON_ARR='["test"]'  \
+ -e IS_DOCKER_CONTAINER='true'  \
+docker.io/anodev/image-background-remove-tool:release 
+```
 ### 🔨 Building your own image:
 * Build the docker image
 ```bash
-docker build --tag image-background-removal-tool:latest .
+docker build --tag image-background-remove-tool:latest .
 ```
 * Start a container from the image
 ```bash
 docker run -d --restart unless-stopped \
- --name image-background-removal-tool-http-api \
+ --name image-background-remove-tool \
  -p 5000:5000 \
- -e HOST=0.0.0.0   \
- -e PORT=5000  \
- -e AUTH=false  \
- -e MODEL=u2net  \
- -e PREPROCESSING=None  \
- -e POSTPROCESSING=fba  \
- -e ADMIN_TOKEN=admin  \
- -e ALLOWED_TOKENS_PYTHON_ARR=["test"]  \
- -e IS_DOCKER_CONTAINER=true  \
-image-background-removal-tool:latest
+ -e HOST='0.0.0.0'   \
+ -e PORT='5000'  \
+ -e AUTH='false'  \
+ -e MODEL='u2net'  \
+ -e PREPROCESSING='None'  \
+ -e POSTPROCESSING='fba'  \
+ -e ADMIN_TOKEN='admin'  \
+ -e ALLOWED_TOKENS_PYTHON_ARR='["test"]'  \
+ -e IS_DOCKER_CONTAINER='true'  \
+image-background-remove-tool:latest
 ```
 
 
