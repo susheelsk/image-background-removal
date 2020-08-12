@@ -36,7 +36,7 @@ jobs:
         cd tests
         mv *.py ../
         cd ..
-        pytest
+        pytest -s -v
     - name: Packing a docs folder in a zip archive
       run: |
         zip -r docs.zip ./docs/
@@ -77,14 +77,6 @@ jobs:
           mv *.py ../
           cd ..
           pytest -s -v
-      - name: Packing a docs folder in a zip archive
-        run: |
-          zip -r docs.zip ./docs/
-      - name: Upload docs folder
-        uses: actions/upload-artifact@v1
-        with:
-          name: generated_docs_examples.zip
-          path: docs.zip
   test_macos:
     runs-on: macos-latest
     strategy:
@@ -116,12 +108,4 @@ jobs:
           cd tests
           mv *.py ../
           cd ..
-          pytest
-      - name: Packing a docs folder in a zip archive
-        run: |
-          zip -r docs.zip ./docs/
-      - name: Upload docs folder
-        uses: actions/upload-artifact@v1
-        with:
-          name: generated_docs_examples.zip
-          path: docs.zip
+          pytest -s -v
