@@ -22,14 +22,18 @@ License:
 """
 
 # Built-in libraries
+import ast
 import argparse
 import base64
 import io
-import multiprocessing
+import string
+import random
+import threading
 import os
 import time
 import zipfile
 from copy import deepcopy
+import gc
 
 # 3rd party libraries
 import psutil
@@ -37,7 +41,6 @@ import requests
 from PIL import Image, ImageColor
 from flask import Flask, request, send_file, jsonify, make_response
 from flask_cors import CORS
-
 
 # Libraries of this project
 from libs.args import str2bool
@@ -84,8 +87,7 @@ if "IS_DOCKER_CONTAINER" in os.environ.keys():
         port = int(os.environ["PORT"])  # 5000
         host = os.environ["HOST"]  # 0.0.0.0
         admin_token = os.environ["ADMIN_TOKEN"]  # Admin token
-        allowed_tokens = list(os.environ["ALLOWED_TOKENS_PYTHON_ARR"])  # All allowed tokens
-        procs_num_max = 1  # The maximum number of processes that can process a request
+        allowed_tokens = ast.literal_eval(os.environ["ALLOWED_TOKENS_PYTHON_ARR"])  # All allowed tokens
 else:
     class Config:
         """Config object"""
@@ -97,14 +99,83 @@ else:
         host = args.host  # 0.0.0.0
         admin_token = "admin"  # Admin token
         allowed_tokens = ["test"]  # All allowed tokens
-        procs_num_max = 1  # The maximum number of processes that can process a request
+
+
+class TaskQueue:
+    """
+    Very simple job queue
+    """
+
+    def __init__(self):
+        self.jobs = {}
+        self.completed_jobs = {}
+        self.thread = threading.Thread(target=self.__thread__, args=())
+        self.thread.start()
+
+    def __id_generator__(self, size=10, chars=string.ascii_uppercase + string.digits):
+        id = ''.join(random.choices(chars, k=size))
+        while id in self.jobs.keys():
+            id = ''.join(random.choices(chars, k=size))
+        return id
+
+    def __thread__(self):
+        while True:
+            if len(self.jobs.keys()) >= 1:
+                id = list(self.jobs.keys())[0]
+                data = self.jobs[id]
+                response = process_remove_bg(data[0], data[1], data[2], data[3])
+                self.completed_jobs[id] = response
+                del self.jobs[id]
+                gc.collect()
+            else:
+                time.sleep(0.5)
+                continue
+
+    def job_status(self, id):
+        """
+        :param id: job id
+        :return: Job status
+        """
+        if id in self.completed_jobs.keys():
+            return "finished"
+        elif id in self.jobs.keys():
+            return "wait"
+        else:
+            return "not_found"
+
+    def job_result(self, id):
+        """
+        :param id: Job id
+        :return: Result for this task
+        """
+        if id in self.completed_jobs.keys():
+            data = self.completed_jobs[id]
+            del self.completed_jobs[id]
+            return data
+        else:
+            return False
+
+    def job_create(self, data: list):
+        """
+        Send job to queue
+        :param data: Job data
+        :return: Job id
+        """
+        id = self.__id_generator__(10)
+        self.jobs[id] = data
+        return id
+
 
 # Init vars
 config = Config()  # Init config object
 app = Flask(__name__)  # Init flask app
 CORS(app)  # Enable Cross-origin resource sharing
 start_time = time.time()  # This time is needed to get uptime
-procs = 0  # Number of running processes
+queue = TaskQueue()
+# Tool initialization
+prep_method = preprocessing_detect(config.prep_method)
+post_method = postprocessing_detect(config.post_method)
+model = model_detect(config.model)
 
 default_settings = \
     {  # API settings by default. See https://www.remove.bg/api for more details.
@@ -125,6 +196,9 @@ default_settings = \
         "bg_image_url": ""
     }
 
+if not isinstance(config.allowed_tokens, list):
+    raise ValueError("Allowed tokens must be a Python list! Change it like this: ['test']!")
+
 
 # noinspection PyBroadException
 @app.route("/api/removebg", methods=["POST"])
@@ -133,16 +207,11 @@ def removebg():
     API method for removing background from image.
     :return: Image or error or zip file
     """
-    global procs
-    h = dict(request.headers)
-    headers = dict()
-    for key in h:
-        val = h[key]
-        headers[key.lower()] = val
-    if "x-api-key" in headers.keys() or config.auth is False:
-        if headers["x-api-key"] in config.allowed_tokens \
-                or config.auth is False or headers["x-api-key"] == config.admin_token:
-            if "content-type" in headers.keys():
+    headers = request.headers
+    if "X-Api-Key" in headers.keys() or config.auth is False:
+        if headers["X-Api-Key"] in config.allowed_tokens \
+                or config.auth is False or headers["X-Api-Key"] == config.admin_token:
+            if "Content-Type" in headers.keys():
                 if "multipart/form-data" in request.content_type:
                     try:
                         params = deepcopy(default_settings)
@@ -151,17 +220,70 @@ def removebg():
                             params[key] = data[key]
                     except BaseException:
                         return error_dict("Something went wrong"), 400
-                    if procs >= config.procs_num_max:
-                        while procs >= config.procs_num_max:
-                            pass
-                    if procs < config.procs_num_max:
-                        procs += 1
-                        q = multiprocessing.Queue()
-                        proc = multiprocessing.Process(target=process_remove_bg,
-                                                       args=(params, request, q, False,))
-                        proc.start()
-                        procs -= 1
-                    return q.get()
+                    image_loaded = False
+                    image = None
+                    if "image_file_b64" in params.keys() and image_loaded is False:
+                        value = params["image_file_b64"]
+                        if len(value) > 0:
+                            try:
+                                image = Image.open(io.BytesIO(base64.b64decode(value)))
+                            except BaseException:
+                                return error_dict("Error decode image!"), 400
+                            image_loaded = True
+                        else:
+                            if "image_url" in params.keys() and image_loaded is False:
+                                value = params["image_url"]
+                                if len(value) > 0:
+                                    try:
+                                        image = Image.open(io.BytesIO(requests.get(value).content))
+                                        image_loaded = True
+                                    except BaseException:
+                                        return error_dict("Error download image!"), 400
+                    if image_loaded is False:
+                        if 'image_file' not in request.files:
+                            return error_dict("File not found"), 400
+                        image = request.files['image_file'].read()
+                        if len(image) == 0:
+                            return error_dict("Empty image"), 400
+                        image = Image.open(io.BytesIO(image))  # Convert bytes to PIL image
+                    bg = None
+                    if "bg_image_file" in request.files:
+                        bg = request.files['image_file'].read()
+                        if len(bg) == 0:
+                            return error_dict("Empty background image"), 400
+                        bg = Image.open(io.BytesIO(bg))  # Convert bytes to PIL image
+                    job_id = queue.job_create([params, image, bg, False])
+                    while queue.job_status(job_id) != "finished":
+                        time.sleep(1)
+                    response = queue.job_result(job_id)
+                    if isinstance(response, dict):
+                        if response["type"] == "jpg":
+                            resp = send_file(response["data"][0], mimetype='image/jpeg')
+                            resp.headers["X-Credits-Charged"] = 0
+                            resp.headers["X-Type"] = "other"
+                            resp.headers["X-Width"] = response["data"][1][0]
+                            resp.headers["X-Height"] = response["data"][1][1]
+                            return resp
+                        if response["type"] == "png":
+                            resp = send_file(response["data"][0], mimetype='image/png')
+                            resp.headers["X-Credits-Charged"] = 0
+                            resp.headers["X-Type"] = "other"
+                            resp.headers["X-Width"] = response["data"][1][0]
+                            resp.headers["X-Height"] = response["data"][1][1]
+                            return resp
+                        if response["type"] == "zip":
+                            resp = make_response(response["data"][0])
+                            resp.headers.set('Content-Type', 'zip')
+                            resp.headers.set('Content-Disposition', 'attachment',
+                                             filename='no-bg.zip')
+                            resp.headers["X-Credits-Charged"] = 0
+                            resp.headers["X-Type"] = "other"
+                            resp.headers["X-Width"] = response["data"][1][0]
+                            resp.headers["X-Height"] = response["data"][1][1]
+                            return resp
+                    else:
+                        return response
+
                 elif request.content_type == "application/x-www-form-urlencoded":
                     try:
                         params = deepcopy(default_settings)
@@ -170,17 +292,57 @@ def removebg():
                             params[key] = data[key]
                     except BaseException:
                         return error_dict("Something went wrong"), 400
-                    if procs >= config.procs_num_max:
-                        while procs >= config.procs_num_max:
-                            pass
-                    if procs < config.procs_num_max:
-                        procs += 1
-                        q = multiprocessing.Queue()
-                        proc = multiprocessing.Process(target=process_remove_bg,
-                                                       args=(params, request, q, True,))
-                        proc.start()
-                        procs -= 1
-                    return q.get()
+                    image_loaded = False
+                    image = None
+                    if "image_file_b64" in params.keys() and image_loaded is False:
+                        value = params["image_file_b64"]
+                        if len(value) > 0:
+                            try:
+                                image = Image.open(io.BytesIO(base64.b64decode(value)))
+                            except BaseException:
+                                return error_dict("Error decode image!"), 400
+                            image_loaded = True
+                        else:
+                            if "image_url" in params.keys() and image_loaded is False:
+                                value = params["image_url"]
+                                if len(value) > 0:
+                                    try:
+                                        image = Image.open(io.BytesIO(requests.get(value).content))
+                                        image_loaded = True
+                                    except BaseException:
+                                        return error_dict("Error download image!"), 400
+                    job_id = queue.job_create([params, image, None, True])
+                    while queue.job_status(job_id) != "finished":
+                        time.sleep(1)
+                    response = queue.job_result(job_id)
+                    if isinstance(response, dict):
+                        if response["type"] == "jpg":
+                            resp = send_file(response["data"][0], mimetype='image/jpeg')
+                            resp.headers["X-Credits-Charged"] = 0
+                            resp.headers["X-Type"] = "other"
+                            resp.headers["X-Width"] = response["data"][1][0]
+                            resp.headers["X-Height"] = response["data"][1][1]
+                            return resp
+                        if response["type"] == "png":
+                            resp = send_file(response["data"][0], mimetype='image/png')
+                            resp.headers["X-Credits-Charged"] = 0
+                            resp.headers["X-Type"] = "other"
+                            resp.headers["X-Width"] = response["data"][1][0]
+                            resp.headers["X-Height"] = response["data"][1][1]
+                            return resp
+                        if response["type"] == "zip":
+                            resp = make_response(response["data"][0])
+                            resp.headers.set('Content-Type', 'zip')
+                            resp.headers.set('Content-Disposition', 'attachment',
+                                             filename='no-bg.zip')
+                            resp.headers["X-Credits-Charged"] = 0
+                            resp.headers["X-Type"] = "other"
+                            resp.headers["X-Width"] = response["data"][1][0]
+                            resp.headers["X-Height"] = response["data"][1][1]
+                            return resp
+                    else:
+                        return response
+
                 elif request.content_type == "application/json":
                     try:
                         params = deepcopy(default_settings)
@@ -189,17 +351,57 @@ def removebg():
                             params[key] = data[key]
                     except BaseException:
                         return error_dict("Something went wrong"), 400
-                    if procs >= config.procs_num_max:
-                        while procs >= config.procs_num_max:
-                            pass
-                    if procs < config.procs_num_max:
-                        procs += 1
-                        q = multiprocessing.Queue()
-                        proc = multiprocessing.Process(target=process_remove_bg,
-                                                       args=(params, request, q, True,))
-                        proc.start()
-                        procs -= 1
-                    return q.get()
+                    image_loaded = False
+                    image = None
+                    if "image_file_b64" in params.keys() and image_loaded is False:
+                        value = params["image_file_b64"]
+                        if len(value) > 0:
+                            try:
+                                image = Image.open(io.BytesIO(base64.b64decode(value)))
+                            except BaseException:
+                                return error_dict("Error decode image!"), 400
+                            image_loaded = True
+                        else:
+                            if "image_url" in params.keys() and image_loaded is False:
+                                value = params["image_url"]
+                                if len(value) > 0:
+                                    try:
+                                        image = Image.open(io.BytesIO(requests.get(value).content))
+                                        image_loaded = True
+                                    except BaseException:
+                                        return error_dict("Error download image!"), 400
+                    job_id = queue.job_create([params, image, None, True])
+                    while queue.job_status(job_id) != "finished":
+                        time.sleep(1)
+                    response = queue.job_result(job_id)
+                    if isinstance(response, dict):
+                        if response["type"] == "jpg":
+                            resp = send_file(response["data"][0], mimetype='image/jpeg')
+                            resp.headers["X-Credits-Charged"] = 0
+                            resp.headers["X-Type"] = "other"
+                            resp.headers["X-Width"] = response["data"][1][0]
+                            resp.headers["X-Height"] = response["data"][1][1]
+                            return resp
+                        if response["type"] == "png":
+                            resp = send_file(response["data"][0], mimetype='image/png')
+                            resp.headers["X-Credits-Charged"] = 0
+                            resp.headers["X-Type"] = "other"
+                            resp.headers["X-Width"] = response["data"][1][0]
+                            resp.headers["X-Height"] = response["data"][1][1]
+                            return resp
+                        if response["type"] == "zip":
+                            resp = make_response(response["data"][0])
+                            resp.headers.set('Content-Type', 'zip')
+                            resp.headers.set('Content-Disposition', 'attachment',
+                                             filename='no-bg.zip')
+                            resp.headers["X-Credits-Charged"] = 0
+                            resp.headers["X-Type"] = "other"
+                            resp.headers["X-Width"] = response["data"][1][0]
+                            resp.headers["X-Height"] = response["data"][1][1]
+                            return resp
+                    else:
+                        return response
+
                 else:
                     return error_dict("Invalid request content type"), 400
             else:
@@ -215,13 +417,9 @@ def status():
     """
     Returns the current server status.
     """
-    h = dict(request.headers)
-    headers = dict()
-    for key in h:
-        val = h[key]
-        headers[key.lower()] = val
-    if "x-api-key" in headers.keys() or config.auth is False:
-        if config.auth is False or headers["x-api-key"] == config.admin_token:
+    headers = request.headers
+    if "X-Api-Key" in headers.keys() or config.auth is False:
+        if config.auth is False or headers["X-Api-Key"] == config.admin_token:
             this = psutil.Process(os.getpid())
             data = {
                 "status": {
@@ -278,54 +476,16 @@ def error_dict(error_text: str):
     return resp
 
 
-# TODO Make a queue for processing requests and a method for quickly changing models and methods of image processing
-# TODO Move initialization somewhere else
 # noinspection PyBroadException
-def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
+def process_remove_bg(params, image, bg, is_json_or_www_encoded=False):
     """
     Handles a request to the removebg api method
     :param params: parameters
-    :param request: flask request
-    :param queue: Queue for sending a response
+    :param image: foreground pil image
     :param is_json_or_www_encoded: is "json" or "x-www-form-urlencoded" content-type
-    :return:
+    :param bg: background pil image
+    :return: tuple or dict
     """
-    # Tool initialization
-    prep_method = preprocessing_detect(config.prep_method)
-    post_method = postprocessing_detect(config.post_method)
-    model = model_detect(config.model)
-
-    image_loaded = False
-    image = None
-    if "image_file_b64" in params.keys() and image_loaded is False:
-        value = params["image_file_b64"]
-        if len(value) > 0:
-            try:
-                image = Image.open(io.BytesIO(base64.b64decode(value)))
-            except BaseException:
-                queue.put((error_dict("Error decode image!"), 400))
-                exit(0)
-            image_loaded = True
-        else:
-            if "image_url" in params.keys() and image_loaded is False:
-                value = params["image_url"]
-                if len(value) > 0:
-                    try:
-                        image = Image.open(io.BytesIO(requests.get(value).content))
-                        image_loaded = True
-                    except BaseException:
-                        queue.put((error_dict("Error download image!"), 400))
-                        exit(0)
-    if not is_json_or_www_encoded:
-        if image_loaded is False:
-            if 'image_file' not in request.files:
-                queue.put((error_dict("File not found"), 400))
-                exit(0)
-            image = request.files['image_file'].read()
-            if len(image) == 0:
-                queue.put((error_dict("Empty image"), 400))
-                exit(0)
-            image = Image.open(io.BytesIO(image))  # Convert bytes to PIL image
 
     if "size" in params.keys():
         value = params["size"]
@@ -355,38 +515,31 @@ def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
                     try:
                         coord = int(coord)
                     except BaseException:
-                        queue.put((error_dict("Error converting roi coordinate string to number!"), 400))
-                        exit(0)
+                        return error_dict("Error converting roi coordinate string to number!"), 400
                     if (i == 0 or i == 2) and coord > image.size[0]:
-                        queue.put((error_dict(
-                            "The roi coordinate cannot be larger than the image size."), 400))
-                        exit(0)
+                        return error_dict(
+                            "The roi coordinate cannot be larger than the image size."), 400
                     elif (i == 1 or i == 3) and coord > image.size[1]:
-                        queue.put((error_dict(
-                            "The roi coordinate cannot be larger than the image size."), 400))
-                        exit(0)
+                        return error_dict(
+                            "The roi coordinate cannot be larger than the image size."), 400
                     roi_box[i] = int(coord)
                 elif "%" in coord:
                     coord = coord.replace("%", "")
                     try:
                         coord = int(coord)
                     except BaseException:
-                        queue.put((error_dict("Error converting roi coordinate string to number!"), 400))
-                        exit(0)
+                        return error_dict("Error converting roi coordinate string to number!"), 400
                     if coord > 100:
-                        queue.put((error_dict("The coordinate cannot be more than 100%"), 400))
-                        exit(0)
+                        return error_dict("The coordinate cannot be more than 100%"), 400
                     elif coord < 0:
-                        queue.put((error_dict("Coordinate cannot be less than 0%"), 400))
-                        exit(0)
+                        return error_dict("Coordinate cannot be less than 0%"), 400
                     if i == 0 or i == 2:
                         coord = int(image.size[0] * coord / 100)
                     elif i == 1 or i == 3:
                         coord = int(image.size[1] * coord / 100)
                     roi_box[i] = coord
                 else:
-                    queue.put((error_dict("Something wrong with roi coordinates!"), 400))
-                    exit(0)
+                    return error_dict("Something wrong with roi coordinates!"), 400
 
     new_image = image.copy()
     new_image = new_image.crop(roi_box)
@@ -403,14 +556,11 @@ def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
             try:
                 value = int(value)
             except BaseException:
-                queue.put((error_dict("Error converting scale string to number!"), 400))
-                exit(0)
+                return error_dict("Error converting scale string to number!"), 400
             if value > 100:
-                queue.put((error_dict("The scale cannot be more than 100%"), 400))
-                exit(0)
+                return error_dict("The scale cannot be more than 100%"), 400
             elif value <= 0:
-                queue.put((error_dict("scale cannot be less than 1%"), 400))
-                exit(0)
+                return error_dict("scale cannot be less than 1%"), 400
             new_image.thumbnail((int(image.size[0] * value / 100),
                                  int(image.size[1] * value / 100)), resample=Image.ANTIALIAS)
             scaled = True
@@ -425,13 +575,11 @@ def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
                     try:
                         crop_margin = int(crop_margin)
                     except BaseException:
-                        queue.put((error_dict("Error converting crop_margin string to number!"), 400))
-                        exit(0)
+                        return error_dict("Error converting crop_margin string to number!"), 400
                     crop_margin = abs(crop_margin)
                     if crop_margin > 500:
-                        queue.put((error_dict(
-                            "The crop_margin cannot be larger than the original image size."), 400))
-                        exit(0)
+                        return error_dict(
+                            "The crop_margin cannot be larger than the original image size."), 400
                     new_image = add_margin(new_image, crop_margin,
                                            crop_margin, crop_margin, crop_margin, (0, 0, 0, 0))
                 elif "%" in crop_margin:
@@ -439,14 +587,11 @@ def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
                     try:
                         crop_margin = int(crop_margin)
                     except BaseException:
-                        queue.put((error_dict("Error converting crop_margin string to number!"), 400))
-                        exit(0)
+                        return error_dict("Error converting crop_margin string to number!"), 400
                     if crop_margin > 100:
-                        queue.put((error_dict("The crop_margin cannot be more than 100%"), 400))
-                        exit(0)
+                        return error_dict("The crop_margin cannot be more than 100%"), 400
                     elif crop_margin < 0:
-                        queue.put((error_dict("Crop_margin cannot be less than 0%"), 400))
-                        exit(0)
+                        return error_dict("Crop_margin cannot be less than 0%"), 400
                     new_image = add_margin(new_image, int(new_image.size[1] * crop_margin / 100),
                                            int(new_image.size[0] * crop_margin / 100),
                                            int(new_image.size[1] * crop_margin / 100),
@@ -462,14 +607,11 @@ def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
                         try:
                             value = int(value)
                         except BaseException:
-                            queue.put((error_dict("Error converting position string to number!"), 400))
-                            exit(0)
+                            return error_dict("Error converting position string to number!"), 400
                         if value > 100:
-                            queue.put((error_dict("The position cannot be more than 100%"), 400))
-                            exit(0)
+                            return error_dict("The position cannot be more than 100%"), 400
                         elif value < 0:
-                            queue.put((error_dict("position cannot be less than 0%"), 400))
-                            exit(0)
+                            return error_dict("position cannot be less than 0%"), 400
                         new_image = trans_paste(Image.new("RGBA", image.size), new_image,
                                                 (int(image.size[0] * value / 100),
                                                  int(image.size[1] * value / 100)))
@@ -480,17 +622,13 @@ def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
                         try:
                             val = int(val)
                         except BaseException:
-                            queue.put((error_dict("Error converting position string to number!"), 400))
-                            exit(0)
+                            return error_dict("Error converting position string to number!"), 400
                         if val < 0:
-                            queue.put((error_dict("position cannot be less than 0px"), 400))
-                            exit(0)
+                            return error_dict("position cannot be less than 0px"), 400
                         if i == 0 and val > image.size[0]:
-                            queue.put((error_dict("position cannot be greater than image size"), 400))
-                            exit(0)
+                            return error_dict("position cannot be greater than image size"), 400
                         elif i == 1 and val > image.size[1]:
-                            queue.put((error_dict("position cannot be greater than image size"), 400))
-                            exit(0)
+                            return error_dict("position cannot be greater than image size"), 400
                         value[i] = val
                     new_image = trans_paste(Image.new("RGBA", image.size), new_image,
                                             (value[0], value[1]))
@@ -513,8 +651,7 @@ def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
                         try:
                             color = ImageColor.getcolor("#" + value, "RGB")
                         except BaseException:
-                            queue.put((error_dict("Error converting bg_color string to color tuple!"), 400))
-                            exit(0)
+                            return error_dict("Error converting bg_color string to color tuple!"), 400
                     bg = Image.new("RGBA", new_image.size, color)
                     bg = trans_paste(bg, new_image, (0, 0))
                     new_image = bg.copy()
@@ -525,19 +662,13 @@ def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
                     try:
                         bg = Image.open(io.BytesIO(requests.get(value).raw))
                     except BaseException:
-                        queue.put((error_dict("Error download background image!"), 400))
-                        exit(0)
+                        return error_dict("Error download background image!"), 400
                     bg = bg.resize(new_image.size)
                     bg = trans_paste(bg, new_image, (0, 0))
                     new_image = bg.copy()
                     bg_chaged = True
             if not is_json_or_www_encoded:
-                if "bg_image_file" in request.files and bg_chaged is False:
-                    bg = request.files['image_file'].read()
-                    if len(bg) == 0:
-                        queue.put((error_dict("Empty background image"), 400))
-                        exit(0)
-                    bg = Image.open(io.BytesIO(bg))  # Convert bytes to PIL image
+                if bg and bg_chaged is False:
                     bg = bg.resize(new_image.size)
                     bg = trans_paste(bg, new_image, (0, 0))
                     new_image = bg.copy()
@@ -548,13 +679,7 @@ def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
             img_io = io.BytesIO()
             new_image.save(img_io, 'JPEG', quality=100)
             img_io.seek(0)
-            resp = send_file(img_io, mimetype='image/jpeg')
-            resp.headers["X-Credits-Charged"] = 0
-            resp.headers["X-Type"] = "other"
-            resp.headers["X-Width"] = new_image.size[0]
-            resp.headers["X-Height"] = new_image.size[1]
-            queue.put((resp))
-            exit(0)
+            return {"type": "jpg", "data": [img_io, new_image.size]}
         elif value == "zip":
             mask = __extact_alpha_channel__(new_image)
             mask_buff = io.BytesIO()
@@ -574,27 +699,14 @@ def process_remove_bg(params, request, queue, is_json_or_www_encoded=False, ):
                 zip_info.compress_type = zipfile.ZIP_DEFLATED
                 zip_file.writestr(zip_info, mask_buff.getvalue())
             fileobj.seek(0)
-            response = make_response(fileobj.read())
-            response.headers.set('Content-Type', 'zip')
-            response.headers.set('Content-Disposition', 'attachment',
-                                 filename='no-bg.zip')
-            response.headers["X-Credits-Charged"] = 0
-            response.headers["X-Type"] = "other"  # TODO: Associate this with an object classifier
-            response.headers["X-Width"] = new_image.size[0]
-            response.headers["X-Height"] = new_image.size[1]
-            queue.put((response))
-            exit(0)
+            return {"type": "zip", "data": [fileobj.read(), new_image.size]}
         else:
             buff = io.BytesIO()
             new_image.save(buff, 'PNG')
             buff.seek(0)
-            resp = send_file(buff, mimetype='image/png')
-            resp.headers["X-Credits-Charged"] = 0
-            resp.headers["X-Type"] = "other"  # TODO: Associate this with an object classifier
-            resp.headers["X-Width"] = new_image.size[0]
-            resp.headers["X-Height"] = new_image.size[1]
-            queue.put((resp))
-            exit(0)
+            return {"type": "png", "data": [buff, new_image.size]}
+    return error_dict("Something wrong with request or http api. Please, open new issue on Github! This is error in "
+                      "code."), 400
 
 
 def trans_paste(bg_img, fg_img, box=(0, 0)):

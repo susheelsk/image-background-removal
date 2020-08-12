@@ -1,7 +1,7 @@
 """
 Name: tests
 Description: This file contains the test code
-Version: [release][3.2]
+Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
 Author: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 License: Apache License 2.0

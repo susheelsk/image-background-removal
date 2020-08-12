@@ -240,7 +240,7 @@ class FBAMatting:
 
         self.__fba__ = FBAMattingNeural()
 
-    def __remove_too_transparent_borders__(self, mask, tranp_val=231):
+    def __remove_too_transparent_borders__(self, mask, tranp_val=50):
         """
         Marks all pixels in the mask with a transparency greater than tranp_val as opaque.
         Pixels with transparency less than tranp_val, as fully transparent
@@ -276,8 +276,14 @@ class FBAMatting:
         mask = self.np.array(self.__extact_alpha_channel__(png))
         if model_name == "deeplabv3":
             trimap = self.trimap(mask, "", 50, 2, erosion=12)
+        elif model_name in ["u2net", "basnet"]:
+            mask = self.__remove_too_transparent_borders__(mask, 50)
+            trimap = self.trimap(mask, "", 50, 2, erosion=5)
+        elif model_name == "u2netp":
+            mask = self.__remove_too_transparent_borders__(mask, 231)
+            trimap = self.trimap(mask, "", 50, 2, erosion=1)
         else:
-            mask = self.__remove_too_transparent_borders__(mask)
+            mask = self.__remove_too_transparent_borders__(mask, 231)
             trimap = self.trimap(mask, "", 50, 2, erosion=1)
         if not isinstance(trimap, bool):
             return Image.fromarray(trimap)

@@ -65,13 +65,15 @@ class U2NET:
         self.torch = torch
         self.U2NET_DEEP = U2NET_DEEP
         self.U2NETP_DEEP = U2NETP_DEEP
-        self.model_name = "u2net"
+
         if name == 'u2net':  # Load model
             logger.debug("Loading a U2NET model (176.6 mb) with better quality but slower processing.")
             net = self.U2NET_DEEP()
+            self.model_name = "u2net"
         elif name == 'u2netp':
             logger.debug("Loading a U2NETp model (4 mb) with lower quality but fast processing.")
             net = self.U2NETP_DEEP()
+            self.model_name = "u2netp"
         else:
             raise Exception("Unknown u2net model!")
         try:
