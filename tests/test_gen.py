@@ -79,6 +79,7 @@ def gen(test):
                     try:
                         sub = cli_call(str(input_path.absolute()), str(path.absolute()), model_name,
                                         preprocess_method_name, postprocess_method_name)
+                        test.fail(sub.communicate()[0].decode("UTF-8"))
                         if sub.returncode == 1:
                             test.fail("TESTING FAILED!\n"
                                       "PARAMS:\n"
@@ -98,6 +99,7 @@ def gen(test):
                     try:
                         sub = cli_call(str(input_path.absolute()), str(path.absolute()), model_name,
                                         preprocess_method_name, postprocess_method_name)
+                        test.fail(sub.communicate()[0].decode("UTF-8"))
                         if sub.returncode == 1:
                             test.fail("TESTING FAILED!\n"
                                       "PARAMS:\n"
