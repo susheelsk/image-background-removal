@@ -54,16 +54,20 @@ def gen(test):
                                                                      preprocess_method_name, postprocess_method_name),
                                 exist_ok=True)
                 print(model_name, preprocess_method_name, postprocess_method_name)
-                proc = multiprocessing.Process(target=run,
-                                               args=(test, "docs/imgs/input/",
-                                                     "docs/imgs/examples/{}/{}/{}".format(model_name,
-                                                                                          preprocess_method_name,
-                                                                                          postprocess_method_name),
-                                                     model_name, preprocess_method_name, postprocess_method_name,))
-                proc.start()
-                proc.join()
-                if proc.exitcode == 1:
-                    return False
+                try:
+                    proc = multiprocessing.Process(target=run,
+                                                   args=(test, "docs/imgs/input/",
+                                                         "docs/imgs/examples/{}/{}/{}".format(model_name,
+                                                                                              preprocess_method_name,
+                                                                                              postprocess_method_name),
+                                                         model_name, preprocess_method_name, postprocess_method_name,))
+                    proc.start()
+                    proc.join()
+                    if proc.exitcode == 1:
+                        return False
+                except BaseException as e:
+                    print(e)
+                    raise e
     return True
 
 

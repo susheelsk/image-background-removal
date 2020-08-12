@@ -373,7 +373,7 @@ class DeeplabV3(object):
         else:
             orig_image = data.copy()
 
-        return orig_image.copy(), orig_image
+        return orig_image.copy().convert("RGB"), orig_image
 
     def process_image(self, data, preprocessing=None, postprocessing=None):
         """
