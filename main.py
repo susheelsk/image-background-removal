@@ -58,6 +58,8 @@ def __save_image_file__(img, file_path: Path, output_path: Path):
                 output_path.mkdir(parents=True, exist_ok=True)
             img.save(output_path.joinpath(file_path.stem + ".png"))
         else:
+            if not output_path.parents[0].exists():  # create output directory if it doesn't exist
+                output_path.parents[0].mkdir(parents=True, exist_ok=True)
             img.save(output_path.with_suffix(".png"))
 
 

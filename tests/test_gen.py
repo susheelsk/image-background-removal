@@ -1,6 +1,6 @@
 """
-Name: tests
-Description: This file contains the test code
+Name: Sample Image Generation Test
+Description: This file contains the test code for creating a sample image
 Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
 Author: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
