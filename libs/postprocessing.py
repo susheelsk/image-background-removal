@@ -276,10 +276,10 @@ class FBAMatting:
         mask = self.np.array(self.__extact_alpha_channel__(png))
         if model_name == "deeplabv3":
             trimap = self.trimap(mask, "", 50, 2, erosion=12)
-        elif model_name in ["u2net", "basnet"]:
+        elif model_name == "basnet":
             mask = self.__remove_too_transparent_borders__(mask, 50)
             trimap = self.trimap(mask, "", 50, 2, erosion=5)
-        elif model_name == "u2netp":
+        elif model_name in ["u2net", "u2netp"]:
             mask = self.__remove_too_transparent_borders__(mask, 231)
             trimap = self.trimap(mask, "", 50, 2, erosion=1)
         else:
@@ -405,6 +405,9 @@ class FBAMattingNeural:
                 return False, False
         else:
             image = data_input.convert("RGB")
+        w, h = image.size
+        if h < 2 or w < 2:
+            raise Exception("Image is too small. Minimum size 2x2")
         return image
 
     def process_image(self, image, trimap):

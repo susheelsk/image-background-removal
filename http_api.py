@@ -101,9 +101,10 @@ else:
         allowed_tokens = ["test"]  # All allowed tokens
 
 
+# noinspection PyBroadException,PyShadowingBuiltins
 class TaskQueue:
     """
-    Very simple job queue
+    Very simple task queue
     """
 
     def __init__(self):
@@ -111,6 +112,9 @@ class TaskQueue:
         self.completed_jobs = {}
         self.thread = threading.Thread(target=self.__thread__, args=())
         self.thread.start()
+        self.__unused_result_delete_thread__ = threading.Thread(target=self.__unused_result_check__,
+                                                                args=())
+        self.__unused_result_delete_thread__.start()
 
     def __id_generator__(self, size=10, chars=string.ascii_uppercase + string.digits):
         id = ''.join(random.choices(chars, k=size))
@@ -124,11 +128,29 @@ class TaskQueue:
                 id = list(self.jobs.keys())[0]
                 data = self.jobs[id]
                 response = process_remove_bg(data[0], data[1], data[2], data[3])
-                self.completed_jobs[id] = response
-                del self.jobs[id]
+                self.completed_jobs[id] = [response, time.time()]
+                try:
+                    del self.jobs[id]
+                except BaseException:
+                    pass
                 gc.collect()
             else:
                 time.sleep(0.5)
+                continue
+
+    def __unused_result_check__(self):
+        while True:
+            if len(self.completed_jobs.keys()) >= 1:
+                for job_id in self.completed_jobs.keys():
+                    job_finished_time = self.completed_jobs[job_id][1]
+                    if time.time() - job_finished_time > 3600:
+                        try:
+                            del self.completed_jobs[job_id]
+                        except BaseException:
+                            pass
+                gc.collect()
+            else:
+                time.sleep(120)
                 continue
 
     def job_status(self, id):
@@ -149,8 +171,11 @@ class TaskQueue:
         :return: Result for this task
         """
         if id in self.completed_jobs.keys():
-            data = self.completed_jobs[id]
-            del self.completed_jobs[id]
+            data = self.completed_jobs[id][0]
+            try:
+                del self.completed_jobs[id]
+            except BaseException:
+                pass
             return data
         else:
             return False
@@ -161,7 +186,7 @@ class TaskQueue:
         :param data: Job data
         :return: Job id
         """
-        id = self.__id_generator__(10)
+        id = self.__id_generator__()
         self.jobs[id] = data
         return id
 
@@ -219,7 +244,7 @@ def removebg():
                         for key in data:
                             params[key] = data[key]
                     except BaseException:
-                        return error_dict("Something went wrong"), 400
+                        return handle_response((error_dict("Something went wrong"), 400), None)
                     image_loaded = False
                     image = None
                     if "image_file_b64" in params.keys() and image_loaded is False:
@@ -228,7 +253,7 @@ def removebg():
                             try:
                                 image = Image.open(io.BytesIO(base64.b64decode(value)))
                             except BaseException:
-                                return error_dict("Error decode image!"), 400
+                                return handle_response((error_dict("Error decode image!"), 400), None)
                             image_loaded = True
                         else:
                             if "image_url" in params.keys() and image_loaded is False:
@@ -238,52 +263,25 @@ def removebg():
                                         image = Image.open(io.BytesIO(requests.get(value).content))
                                         image_loaded = True
                                     except BaseException:
-                                        return error_dict("Error download image!"), 400
+                                        return handle_response((error_dict("Error download image!"), 400), None)
                     if image_loaded is False:
                         if 'image_file' not in request.files:
-                            return error_dict("File not found"), 400
+                            return handle_response((error_dict("File not found"), 400), None)
                         image = request.files['image_file'].read()
                         if len(image) == 0:
-                            return error_dict("Empty image"), 400
+                            return handle_response((error_dict("Empty image"), 400), None)
                         image = Image.open(io.BytesIO(image))  # Convert bytes to PIL image
                     bg = None
                     if "bg_image_file" in request.files:
                         bg = request.files['image_file'].read()
                         if len(bg) == 0:
-                            return error_dict("Empty background image"), 400
+                            return handle_response((error_dict("Empty background image"), 400), None)
                         bg = Image.open(io.BytesIO(bg))  # Convert bytes to PIL image
                     job_id = queue.job_create([params, image, bg, False])
                     while queue.job_status(job_id) != "finished":
                         time.sleep(1)
                     response = queue.job_result(job_id)
-                    if isinstance(response, dict):
-                        if response["type"] == "jpg":
-                            resp = send_file(response["data"][0], mimetype='image/jpeg')
-                            resp.headers["X-Credits-Charged"] = 0
-                            resp.headers["X-Type"] = "other"
-                            resp.headers["X-Width"] = response["data"][1][0]
-                            resp.headers["X-Height"] = response["data"][1][1]
-                            return resp
-                        if response["type"] == "png":
-                            resp = send_file(response["data"][0], mimetype='image/png')
-                            resp.headers["X-Credits-Charged"] = 0
-                            resp.headers["X-Type"] = "other"
-                            resp.headers["X-Width"] = response["data"][1][0]
-                            resp.headers["X-Height"] = response["data"][1][1]
-                            return resp
-                        if response["type"] == "zip":
-                            resp = make_response(response["data"][0])
-                            resp.headers.set('Content-Type', 'zip')
-                            resp.headers.set('Content-Disposition', 'attachment',
-                                             filename='no-bg.zip')
-                            resp.headers["X-Credits-Charged"] = 0
-                            resp.headers["X-Type"] = "other"
-                            resp.headers["X-Width"] = response["data"][1][0]
-                            resp.headers["X-Height"] = response["data"][1][1]
-                            return resp
-                    else:
-                        return response
-
+                    return handle_response(response, image)
                 elif request.content_type == "application/x-www-form-urlencoded":
                     try:
                         params = deepcopy(default_settings)
@@ -291,7 +289,7 @@ def removebg():
                         for key in data:
                             params[key] = data[key]
                     except BaseException:
-                        return error_dict("Something went wrong"), 400
+                        return handle_response((error_dict("Something went wrong"), 400), None)
                     image_loaded = False
                     image = None
                     if "image_file_b64" in params.keys() and image_loaded is False:
@@ -300,7 +298,7 @@ def removebg():
                             try:
                                 image = Image.open(io.BytesIO(base64.b64decode(value)))
                             except BaseException:
-                                return error_dict("Error decode image!"), 400
+                                return handle_response((error_dict("Error decode image!"), 400), None)
                             image_loaded = True
                         else:
                             if "image_url" in params.keys() and image_loaded is False:
@@ -310,39 +308,12 @@ def removebg():
                                         image = Image.open(io.BytesIO(requests.get(value).content))
                                         image_loaded = True
                                     except BaseException:
-                                        return error_dict("Error download image!"), 400
+                                        return handle_response((error_dict("Error download image!"), 400), None)
                     job_id = queue.job_create([params, image, None, True])
                     while queue.job_status(job_id) != "finished":
                         time.sleep(1)
                     response = queue.job_result(job_id)
-                    if isinstance(response, dict):
-                        if response["type"] == "jpg":
-                            resp = send_file(response["data"][0], mimetype='image/jpeg')
-                            resp.headers["X-Credits-Charged"] = 0
-                            resp.headers["X-Type"] = "other"
-                            resp.headers["X-Width"] = response["data"][1][0]
-                            resp.headers["X-Height"] = response["data"][1][1]
-                            return resp
-                        if response["type"] == "png":
-                            resp = send_file(response["data"][0], mimetype='image/png')
-                            resp.headers["X-Credits-Charged"] = 0
-                            resp.headers["X-Type"] = "other"
-                            resp.headers["X-Width"] = response["data"][1][0]
-                            resp.headers["X-Height"] = response["data"][1][1]
-                            return resp
-                        if response["type"] == "zip":
-                            resp = make_response(response["data"][0])
-                            resp.headers.set('Content-Type', 'zip')
-                            resp.headers.set('Content-Disposition', 'attachment',
-                                             filename='no-bg.zip')
-                            resp.headers["X-Credits-Charged"] = 0
-                            resp.headers["X-Type"] = "other"
-                            resp.headers["X-Width"] = response["data"][1][0]
-                            resp.headers["X-Height"] = response["data"][1][1]
-                            return resp
-                    else:
-                        return response
-
+                    return handle_response(response, image)
                 elif request.content_type == "application/json":
                     try:
                         params = deepcopy(default_settings)
@@ -350,7 +321,7 @@ def removebg():
                         for key in data:
                             params[key] = data[key]
                     except BaseException:
-                        return error_dict("Something went wrong"), 400
+                        return handle_response((error_dict("Something went wrong"), 400), None)
                     image_loaded = False
                     image = None
                     if "image_file_b64" in params.keys() and image_loaded is False:
@@ -359,7 +330,7 @@ def removebg():
                             try:
                                 image = Image.open(io.BytesIO(base64.b64decode(value)))
                             except BaseException:
-                                return error_dict("Error decode image!"), 400
+                                return handle_response((error_dict("Error decode image!"), 400), None)
                             image_loaded = True
                         else:
                             if "image_url" in params.keys() and image_loaded is False:
@@ -369,47 +340,20 @@ def removebg():
                                         image = Image.open(io.BytesIO(requests.get(value).content))
                                         image_loaded = True
                                     except BaseException:
-                                        return error_dict("Error download image!"), 400
+                                        return handle_response((error_dict("Error download image!"), 400), None)
                     job_id = queue.job_create([params, image, None, True])
                     while queue.job_status(job_id) != "finished":
                         time.sleep(1)
                     response = queue.job_result(job_id)
-                    if isinstance(response, dict):
-                        if response["type"] == "jpg":
-                            resp = send_file(response["data"][0], mimetype='image/jpeg')
-                            resp.headers["X-Credits-Charged"] = 0
-                            resp.headers["X-Type"] = "other"
-                            resp.headers["X-Width"] = response["data"][1][0]
-                            resp.headers["X-Height"] = response["data"][1][1]
-                            return resp
-                        if response["type"] == "png":
-                            resp = send_file(response["data"][0], mimetype='image/png')
-                            resp.headers["X-Credits-Charged"] = 0
-                            resp.headers["X-Type"] = "other"
-                            resp.headers["X-Width"] = response["data"][1][0]
-                            resp.headers["X-Height"] = response["data"][1][1]
-                            return resp
-                        if response["type"] == "zip":
-                            resp = make_response(response["data"][0])
-                            resp.headers.set('Content-Type', 'zip')
-                            resp.headers.set('Content-Disposition', 'attachment',
-                                             filename='no-bg.zip')
-                            resp.headers["X-Credits-Charged"] = 0
-                            resp.headers["X-Type"] = "other"
-                            resp.headers["X-Width"] = response["data"][1][0]
-                            resp.headers["X-Height"] = response["data"][1][1]
-                            return resp
-                    else:
-                        return response
-
+                    return handle_response(response, image)
                 else:
-                    return error_dict("Invalid request content type"), 400
+                    return handle_response((error_dict("Invalid request content type"), 400), None)
             else:
-                return error_dict("Invalid request content type"), 400
+                return handle_response((error_dict("Invalid request content type"), 400), None)
         else:
-            return error_dict("Authentication failed"), 403
+            return handle_response((error_dict("Authentication failed"), 403), None)
     else:
-        return error_dict("Missing API Key"), 403
+        return handle_response((error_dict("Missing API Key"), 403), None)
 
 
 @app.route("/api/status", methods=["GET"])
@@ -465,17 +409,6 @@ def root():
     return 'image-background-remove-tool API v3.3'
 
 
-def error_dict(error_text: str):
-    """
-    Generates a dictionary containing $error_text error
-    :param error_text: Error text
-    :return: error dictionary
-    """
-    resp = jsonify({"errors": [{"title": error_text}]})
-    resp.headers["X-Credits-Charged"] = 0
-    return resp
-
-
 # noinspection PyBroadException
 def process_remove_bg(params, image, bg, is_json_or_www_encoded=False):
     """
@@ -486,7 +419,9 @@ def process_remove_bg(params, image, bg, is_json_or_www_encoded=False):
     :param bg: background pil image
     :return: tuple or dict
     """
-
+    h, w = image.size
+    if h < 2 or w < 2:
+        return error_dict("Image is too small. Minimum size 2x2"), 400
     if "size" in params.keys():
         value = params["size"]
         if value == "preview" or value == "small" or value == "regular":
@@ -516,6 +451,9 @@ def process_remove_bg(params, image, bg, is_json_or_www_encoded=False):
                         coord = int(coord)
                     except BaseException:
                         return error_dict("Error converting roi coordinate string to number!"), 400
+                    if coord < 0:
+                        error_dict(
+                            "Bad roi coordinate."), 400
                     if (i == 0 or i == 2) and coord > image.size[0]:
                         return error_dict(
                             "The roi coordinate cannot be larger than the image size."), 400
@@ -543,6 +481,9 @@ def process_remove_bg(params, image, bg, is_json_or_www_encoded=False):
 
     new_image = image.copy()
     new_image = new_image.crop(roi_box)
+    h, w = new_image.size
+    if h < 2 or w < 2:
+        return error_dict("Image is too small. Minimum size 2x2"), 400
     new_image = model.process_image(new_image, prep_method, post_method)
 
     if prep_method:
@@ -566,7 +507,7 @@ def process_remove_bg(params, image, bg, is_json_or_www_encoded=False):
             scaled = True
     if "crop" in params.keys():
         value = params["crop"]
-        if value == "true" or value is True:
+        if value in ["true", "True"] or (value is True and isinstance(value, bool)):
             new_image = new_image.crop(new_image.getbbox())
             if "crop_margin" in params.keys():
                 crop_margin = params["crop_margin"]
@@ -660,16 +601,18 @@ def process_remove_bg(params, image, bg, is_json_or_www_encoded=False):
                 value = params["bg_image_url"]
                 if len(value) > 0:
                     try:
-                        bg = Image.open(io.BytesIO(requests.get(value).raw))
+                        bg = Image.open(io.BytesIO(requests.get(value).content))
                     except BaseException:
                         return error_dict("Error download background image!"), 400
                     bg = bg.resize(new_image.size)
+                    bg = bg.convert("RGBA")
                     bg = trans_paste(bg, new_image, (0, 0))
                     new_image = bg.copy()
                     bg_chaged = True
             if not is_json_or_www_encoded:
                 if bg and bg_chaged is False:
                     bg = bg.resize(new_image.size)
+                    bg = bg.convert("RGBA")
                     bg = trans_paste(bg, new_image, (0, 0))
                     new_image = bg.copy()
     if "format" in params.keys():
@@ -707,6 +650,52 @@ def process_remove_bg(params, image, bg, is_json_or_www_encoded=False):
             return {"type": "png", "data": [buff, new_image.size]}
     return error_dict("Something wrong with request or http api. Please, open new issue on Github! This is error in "
                       "code."), 400
+
+
+def error_dict(error_text: str):
+    """
+    Generates a dictionary containing $error_text error
+    :param error_text: Error text
+    :return: error dictionary
+    """
+    resp = {"errors": [{"title": error_text}]}
+    return resp
+
+
+def handle_response(response, original_image):
+    """
+    Response handler from TaskQueue
+    :param response: TaskQueue response
+    :param original_image: Original PIL image
+    :return: Complete flask response
+    """
+    if isinstance(response, dict):
+        resp = None
+        if response["type"] == "jpg":
+            resp = send_file(response["data"][0], mimetype='image/jpeg')
+        elif response["type"] == "png":
+            resp = send_file(response["data"][0], mimetype='image/png')
+        elif response["type"] == "zip":
+            resp = make_response(response["data"][0])
+            resp.headers.set('Content-Type', 'zip')
+            resp.headers.set('Content-Disposition', 'attachment',
+                             filename='no-bg.zip')
+        # Add headers to output result
+        resp.headers["X-Credits-Charged"] = 0
+        resp.headers["X-Type"] = "other"  # TODO Make support for this
+        resp.headers["X-Max-Width"] = original_image.size[0]
+        resp.headers["X-Max-Height"] = original_image.size[1]
+        resp.headers["X-Ratelimit-Limit"] = 500  # TODO Make ratelimit support
+        resp.headers["X-Ratelimit-Remaining"] = 500
+        resp.headers["X-Ratelimit-Reset"] = 1
+        resp.headers["X-Width"] = response["data"][1][0]
+        resp.headers["X-Height"] = response["data"][1][1]
+
+        return resp
+    else:
+        resp = jsonify(response[0])
+        resp.headers["X-Credits-Charged"] = 0
+        return resp, response[1]
 
 
 def trans_paste(bg_img, fg_img, box=(0, 0)):

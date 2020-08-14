@@ -157,11 +157,12 @@ class U2NET:
                 return False, False
             pil_image = image.copy()
             image = np.array(image)
-
         else:
             image = np.array(data)  # Convert PIL image to numpy arr
             pil_image = data.copy()
-
+        h, w, _ = image.shape
+        if h < 2 or w < 2:
+            raise Exception("Image is too small. Minimum size 2x2")
         image = transform.resize(image, (image_size, image_size), mode='constant')  # Resize image
         image = self.__ndrarray2tensor__(image)  # Convert image from numpy arr to tensor
         return image, pil_image
@@ -302,6 +303,9 @@ class BasNet:
         else:
             image = np.array(data)  # Convert PIL image to numpy arr
             pil_image = data.copy()
+        h, w, _ = image.shape
+        if h < 2 or w < 2:
+            raise Exception("Image is too small. Minimum size 2x2")
         image = transform.resize(image, (image_size, image_size), mode='constant')  # Resize image
         image = self.__ndrarray2tensor__(image)  # Convert image from numpy arr to tensor
         return image, pil_image
@@ -374,7 +378,9 @@ class DeeplabV3(object):
                 return False
         else:
             orig_image = data.copy()
-
+        w, h = orig_image.size
+        if h < 2 or w < 2:
+            raise Exception("Image is too small. Minimum size 2x2")
         return orig_image.copy().convert("RGB"), orig_image
 
     def process_image(self, data, preprocessing=None, postprocessing=None):

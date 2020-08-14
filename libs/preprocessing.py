@@ -45,6 +45,7 @@ def method_detect(method: str):
     else:
         return False
 
+
 # This preprocessing method will be added in the future!
 # Todo Refine this method.
 # class MiDaS:
@@ -466,6 +467,9 @@ class FastRcnn:
             # Fix https://github.com/OPHoperHPO/image-background-remove-tool/issues/19
             data_input = data_input.convert("RGB")
             image = np.array(data_input)  # Convert PIL image to numpy arr
+        h, w, _ = image.shape
+        if h < 2 or w < 2:
+            raise Exception("Image is too small. Minimum size 2x2")
         x, resized_image = self.data.transforms.presets.rcnn.transform_test(self.nd.array(image))
         return x, image, resized_image
 
@@ -519,6 +523,9 @@ class MaskRcnn:
             # Fix https://github.com/OPHoperHPO/image-background-remove-tool/issues/19
             data_input = data_input.convert("RGB")
             image = np.array(data_input)  # Convert PIL image to numpy arr
+        h, w, _ = image.shape
+        if h < 2 or w < 2:
+            raise Exception("Image is too small. Minimum size 2x2")
         x, resized_image = self.data.transforms.presets.rcnn.transform_test(self.nd.array(image))
         return x, image, resized_image
 

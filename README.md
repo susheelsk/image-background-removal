@@ -48,14 +48,16 @@ The program removes the background from photos.
 **********************************************************************
 ## 🏷 Setup for Windows:  
 * Clone this repository  
-* Install all the dependencies from **requirements.txt** via ```pip3 install -r requirements.txt```  
+* Install numpy ```pip3 install numpy```
+* Install all the dependencies from **requirements.txt** via ```pip3 install -f https://download.pytorch.org/whl/torch_stable.html -r requirements.txt```  
 * Run ```python3 setup.py```
 > _This setup.bat script loads the trained model._  \
 > The install script also supports installing models using arguments. For more information, run `python3 setup.py --help`.\
 > The program was tested on python version 3.7.3
 **********************************************************************
 ## 🏷 Setup for Linux:  
-* Clone repository: ```git clone https://github.com/OPHoperHPO/image-background-remove-tool```  
+* Clone repository: ```git clone https://github.com/OPHoperHPO/image-background-remove-tool```
+* Install numpy ```pip3 install numpy```  
 * Install all the dependencies from **requirements.txt**: ```pip3 install -r requirements.txt```  
 * Run ```python3 setup.py``` and select the model you need.
 > _This setup.py script loads the pre-trained model._ \
@@ -67,15 +69,14 @@ The program removes the background from photos.
 **********************************************************************
 ## 🖵 Running the GUI app:
 ```python3 gui.py```
+> Note: It may not work on windows machines. This will be fixed in version 3.4.
 **********************************************************************
 ## 📦 Running the HTTP API server:
 ### 🧲 With defaults:
 ```python3 http_api.py```
 
 ### 🧲 With custom arguments:
-
 ```python3 http_api.py -auth false -port 5000 -host 0.0.0.0 -m u2net -pre None -post fba```
-
 
 ### ⏩ Example usage with curl:
 ```bash
@@ -84,7 +85,7 @@ curl -H 'X-API-Key: test'                                   \
        -F 'size=auto'                                       \ # oneOf 'preview', 'medium', 'hd', 'auto'
        -f http://localhost:5000/api/removebg -o no-bg.png
 ```
-
+> Note:  See example scripts in docs/code_examples/python for more information on using the http api.  
 ## 📦 Running the HTTP API server via docker:
 Using the API via docker is a **fast** and non-complex way to have a working API.  \
 The docker image uses `u2net` as default and runs without authentication.
@@ -132,15 +133,15 @@ image-background-remove-tool:latest
  * ```python3 main.py -i <input_path> -o <output_path> -m <model_type> -pre <preprocessing_method> -post <postprocessing_method> --recursive```  
  
 ### Explanation of args:  
-* `-i <input_path>` - path to input file or dir.
-* `-o <output_path>` - path to output file or dir.
+* `-i <input_path>` - Path to input file or dir.
+* `-o <output_path>` - Path to output file or dir.
 * `-pre <preprocessing_method>` - Preprocessing method. Can be `bbd-fastrcnn` or `bbmd-maskrcnn` or `None`. `None` is better to use.
 * `-post <postprocessing_method>` - Postprocessing method. Can be `fba` or `rtb-bnb` or `rtb-bnb2` or `No`. `fba` is better to use.
-* `-m <model_type>` - can be `u2net` or `basnet` or `u2netp` or `deeplabv3`. `u2net` is better to use. 
+* `-m <model_type>` - Can be `u2net` or `basnet` or `u2netp` or `deeplabv3`. `u2net` is better to use. 
 * `--recursive`  - Enables recursive search for images in a folder \
 **DeepLabV3** model designed to remove the background from **PORTRAIT** photos or **PHOTOS WITH ANIMALS!** \
 [More info about models.](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/MODELS.md)  
-> Note:  See example scripts in docs/shell_examples/ for more information on using the program.  
+> Note:  See example scripts in docs/code_examples/shell for more information on using the program.  
 **********************************************************************
 
 ## ⏳ TODO:  
@@ -165,14 +166,14 @@ image-background-remove-tool:latest
 * **More sample images in [docs/imgs/input/](docs/imgs/input) and [docs/imgs/examples/](docs/imgs/examples) folders.**  \
 Examples of images from the background are contained in folders in the following format: `{model_name}/{preprocessing_method_name}/{postprocessing_method_name}`
 * Input:   
-* ![Input](/docs/imgs/input/4.jpg)
+* ![Input](/docs/imgs/input/1.jpg)
 * Output(u2net/None/fba):
-* ![Output](/docs/imgs/examples/u2net/None/fba/4.png "Output")
+* ![Output](/docs/imgs/examples/u2net/None/fba/1.png "Output")
 * Output(deeplabv3/None/fba):
-* ![Output](/docs/imgs/examples/deeplabv3/None/fba/4.png "Output")
+* ![Output](/docs/imgs/examples/deeplabv3/None/fba/1.png "Output")
 *  Output(basnet/None/fba):
-* ![Output](/docs/imgs/examples/basnet/None/fba/4.png "Output")
+* ![Output](/docs/imgs/examples/basnet/None/fba/1.png "Output")
 * Output(u2netp/None/fba):
-* ![Output](/docs/imgs/examples/u2netp/None/fba/4.png "Output")
+* ![Output](/docs/imgs/examples/u2netp/None/fba/1.png "Output")
 **********************************************************************
 
