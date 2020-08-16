@@ -1,9 +1,10 @@
 # 🥧 Image Background Remove Tool 🥧 ![Test](https://github.com/OPHoperHPO/image-background-remove-tool/workflows/Test/badge.svg?branch=master) [![](https://camo.githubusercontent.com/52feade06f2fecbf006889a904d221e6a730c194/68747470733a2f2f636f6c61622e72657365617263682e676f6f676c652e636f6d2f6173736574732f636f6c61622d62616467652e737667)](https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/try.ipynb)
 ![Input](/docs/imgs/compare/readme.jpg)
+> The higher resolution images from the picture above can be seen in the docs/imgs/compare/ folder.
 **********************************************************************
 ## 📄 Description:  
 The program removes the background from photos using neural networks.  
-> The higher resolution images from the picture above can be seen in the docs/imgs/compare/ folder.
+
 **********************************************************************
 ## 🎆 Features:  
 * **GUI**
