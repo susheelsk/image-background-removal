@@ -124,7 +124,8 @@ class RemovingTooTransparentBordersHardAndBlurringHardBordersTwo:
         empty = Image.new("RGBA", orig_image.size)
         image = Image.composite(orig_image, empty, mask)
         image = self.__blur_edges__(image)
-
+        if model.model_name == "deeplabv3":
+            image = image.convert("RGB")
         image = model.process_image(image)
 
         mask = self.__remove_too_transparent_borders__(self.__extact_alpha_channel__(image))
