@@ -155,9 +155,11 @@ class U2NET:
             except IOError:
                 logger.error('Cannot retrieve image. Please check file: ' + data)
                 return False, False
+            image = image.convert("RGB")
             pil_image = image.copy()
             image = np.array(image)
         else:
+            data = data.convert("RGB")
             image = np.array(data)  # Convert PIL image to numpy arr
             pil_image = data.copy()
         h, w, _ = image.shape
@@ -295,12 +297,15 @@ class BasNet:
         image_size = 256  # Size of the input and output image for the model
         if isinstance(data, str):
             try:
-                image = io.imread(data)  # Load image if there is a path
+                image = Image.open(data)  # Load image if there is a path
             except IOError:
                 logger.error('Cannot retrieve image. Please check file: ' + data)
                 return False, False
-            pil_image = Image.fromarray(image)
+            image = image.convert("RGB")
+            pil_image = image.copy()
+            image = np.array(image)
         else:
+            data = data.convert("RGB")
             image = np.array(data)  # Convert PIL image to numpy arr
             pil_image = data.copy()
         h, w, _ = image.shape
@@ -376,12 +381,13 @@ class DeeplabV3(object):
             except IOError:
                 logger.error('Cannot retrieve image. Please check file: ' + data)
                 return False
+            orig_image = orig_image.convert("RGB")
         else:
             orig_image = data.copy()
         w, h = orig_image.size
         if h < 2 or w < 2:
             raise Exception("Image is too small. Minimum size 2x2")
-        return orig_image.copy().convert("RGB"), orig_image
+        return orig_image.copy(), orig_image
 
     def process_image(self, data, preprocessing=None, postprocessing=None):
         """
