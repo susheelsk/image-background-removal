@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Name: Background removal tool.
 Description: This file contains the CLI interface.
@@ -21,6 +22,7 @@ License:
    limitations under the License.
 """
 # Built-in libraries
+import gc
 import argparse
 import logging
 from pathlib import Path
@@ -91,11 +93,12 @@ def process(input_path, output_path, model_name=MODELS_NAMES[0],
     postprocessing_method = postprocessing.method_detect(postprocessing_method_name)
     output_path = Path(output_path)
 
-    if isinstance(input_path, str):
+    if isinstance(input_path, str) or isinstance(input_path, Path):
         input_path = Path(input_path)
         if input_path.is_file():
             image = model.process_image(str(input_path.absolute()), preprocessing_method, postprocessing_method)
             __save_image_file__(image, input_path, output_path)
+            gc.collect()
 
         elif input_path.is_dir():
             if not recursive:
@@ -110,6 +113,7 @@ def process(input_path, output_path, model_name=MODELS_NAMES[0],
             for file in tqdm.tqdm(files, ascii=True, desc='Remove Background', unit='image'):
                 image = model.process_image(str(file.absolute()), preprocessing_method, postprocessing_method)
                 __save_image_file__(image, file, output_path)
+                gc.collect()
         else:
             if input_path.exists():
                 raise ValueError("Bad input path parameter! "
@@ -123,6 +127,7 @@ def process(input_path, output_path, model_name=MODELS_NAMES[0],
             if input_path.is_file():
                 image = model.process_image(str(input_path.absolute()), preprocessing_method, postprocessing_method)
                 __save_image_file__(image, input_path, output_path)
+                gc.collect()
 
             elif input_path.is_dir():
                 if not recursive:
@@ -137,6 +142,7 @@ def process(input_path, output_path, model_name=MODELS_NAMES[0],
                 for file in tqdm.tqdm(files, ascii=True, desc='Remove Background', unit='image'):
                     image = model.process_image(str(file.absolute()), preprocessing_method, postprocessing_method)
                     __save_image_file__(image, file, output_path)
+                    gc.collect()
             else:
                 if input_path.exists():
                     raise ValueError("Bad input path parameter! "
@@ -165,6 +171,7 @@ def process(input_path, output_path, model_name=MODELS_NAMES[0],
             for file in tqdm.tqdm(files, ascii=True, desc='Remove Background', unit='image'):
                 image = model.process_image(str(file.absolute()), preprocessing_method, postprocessing_method)
                 __save_image_file__(image, file, output_path)
+                gc.collect()
 
 
 def cli():

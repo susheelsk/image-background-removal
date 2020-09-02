@@ -1,4 +1,4 @@
-pywebview==3.2
+PyQt5==5.15.0
 numpy==1.19.1
 tqdm==4.48.2
 torch==1.6.0

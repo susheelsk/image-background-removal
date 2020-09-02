@@ -1,9 +1,10 @@
+#!/usr/bin/python3
 """
-Name: GUI
-Description: This file contains the GUI interface.
-Version: [release][3.2]
+Name: Gui for background removal tool.
+Description: This file contains a QT based GUI.
+Version: [release][3.3]
 Source url: https://github.com/OPHoperHPO/image-background-remove-tool
-Authors: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
+Author: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 License: Apache License 2.0
 License:
    Copyright 2020 OPHoperHPO
@@ -20,238 +21,167 @@ License:
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-import os
-import logging
-import platform
-import subprocess
-import webview
-import threading
-from main import process
+
+# Built-in libraries
+import gc
 import multiprocessing
-from libs.strings import MODELS_NAMES, PREPROCESS_METHODS, POSTPROCESS_METHODS
+import os
+import subprocess
+import sys
+from pathlib import Path
 
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+# Third party libraries
+from PyQt5.QtCore import *
+from PyQt5.QtQml import *
+from PyQt5.QtWidgets import *
 
+# Libraries of this project
+import gui.ui as ui
+# noinspection PyUnresolvedReferences
+from gui.libs import qrc, config_utils
 
-def show_error(w, e):
-    """
-    Shows error
-    @param w: Window obj
-    @param e: Error text
-    """
-    w.evaluate_js("""
-    var err_label = document.querySelector('.error_label');
-    err_label.style.visibility = "";
-    err_label.textContent = 'REPLACE';
-    """.replace("REPLACE", "An error has occurred! ERROR: " + str(e)))
+gui_dir = Path(__file__).parent.joinpath("gui")  # Absolute path to gui folder
+config_ctl = config_utils.Config(gui_dir.joinpath("config.json"))  # Init config
+config = config_ctl.c
 
+if not config["tool"]["use_gpu"]:  # Enable or disable cuda acceleration
+    os.environ["CUDA_VISIBLE_DEVICES"] = ""
+else:
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-# noinspection PyMissingOrEmptyDocstring
-def worker_thread(win, input_files, model, preprocessing_method, postprocessing_method):
-    logger.debug('Processing started ...')
-    for i, file in enumerate(input_files):
-        (file_path, file_name) = os.path.split(file)
-        output_file = os.path.join(
-            file_path,
-            'bg-removed',
-            # only support PNG files as of now
-            os.path.splitext(file_name)[0] + '.png'
-        )
-        win.evaluate_js(
-            "window.app.fileUploadButton.textContent = 'Processing "
-            + str(i + 1) + ' of ' + str(len(input_files)) + " ...'"
-        )
-        try:
-            proc = multiprocessing.Process(target=process,
-                                           args=(file, output_file, model,
-                                                 preprocessing_method, postprocessing_method,))
-            proc.start()
-            proc.join()
-        except BaseException as e:
-            show_error(win, e)
-    win.evaluate_js("window.app.fileUploadButton.textContent = 'Select photos'")
-    logger.debug('Processing complete')
-    # noinspection PyUnboundLocalVariable
-    open_folder(os.path.join(file_path, 'bg-removed'))
+# Libraries of this project
+from main import  __save_image_file__
+import libs.networks as networks
+import libs.preprocessing as preprocessing
+import libs.postprocessing as postprocessing
 
 
-def onWindowStart(win2):
-    """
-    Window Start Event listener
-    @param win2: Window object
-    """
-    # TODO: Make a universal function for adding parameters to the settings page.
-    def addPostprocessingMethods():
-        """
-        Adds postprocessing methods to the postprocessing methods selection list.
-        """
+class UIcls:
+    """UI initializer"""
 
-        def __add_method__(method: str):
-            if not method == POSTPROCESS_METHODS[0]:
-                win2.evaluate_js("""
-                 function createElementFromHTML(htmlString) {
-                         var div = document.createElement('div');
-                         div.innerHTML = htmlString.trim();
+    def __init__(self, engine):
+        self.engine = engine  # Qml engine
+        self.settings = ui.SettingsUI(config_ctl, self.engine)  # Configure settings ui
 
-                         // Change this to div.childNodes to support multiple top-level nodes
-                         return div.firstChild; 
-                       }
-                       var models = document.querySelector('.postprocessing_methods');
-                       var rbut = createElementFromHTML('<label style="margin-left:16;" class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="MODELD"><input  id="MODELD" class="mdl-radio__button MODELD" type="radio" name="postprocessing_method" value="MODELD" /><span class="mdl-radio__label">MODELD</span></label>')
-                       models.appendChild(rbut)
-                       componentHandler.upgradeDom()
-                       """.replace("MODELD", method))
-            else:
-                win2.evaluate_js("""
-                   function createElementFromHTML(htmlString) {
-                           var div = document.createElement('div');
-                           div.innerHTML = htmlString.trim();
+    def open_settings(self):
+        """Shows settings ui"""
+        self.settings.init(str(gui_dir.joinpath("qml/settings.qml")))
 
-                           // Change this to div.childNodes to support multiple top-level nodes
-                           return div.firstChild; 
-                         }
-                         var models = document.querySelector('.postprocessing_methods');
-                         var rbut = createElementFromHTML('<label style="margin-left:16;" class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="MODELD"><input  id="MODELD" class="mdl-radio__button MODELD" type="radio" name="postprocessing_method" value="MODELD" checked /><span class="mdl-radio__label">MODELD</span></label>')
-                         models.appendChild(rbut)
-                         componentHandler.upgradeDom()
-                         """.replace("MODELD", method))
+    @staticmethod
+    def open_about():
+        open_folder("https://github.com/OPHoperHPO/image-background-remove-tool/")
 
-        for i in POSTPROCESS_METHODS:
-            __add_method__(i)
 
-    def addPreprocessingMethods():
-        """
-        Adds preprocessing methods to the preprocessing methods selection list.
-        """
+class App(QQmlApplicationEngine):
+    """Main Window"""
 
-        def __add_method__(method: str):
-            if not method == PREPROCESS_METHODS[0]:
-                win2.evaluate_js("""
-              function createElementFromHTML(htmlString) {
-                      var div = document.createElement('div');
-                      div.innerHTML = htmlString.trim();
+    def __init__(self, cfg):
+        super().__init__()
+        self.config = cfg
+        # noinspection PyArgumentList
+        self.load(QUrl(str(gui_dir.joinpath("qml/main.qml"))))
+        self.window = self.rootObjects()[0]  # Find root window
+        self.ui = UIcls(self)  # Init ui
 
-                      // Change this to div.childNodes to support multiple top-level nodes
-                      return div.firstChild; 
-                    }
-                    var models = document.querySelector('.preprocessing_methods');
-                    var rbut = createElementFromHTML('<label style="margin-left:16;" class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="MODELD"><input  id="MODELD" class="mdl-radio__button MODELD" type="radio" name="preprocessing_method" value="MODELD" /><span class="mdl-radio__label">MODELD</span></label>')
-                    models.appendChild(rbut)
-                    componentHandler.upgradeDom()
-                    """.replace("MODELD", method))
-            else:
-                win2.evaluate_js("""
-                function createElementFromHTML(htmlString) {
-                        var div = document.createElement('div');
-                        div.innerHTML = htmlString.trim();
+        self.photos_queue = multiprocessing.Queue()
+        self.worker = Worker(self.config, self.photos_queue)  # Init worker
+        self.worker.update_busypage.connect(self.__update_busypage__)
 
-                        // Change this to div.childNodes to support multiple top-level nodes
-                        return div.firstChild; 
-                      }
-                      var models = document.querySelector('.preprocessing_methods');
-                      var rbut = createElementFromHTML('<label style="margin-left:16;" class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="MODELD"><input  id="MODELD" class="mdl-radio__button MODELD" type="radio" name="preprocessing_method" value="MODELD" checked /><span class="mdl-radio__label">MODELD</span></label>')
-                      models.appendChild(rbut)
-                      componentHandler.upgradeDom()
-                      """.replace("MODELD", method))
+        self.init_ui()  # Initialize gui
 
-        for i in PREPROCESS_METHODS:
-            __add_method__(i)
+    def init_ui(self):
+        """Gui initializer"""
+        # Configure window
+        window = self.window
+        window.closing.connect(sys.exit)
 
-    def addModels():
-        """
-        Adds models to the model selection list.
-        """
+        # Configure ui elements
+        fd = window.findChild(QObject, "fileDialog")
+        fd.fileDialogCallback.connect(self.__fileDialogCallback__)
+        logo_label = window.findChild(QObject, "logo_label")  # Find logo label
+        row = logo_label.findChild(QObject, "row")  # Find row
 
-        def __add_model__(model: str):
-            if not model == MODELS_NAMES[0]:
-                win2.evaluate_js("""
-              function createElementFromHTML(htmlString) {
-                      var div = document.createElement('div');
-                      div.innerHTML = htmlString.trim();
-                    
-                      // Change this to div.childNodes to support multiple top-level nodes
-                      return div.firstChild; 
-                    }
-                    var models = document.querySelector('.models');
-                    var rbut = createElementFromHTML('<label style="margin-left:16;" class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="MODELD"><input  id="MODELD" class="mdl-radio__button MODELD" type="radio" name="model" value="MODELD" /><span class="mdl-radio__label">MODELD</span></label>')
-                    models.appendChild(rbut)
-                    componentHandler.upgradeDom()
-                    """.replace("MODELD", model))
-            else:
-                win2.evaluate_js("""
-                function createElementFromHTML(htmlString) {
-                        var div = document.createElement('div');
-                        div.innerHTML = htmlString.trim();
+        about_button = row.findChild(QObject, "about")  # Find settings button
+        about_button.clicked.connect(self.ui.open_about)
 
-                        // Change this to div.childNodes to support multiple top-level nodes
-                        return div.firstChild; 
-                      }
-                      var models = document.querySelector('.models');
-                      var rbut = createElementFromHTML('<label style="margin-left:16;" class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="MODELD"><input  id="MODELD" class="mdl-radio__button MODELD" type="radio" name="model" value="MODELD" checked /><span class="mdl-radio__label">MODELD</span></label>')
-                      models.appendChild(rbut)
-                      componentHandler.upgradeDom()
-                      """.replace("MODELD", model))
+        settings_button = row.findChild(QObject, "settings")  # Find settings button
+        settings_button.clicked.connect(self.ui.open_settings)
+        window.show()
 
-        for i in MODELS_NAMES:
-            __add_model__(i)
+        # Start worker
+        self.worker.start()
 
-    def openFileDialog():
-        """
-        Opens a file selection dialog
-        """
-        file_types = ('Image Files (*.png;*.jpg;*.jpeg)', 'All files (*.*)')
+    def __update_busypage__(self, data: list):
+        """Updates the state of the program's busy interface"""
+        window = self.window
+        busy_page = window.findChild(QObject, "busyPage")
+        busy_page.setProperty("visible", data[0])
+        processing_label = busy_page.findChild(QObject, "processing_label")
+        processing_label.setProperty("text", data[1])
 
-        input_files = win2.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=True, file_types=file_types)
-        logger.debug(input_files)
-        preprocessing_method = win2.evaluate_js("window.app.getPreprocessingMethod()")
-        postprocessing_method = win2.evaluate_js("window.app.getPostprocessingMethod()")
-        model = win2.evaluate_js("window.app.getModel()")
-        logger.debug('Use model: {}'.format(model))
+    def __fileDialogCallback__(self, filedialog: QObject):
+        """Callback for qt file dialog"""
+        file_q_urls = filedialog.property("fileUrls")
+        if len(file_q_urls) > 0:
+            file_paths = [i.path() for i in file_q_urls]
+            self.photos_queue.put(file_paths)
 
-        if input_files is not None:
-            win2.evaluate_js("window.app.fileUploadButton.disabled = true")
-            w_th = threading.Thread(target=worker_thread, args=(win2, input_files, model,
-                                                                preprocessing_method, postprocessing_method,))
-            w_th.start()
-            w_th.join()
-            win2.evaluate_js("window.app.fileUploadButton.disabled = false")
 
-    # expose a function during the runtime
-    win2.expose(openFileDialog)
-    if win2.loaded:
-        addModels()
-        addPreprocessingMethods()
-        addPostprocessingMethods()
+class Worker(QThread):
+    update_busypage = pyqtSignal(list)
+
+    def __init__(self, cfg: dict, queue: multiprocessing.Queue):
+        super(Worker, self).__init__()
+        self.config = cfg
+        self.queue = queue
+
+    def run(self):
+        """Launches a worker"""
+        model = networks.model_detect(self.config["tool"]["model"])  # Load model
+        preprocessing_method = preprocessing.method_detect(self.config["tool"]["preprocessing_method"])
+        postprocessing_method = postprocessing.method_detect(self.config["tool"]["postprocessing_method"])
+        while True:
+            file_paths = self.queue.get()  # Get file paths
+            if len(file_paths) > 0:
+                output_path = Path(file_paths[0]).parent.joinpath("bg_removed")
+                # Show busy interface
+                self.update_busypage.emit([True, "Processing {} of {}".format(0, len(file_paths))])
+                err = False
+                for i, file_path in enumerate(file_paths):
+                    self.update_busypage.emit([True, "Processing {} of {}".format(i + 1, len(file_paths))])
+                    file_path = Path(file_path)
+                    try:
+                        image = model.process_image(str(file_path.absolute()), preprocessing_method, postprocessing_method)
+                        __save_image_file__(image, file_path, output_path)
+                    except BaseException as e:
+                        self.update_busypage.emit([True, "A program error has occurred!\n"
+                                                          "Run the gui in the console for more details."])
+                        print("GUI WORKER ERROR!: ", e)
+                        err = True
+                if not err:
+                    self.update_busypage.emit([False, "Processing"])
+                    open_folder(str(output_path.absolute()))
+                del file_paths, output_path, file_path, i
+                gc.collect()  # Cleanup memory
 
 
 def open_folder(path):
     """
     Opens a output folder in file explorer.
-    @param path: Path to folder
+    :param path: Path to folder
     """
-    if platform.system() == "Windows":
+    if "win" in sys.platform:
         os.startfile(path)
-    elif platform.system() == "Darwin":
+    elif "darwin" in sys.platform:
         subprocess.Popen(["open", path])
     else:
         subprocess.Popen(["xdg-open", path])
 
 
-def getfile(filename: str):
-    """
-    Opens html file
-    @param filename: filename
-    @return: file content
-    """
-    dir1 = os.path.dirname(__file__)
-    path = os.path.join(dir1, filename)
-    with open(path, encoding="utf8") as f:
-        content = f.read()
-    return content
-
-
 if __name__ == '__main__':
-    html = getfile('gui/index.html')
-    window = webview.create_window('Automated BG Removal Tool', html=html)
-    webview.start(onWindowStart, window)
+    try:
+        app = QApplication(sys.argv)  # Init Gui
+        ex = App(config)
+        sys.exit(app.exec_())  # Exit when app close
+    except KeyboardInterrupt:
+        sys.exit(0)

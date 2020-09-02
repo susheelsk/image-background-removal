@@ -21,6 +21,7 @@ License:
    limitations under the License.
 """
 # Built-in libraries
+import gc
 import logging
 import os
 import time
@@ -120,12 +121,18 @@ class U2NET:
         :return: Image without background
         """
         start_time = time.time()  # Time counter
-        image = image.type(self.torch.FloatTensor)
-        if self.torch.cuda.is_available():
-            image = self.Variable(image.cuda())
-        else:
-            image = self.Variable(image)
-        mask, d2, d3, d4, d5, d6, d7 = self.__net__(image)  # Predict mask
+        with self.torch.no_grad():
+            image = image.type(self.torch.FloatTensor)
+            if self.torch.cuda.is_available():
+                image = self.Variable(image.cuda())
+            else:
+                image = self.Variable(image)
+            mask, d2, d3, d4, d5, d6, d7 = self.__net__(image)  # Predict mask
+        del d2, d3, d4, d5, d6, d7, image
+        if self.torch.cuda.is_available():  # Clean gpu memory
+            self.torch.cuda.empty_cache()
+        gc.collect()
+
         logger.debug("Mask prediction completed")
         # Normalization
         logger.debug("Mask normalization")
@@ -267,12 +274,17 @@ class BasNet:
         :return: Image without background
         """
         start_time = time.time()  # Time counter
-        image = image.type(self.torch.FloatTensor)
-        if self.torch.cuda.is_available():
-            image = self.Variable(image.cuda())
-        else:
-            image = self.Variable(image)
-        mask, d2, d3, d4, d5, d6, d7, d8 = self.__net__(image)  # Predict mask
+        with self.torch.no_grad():
+            image = image.type(self.torch.FloatTensor)
+            if self.torch.cuda.is_available():
+                image = self.Variable(image.cuda())
+            else:
+                image = self.Variable(image)
+            mask, d2, d3, d4, d5, d6, d7, d8 = self.__net__(image)  # Predict mask
+        del d2, d3, d4, d5, d6, d7, d8, image
+        if self.torch.cuda.is_available():  # Clean gpu memory
+            self.torch.cuda.empty_cache()
+        gc.collect()
         logger.debug("Mask prediction completed")
         # Normalization
         logger.debug("Mask normalization")
@@ -440,6 +452,9 @@ class DeeplabV3(object):
             self.model.to('cuda')
         with self.torch.no_grad():
             output = self.model(input_batch)['out'][0]
+        if self.torch.cuda.is_available():  # Clean gpu memory
+            self.torch.cuda.empty_cache()
+        gc.collect()
         output_predictions = output.argmax(0)
         # Converting the neural network prediction result into a mask
         mask = Image.fromarray(output_predictions.byte().cpu().numpy() * 255).resize((w, h))

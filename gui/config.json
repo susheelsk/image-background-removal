@@ -1,0 +1,8 @@
+{
+  "tool": {
+    "model": "deeplabv3",
+    "postprocessing_method": "fba",
+    "preprocessing_method": "None",
+    "use_gpu": true
+  }
+}

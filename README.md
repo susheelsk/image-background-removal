@@ -69,7 +69,6 @@ The program removes the background from photos using neural networks.
 **********************************************************************
 ## 🖵 Running the GUI app:
 ```python3 gui.py```
-> Note: It may not work on windows machines. This will be fixed in version 3.4.
 **********************************************************************
 ## 📦 Running the HTTP API server:
 ### 🧲 With defaults:

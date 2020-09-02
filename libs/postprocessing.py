@@ -20,11 +20,14 @@ License:
    See the License for the specific language governing permissions and
    limitations under the License.
 """
+import gc
 import logging
 import time
 import os
+
 from PIL import Image
 from PIL import ImageFilter
+
 from libs.strings import POSTPROCESS_METHODS
 from libs.networks import models_dir
 
@@ -457,6 +460,9 @@ class FBAMattingNeural:
             image_transformed_torch = self.groupnorm_normalise_image(image_torch.clone(), format='nchw')
             output = self.model(image_torch, trimap_torch, image_transformed_torch, trimap_transformed_torch)
             output = self.cv2.resize(output[0].cpu().numpy().transpose((1, 2, 0)), (w, h), self.cv2.INTER_LANCZOS4)
+        if self.torch.cuda.is_available():  # Clean gpu memory
+            self.torch.cuda.empty_cache()
+        gc.collect()
         alpha = output[:, :, 0]
         alpha[trimap[:, :, 0] == 1] = 0
         alpha[trimap[:, :, 1] == 1] = 1
