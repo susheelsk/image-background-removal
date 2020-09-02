@@ -177,7 +177,7 @@ class SettingsUI:
                             if text:
                                 exec("self.config{} = str('{}')".format(property_id, text))
                         elif type_val is int:
-                            if text is '':
+                            if text == '':
                                 text = 0
                             text = check_input(text)
                             if text:
