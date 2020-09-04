@@ -37,7 +37,6 @@ from PyQt5.QtWidgets import *
 
 # Libraries of this project
 import gui.ui as ui
-# noinspection PyUnresolvedReferences
 from gui.libs import qrc, config_utils
 
 gui_dir = Path(__file__).parent.joinpath("gui")  # Absolute path to gui folder
@@ -50,7 +49,7 @@ else:
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Libraries of this project
-from main import  __save_image_file__
+from main import __save_image_file__
 import libs.networks as networks
 import libs.preprocessing as preprocessing
 import libs.postprocessing as postprocessing
@@ -151,11 +150,12 @@ class Worker(QThread):
                     self.update_busypage.emit([True, "Processing {} of {}".format(i + 1, len(file_paths))])
                     file_path = Path(file_path)
                     try:
-                        image = model.process_image(str(file_path.absolute()), preprocessing_method, postprocessing_method)
+                        image = model.process_image(str(file_path.absolute()), preprocessing_method,
+                                                    postprocessing_method)
                         __save_image_file__(image, file_path, output_path)
                     except BaseException as e:
                         self.update_busypage.emit([True, "A program error has occurred!\n"
-                                                          "Run the gui in the console for more details."])
+                                                         "Run the gui in the console for more details."])
                         print("GUI WORKER ERROR!: ", e)
                         err = True
                 if not err:

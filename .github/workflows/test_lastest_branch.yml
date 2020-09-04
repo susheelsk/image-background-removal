@@ -45,6 +45,14 @@ jobs:
       with:
         name: generated_docs_examples.zip
         path: docs.zip
+    - name: Push to Docker Hub
+      uses: docker/build-push-action@v1.1.0
+      with:
+        tags: latest
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: anodev/image-background-remove-tool
+        tag_with_ref: true
   test_windows:
     runs-on: windows-latest
     strategy:
