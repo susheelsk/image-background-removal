@@ -1,6 +1,6 @@
 {
   "tool": {
-    "model": "deeplabv3",
+    "model": "u2net",
     "postprocessing_method": "fba",
     "preprocessing_method": "None",
     "use_gpu": true
