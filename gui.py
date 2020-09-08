@@ -23,6 +23,7 @@ License:
 """
 
 # Built-in libraries
+import time
 import gc
 import multiprocessing
 import os
@@ -145,23 +146,25 @@ class Worker(QThread):
                 output_path = Path(file_paths[0]).parent.joinpath("bg_removed")
                 # Show busy interface
                 self.update_busypage.emit([True, "Processing {} of {}".format(0, len(file_paths))])
-                err = False
                 for i, file_path in enumerate(file_paths):
                     self.update_busypage.emit([True, "Processing {} of {}".format(i + 1, len(file_paths))])
                     file_path = Path(file_path)
                     try:
-                        image = model.process_image(str(file_path.absolute()), preprocessing_method,
+                        image = model.process_image(file_path, preprocessing_method,
                                                     postprocessing_method)
                         __save_image_file__(image, file_path, output_path)
                     except BaseException as e:
                         self.update_busypage.emit([True, "A program error has occurred!\n"
                                                          "Run the gui in the console for more details."])
                         print("GUI WORKER ERROR!: ", e)
-                        err = True
-                if not err:
-                    self.update_busypage.emit([False, "Processing"])
-                    open_folder(str(output_path.absolute()))
-                del file_paths, output_path, file_path, i
+                        print("Raising an exception for debug through 15 seconds!\n"
+                              "Please open an issue with this log in the project repository on GitHub. \n"
+                              "More info here https://github.com/OPHoperHPO/image-background-remove-tool/issues")
+                        time.sleep(15)
+                        raise e
+                self.update_busypage.emit([False, "Processing"])
+                open_folder(str(output_path.absolute()))
+                del file_paths, output_path
                 gc.collect()  # Cleanup memory
 
 

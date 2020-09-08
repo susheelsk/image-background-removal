@@ -96,7 +96,7 @@ def process(input_path, output_path, model_name=MODELS_NAMES[0],
     if isinstance(input_path, str) or isinstance(input_path, Path):
         input_path = Path(input_path)
         if input_path.is_file():
-            image = model.process_image(str(input_path.absolute()), preprocessing_method, postprocessing_method)
+            image = model.process_image(input_path, preprocessing_method, postprocessing_method)
             __save_image_file__(image, input_path, output_path)
             gc.collect()
 
@@ -111,7 +111,7 @@ def process(input_path, output_path, model_name=MODELS_NAMES[0],
                     files.append(f)
             files = set(files)
             for file in tqdm.tqdm(files, ascii=True, desc='Remove Background', unit='image'):
-                image = model.process_image(str(file.absolute()), preprocessing_method, postprocessing_method)
+                image = model.process_image(file, preprocessing_method, postprocessing_method)
                 __save_image_file__(image, file, output_path)
                 gc.collect()
         else:
@@ -125,7 +125,7 @@ def process(input_path, output_path, model_name=MODELS_NAMES[0],
             input_path = Path(input_path[0])
 
             if input_path.is_file():
-                image = model.process_image(str(input_path.absolute()), preprocessing_method, postprocessing_method)
+                image = model.process_image(input_path, preprocessing_method, postprocessing_method)
                 __save_image_file__(image, input_path, output_path)
                 gc.collect()
 
@@ -140,7 +140,7 @@ def process(input_path, output_path, model_name=MODELS_NAMES[0],
                         files.append(f)
                 files = set(files)
                 for file in tqdm.tqdm(files, ascii=True, desc='Remove Background', unit='image'):
-                    image = model.process_image(str(file.absolute()), preprocessing_method, postprocessing_method)
+                    image = model.process_image(file, preprocessing_method, postprocessing_method)
                     __save_image_file__(image, file, output_path)
                     gc.collect()
             else:
@@ -169,7 +169,7 @@ def process(input_path, output_path, model_name=MODELS_NAMES[0],
 
             files = set(files)
             for file in tqdm.tqdm(files, ascii=True, desc='Remove Background', unit='image'):
-                image = model.process_image(str(file.absolute()), preprocessing_method, postprocessing_method)
+                image = model.process_image(file, preprocessing_method, postprocessing_method)
                 __save_image_file__(image, file, output_path)
                 gc.collect()
 

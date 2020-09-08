@@ -27,6 +27,7 @@ import os
 
 from PIL import Image
 from PIL import ImageFilter
+from pathlib import Path
 
 from libs.strings import POSTPROCESS_METHODS
 from libs.networks import models_dir
@@ -400,12 +401,12 @@ class FBAMattingNeural:
         :param data_input: Path to image file or PIL image
         :return: image
         """
-        if isinstance(data_input, str):
+        if isinstance(data_input, str) or isinstance(data_input, Path):
             try:
                 image = Image.open(data_input)
                 image = image.convert("RGB")
             except IOError:
-                logger.error('Cannot retrieve image. Please check file: ' + data_input)
+                logger.error('Cannot retrieve image. Please check file: ' + str(data_input))
                 return False, False
         else:
             image = data_input.convert("RGB")

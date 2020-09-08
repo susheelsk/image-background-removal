@@ -23,19 +23,19 @@ License:
 # Built-in libraries
 import gc
 import logging
-import os
 import time
+from pathlib import Path
 
 # Third party libraries
 import numpy as np
 from PIL import Image
-from skimage import io, transform
+from skimage import transform
 
 # Libraries of this project
 from libs import strings
 
 logger = logging.getLogger(__name__)
-models_dir = os.path.join(os.path.dirname(__file__), "..", "models")  # Absolute path to the models folder
+models_dir = Path(__file__).parent.parent.joinpath("models")  # Absolute path to the models folder
 
 
 def model_detect(model_name):
@@ -79,10 +79,10 @@ class U2NET:
             raise Exception("Unknown u2net model!")
         try:
             if self.torch.cuda.is_available():
-                net.load_state_dict(self.torch.load(os.path.join(models_dir, name, name + '.pth')))
+                net.load_state_dict(self.torch.load(models_dir.joinpath(name, name + '.pth')))
                 net.cuda()
             else:
-                net.load_state_dict(self.torch.load(os.path.join(models_dir, name, name + '.pth'), map_location="cpu"))
+                net.load_state_dict(self.torch.load(models_dir.joinpath(name, name + '.pth'), map_location="cpu"))
         except FileNotFoundError:
             raise FileNotFoundError("No pre-trained model found! Run setup.sh or setup.bat to download it!")
         net.eval()
@@ -156,11 +156,11 @@ class U2NET:
         """
         image_size = 320  # Size of the input and output image for the model
 
-        if isinstance(data, str):
+        if isinstance(data, str) or isinstance(data, Path):
             try:
                 image = Image.open(data)  # Load image if there is a path
             except IOError:
-                logger.error('Cannot retrieve image. Please check file: ' + data)
+                logger.error('Cannot retrieve image. Please check file: ' + str(data))
                 return False, False
             image = image.convert("RGB")
             pil_image = image.copy()
@@ -232,10 +232,10 @@ class BasNet:
             raise Exception("Unknown BASNet model")
         try:
             if self.torch.cuda.is_available():
-                net.load_state_dict(self.torch.load(os.path.join(models_dir, name, name + '.pth')))
+                net.load_state_dict(self.torch.load(models_dir.joinpath(name, name + '.pth')))
                 net.cuda()
             else:
-                net.load_state_dict(self.torch.load(os.path.join(models_dir, name, name + '.pth'), map_location="cpu"))
+                net.load_state_dict(self.torch.load(models_dir.joinpath(name, name + '.pth'), map_location="cpu"))
         except FileNotFoundError:
             raise FileNotFoundError("No pre-trained model found! Run setup.sh or setup.bat to download it!")
         net.eval()
@@ -307,11 +307,11 @@ class BasNet:
         :return: image tensor, Original Pil Image
         """
         image_size = 256  # Size of the input and output image for the model
-        if isinstance(data, str):
+        if isinstance(data, str) or isinstance(data, Path):
             try:
                 image = Image.open(data)  # Load image if there is a path
             except IOError:
-                logger.error('Cannot retrieve image. Please check file: ' + data)
+                logger.error('Cannot retrieve image. Please check file: ' + str(data))
                 return False, False
             image = image.convert("RGB")
             pil_image = image.copy()
@@ -387,11 +387,11 @@ class DeeplabV3(object):
         :param data: Path to image file or PIL image
         :return: Pil Image, Pil Image
         """
-        if isinstance(data, str):
+        if isinstance(data, str) or isinstance(data, Path):
             try:
                 orig_image = Image.open(data)  # Load image if there is a path
             except IOError:
-                logger.error('Cannot retrieve image. Please check file: ' + data)
+                logger.error('Cannot retrieve image. Please check file: ' + str(data))
                 return False
             orig_image = orig_image.convert("RGB")
         else:
