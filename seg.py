@@ -5,6 +5,9 @@ import numpy as np
 from PIL import Image
 
 import tensorflow as tf
+if int(tf.__version__[0]) > 1:
+    import tensorflow.compat.v1 as tf
+
 import sys
 import datetime
 
