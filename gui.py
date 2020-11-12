@@ -143,12 +143,20 @@ class Worker(QThread):
         while True:
             file_paths = self.queue.get()  # Get file paths
             if len(file_paths) > 0:
-                output_path = Path(file_paths[0]).parent.joinpath("bg_removed")
+                if sys.platform == "win32":
+                    output_path = Path(file_paths[0][1:len(file_paths[0])].replace("/", "\\"))\
+                        .parent.joinpath("bg_removed")
+                else:
+                    output_path = Path(file_paths[0]).parent.joinpath("bg_removed")
                 # Show busy interface
                 self.update_busypage.emit([True, "Processing {} of {}".format(0, len(file_paths))])
                 for i, file_path in enumerate(file_paths):
                     self.update_busypage.emit([True, "Processing {} of {}".format(i + 1, len(file_paths))])
-                    file_path = Path(file_path)
+                    if sys.platform == "win32":
+                        file_path = Path(file_path[1:len(file_path)].replace("/", "\\"))
+                    else:
+                        file_path = Path(file_path)
+
                     try:
                         image = model.process_image(file_path, preprocessing_method,
                                                     postprocessing_method)
