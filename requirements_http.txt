@@ -12,6 +12,6 @@ numpy==1.18.2
 Flask_Cors==3.0.8
 requests==2.23.0
 pywebview==3.2
-Pillow==8.1.2
+Pillow==7.1.2
 mxnet==1.6.0
 opencv_contrib_python==4.2.0.34
