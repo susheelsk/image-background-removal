@@ -382,9 +382,9 @@ class FBAMattingNeural:
     def __numpy2torch__(self, x):
         """Converts numpy arr to torch tensor"""
         if self.torch.cuda.is_available():
-            return self.torch.from_numpy(x).permute(2, 0, 1)[None, :, :, :].float().cuda()
+            return self.torch.from_numpy(x).permute(2, 0, 1)[None, :, :, :].float().cuda().contiguous()
         else:
-            return self.torch.from_numpy(x).permute(2, 0, 1)[None, :, :, :].float().cpu()
+            return self.torch.from_numpy(x).permute(2, 0, 1)[None, :, :, :].float().cpu().contiguous()
 
     def __scale_input(self, x, scale: float, scale_type):
         """ Scales inputs to multiple of 8. """
