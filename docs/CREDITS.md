@@ -1,13 +1,25 @@
 # Credits:
-## My Team:
-* ⭐ [Anodev (OPHoperHPO)](https://github.com/OPHoperHPO) - __The main part of the functional__
-## Contributors:
-* [Munawwar](https://github.com/Munawwar) - GUI
-## Models authors:
-* [NathanUA](https://github.com/NathanUA/) - [U^2-net(p)](https://github.com/NathanUA/U-2-Net), [BASNet](https://github.com/NathanUA/BASNet) models
-* [susheelsk](https://github.com/susheelsk/image-background-removal) - DeepLabV3 models(xception_model, mobile_net_model) configuration for background removal
-## Photo Sample Authors:
-* `1.jpg` -  Author photo **[雨星 ameboshi](https://www.pexels.com/ru-ru/@ameboshi-1648993?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels)**: **[Pexels](https://www.pexels.com/ru-ru/photo/3594438/?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels)**
-* `2.jpg` - Author photo **[Anna Shvets](https://www.pexels.com/ru-ru/@shvetsa?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels)**: **[Pexels](https://www.pexels.com/ru-ru/photo/4557400/?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels)**
-* `3.jpg` - Author photo **[ready made](https://www.pexels.com/ru-ru/@readymade?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels)**: **[Pexels](https://www.pexels.com/ru-ru/photo/3850542/?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels)**
-* `4.jpg` - Author photo **[Maryia Plashchynskaya](https://www.pexels.com/ru-ru/@maryia-plashchynskaya-1786654?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels)**: **[Pexels](https://www.pexels.com/ru-ru/photo/4457131/?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels)**
+## Disclaimer for pretrained models:
+All rights to the pretrained models used in this project belong to their authors. \
+I do not vouch for their quality and do not claim to be licensed to use any model. \
+It is your responsibility to determine if you have permission to use the pretrained model under the license for the dataset it was trained on or licensed under. \
+Any use of the pretrained model is strictly regulated by the licenses under which the model is distributed. \
+If you own the model and want to update it (file, segmentation quality information, etc.) or don't want your model to be included in this tool, please get in touch through a GitHub issue.
+
+## Photos:
+The photos in the `docs/imgs/input/` and `docs/code_examples/python/input/` folders were taken from the Pexels website. \
+The original photos in the `docs/imgs/compare` folder were taken from the Unsplash site. \
+All images are copyrighted by their authors.
+
+## References:
+1. https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101/
+2. https://github.com/NathanUA/U-2-Net
+3. https://github.com/NathanUA/BASNet
+4. https://github.com/MarcoForte/FBA_Matting
+5. https://gluon-cv.mxnet.io/model_zoo/detection.html
+6. https://arxiv.org/abs/1706.05587
+7. https://arxiv.org/pdf/2005.09007.pdf
+8. http://openaccess.thecvf.com/content_CVPR_2019/html/Qin_BASNet_Boundary-Aware_Salient_Object_Detection_CVPR_2019_paper.html
+9. https://arxiv.org/abs/2003.07711
+10. https://arxiv.org/abs/1506.01497
+11. https://arxiv.org/abs/1703.06870

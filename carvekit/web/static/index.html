@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html lang="en" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html lang="en" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html lang="en" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en" class="no-js">
+<!--<![endif]-->
+
+<head>
+    <!-- meta charec set -->
+    <meta charset="utf-8">
+    <!-- Always force latest IE rendering engine or request Chrome Frame -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <!-- Page Title -->
+    <title>CarveKit</title>
+    <link rel="icon" href="img/icon.png" type="image/x-icon">
+
+    <!-- Mobile Specific Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Google Font -->
+
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js' rel='stylesheet' type='text/css'>
+
+    <!-- CSS
+    ================================================== -->
+    <!-- Fontawesome Icon font -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <!-- Twitter Bootstrap css -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <!-- jquery.fancybox  -->
+    <link rel="stylesheet" href="css/jquery.fancybox.css">
+    <!-- animate -->
+    <link rel="stylesheet" href="css/animate.css">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="css/main.css">
+    <!-- media-queries -->
+    <link rel="stylesheet" href="css/media-queries.css">
+
+    <!-- Modernizer Script for old Browsers -->
+    <script src="js/modernizr-2.6.2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.7.2/css/all.css"></script>
+
+</head>
+
+<body id="body" class="">
+
+<!-- preloader -->
+<div id="preloader">
+    <img src="img/preloader.gif" alt="Preloader">
+</div>
+<!-- end preloader -->
+
+<!--
+Fixed Navigation
+==================================== -->
+
+
+<header id="navigation" class="navbar-fixed-top navbar">
+    <div class="container" style="padding-top: 10px; padding-bottom: 30px;">
+        <div class="navbar-header">
+            <!-- responsive nav button -->
+            <!--
+               <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                 <span class="sr-only">Toggle navigation</span>
+                 <i class="fa fa-bars fa-2x"></i>
+               </button>
+             -->
+            <!-- /responsive nav button -->
+
+        <!-- logo -->
+        <a class="navbar-brand " href="#body" style="padding: 5px">
+          <h1 id="logo">
+            <img src="img\CarveKit_logo_main.png" style="width: 230px; height: 40px; margin: 6pt;  " alt="logo-razres">
+          </h1>
+        </a>
+        <!-- /logo -->
+        </div>
+
+        <!-- main nav -->
+        <!--
+              <nav class="collapse navbar-collapse navbar-dark bg-dark" role="navigation">
+              <ul id="nav" class="nav navbar-nav">
+                <li class="#tryBySelf" style="background:rgba(2, 19, 35, 0.7);"><a href="#tryBySelf">Попробуйте</a></li>
+                <li><a href="#features" style="background:rgba(2, 19, 35, 0.7);">Подробнее</a></li>
+                <li><a href="#contact" style="background:rgba(2, 19, 35, 0.7)">Обратная связь</a></li>
+              </ul>
+            </nav>
+      -->
+        <!-- /main nav -->
+
+    </div>
+</header>
+<!--
+End Fixed Navigation
+==================================== -->
+
+<!--
+Top Section
+==================================== -->
+
+<section id="top" class="top">
+    <div class="parallax-overlay">
+        <div class="container">
+            <div class="row number-counters">
+                <div class="item" data-wow-duration="1000ms">
+                    <div class="caption text-center" data-wow-duration="1000ms">
+                        <h2 data-wow-duration="1ms" class="wow bounceInDown animated" style="color:white">
+                            Introducing<span style="color:white"> CarveKit</span>!</h2>
+                        <h3 data-wow-duration="1ms" class="wow slideInLeft animated" style="color:white"><span
+                                class="color">Background Removal</span> Tool</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--
+End Top Section
+==================================== -->
+
+
+<!--
+Try yourself
+==================================== -->
+
+<section id="tryBySelf" class="tryBySelf">
+    <div class="container text-center" style="width: 100%;">
+        <div class="row">
+
+            <div class="sec-title text-center mb50 wow bounceInDown animated" data-wow-duration="500ms">
+                <h2>Try yourself</h2>
+                <div class="devider"><i class="fa fa-heart-o fa-lg"></i></div>
+            </div>
+
+
+            <div class="form-container">
+                <form id="image_form" name="image_form"  enctype="multipart/form-data" method="POST">
+
+                    <div class="panel-container">
+                        <img id="image_preview" src="" style="max-width: 100vw; max-height: 70vh">
+                        <div class="img-cont" style="flex-direction: column;">
+                          <div class="fileupload fileupload-new" data-provides="fileupload">
+                            <span class="btn btn-primary btn-file"><span class="fileupload-new">Choose file</span>
+                            <span class="fileupload-exists">Choose other</span>         <input name="image_file"    type="file" /></span>
+                            <span class="fileupload-preview"></span>
+                            <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none">×</a>
+                          </div>
+                          <input class="form-input" id="token" placeholder="API token">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="butn" type="submit"><i class="fa fa-download">
+                    </i> Remove background
+                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                        
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--
+End Try yourself
+==================================== -->
+
+
+<!--
+End Contact Us
+==================================== -->
+
+
+<footer id="footer" class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <p class="text-center">
+                    Copyright © 2022 <a href="https://github.com/OPHoperHPO/image-background-remove-tool">CarveKit</a>. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<a href="javascript:void(0);" id="back-top"><i class="fa fa-angle-up fa-3x"></i></a>
+
+<!-- Essential jQuery Plugins
+================================================== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+<!-- Main jQuery -->
+<script src="js/jquery-1.11.1.min.js"></script>
+<!-- Single Page Nav -->
+<script src="js/jquery.singlePageNav.min.js"></script>
+<!-- Twitter Bootstrap -->
+<script src="js/bootstrap.min.js"></script>
+<!-- jquery.fancybox.pack -->
+<script src="js/jquery.fancybox.pack.js"></script>
+<!-- jquery.mixitup.min -->
+<script src="js/jquery.mixitup.min.js"></script>
+<!-- jquery.parallax -->
+<script src="js/jquery.parallax-1.1.3.js"></script>
+<!-- jquery.countTo -->
+<script src="js/jquery-countTo.js"></script>
+<!-- jquery.appear -->
+<script src="js/jquery.appear.js"></script>
+<!-- Contact form validation -->
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.32/jquery.form.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min.js"></script>
+<!-- Google Map -->
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcABaamniA6OL5YvYSpB3pFMNrXwXnLwU&libraries=places"></script>
+<!-- jquery easing -->
+<script src="js/jquery.easing.min.js"></script>
+<!-- jquery easing -->
+<script src="js/wow.min.js"></script>
+
+
+<script>
+    var wow = new WOW({
+        boxClass: 'wow', // animated element css class (default is wow)
+        animateClass: 'animated', // animation css class (default is animated)
+        offset: 120, // distance to the element when triggering the animation (default is 0)
+        mobile: false, // trigger animations on mobile devices (default is true)
+        live: true // act on asynchronously loaded content (default is true)
+    });
+    wow.init();
+    !function(e){var t=function(t,n){this.$element=e(t),this.type=this.$element.data("uploadtype")||(this.$element.find(".thumbnail").length>0?"image":"file"),this.$input=this.$element.find(":file");if(this.$input.length===0)return;this.name=this.$input.attr("name")||n.name,this.$hidden=this.$element.find('input[type=hidden][name="'+this.name+'"]'),this.$hidden.length===0&&(this.$hidden=e('<input type="hidden" />'),this.$element.prepend(this.$hidden)),this.$preview=this.$element.find(".fileupload-preview");var r=this.$preview.css("height");this.$preview.css("display")!="inline"&&r!="0px"&&r!="none"&&this.$preview.css("line-height",r),this.original={exists:this.$element.hasClass("fileupload-exists"),preview:this.$preview.html(),hiddenVal:this.$hidden.val()},this.$remove=this.$element.find('[data-dismiss="fileupload"]'),this.$element.find('[data-trigger="fileupload"]').on("click.fileupload",e.proxy(this.trigger,this)),this.listen()};t.prototype={listen:function(){this.$input.on("change.fileupload",e.proxy(this.change,this)),e(this.$input[0].form).on("reset.fileupload",e.proxy(this.reset,this)),this.$remove&&this.$remove.on("click.fileupload",e.proxy(this.clear,this))},change:function(e,t){if(t==="clear")return;var n=e.target.files!==undefined?e.target.files[0]:e.target.value?{name:e.target.value.replace(/^.+\\/,"")}:null;if(!n){this.clear();return}this.$hidden.val(""),this.$hidden.attr("name",""),this.$input.attr("name",this.name);if(this.type==="image"&&this.$preview.length>0&&(typeof n.type!="undefined"?n.type.match("image.*"):n.name.match(/\.(gif|png|jpe?g)$/i))&&typeof FileReader!="undefined"){var r=new FileReader,i=this.$preview,s=this.$element;r.onload=function(e){i.html('<img src="'+e.target.result+'" '+(i.css("max-height")!="none"?'style="max-height: '+i.css("max-height")+';"':"")+" />"),s.addClass("fileupload-exists").removeClass("fileupload-new")},r.readAsDataURL(n)}else this.$preview.text(n.name),this.$element.addClass("fileupload-exists").removeClass("fileupload-new")},clear:function(e){this.$hidden.val(""),this.$hidden.attr("name",this.name),this.$input.attr("name","");if(navigator.userAgent.match(/msie/i)){var t=this.$input.clone(!0);this.$input.after(t),this.$input.remove(),this.$input=t}else this.$input.val("");this.$preview.html(""),this.$element.addClass("fileupload-new").removeClass("fileupload-exists"),e&&(this.$input.trigger("change",["clear"]),e.preventDefault())},reset:function(e){this.clear(),this.$hidden.val(this.original.hiddenVal),this.$preview.html(this.original.preview),this.original.exists?this.$element.addClass("fileupload-exists").removeClass("fileupload-new"):this.$element.addClass("fileupload-new").removeClass("fileupload-exists")},trigger:function(e){this.$input.trigger("click"),e.preventDefault()}},e.fn.fileupload=function(n){return this.each(function(){var r=e(this),i=r.data("fileupload");i||r.data("fileupload",i=new t(this,n)),typeof n=="string"&&i[n]()})},e.fn.fileupload.Constructor=t,e(document).on("click.fileupload.data-api",'[data-provides="fileupload"]',function(t){var n=e(this);if(n.data("fileupload"))return;n.fileupload(n.data());var r=e(t.target).closest('[data-dismiss="fileupload"],[data-trigger="fileupload"]');r.length>0&&(r.trigger("click.fileupload"),t.preventDefault())})}(window.jQuery)
+
+</script>
+<!-- Custom Functions -->
+<script src="js/custom.js"></script>
+
+<script type="text/javascript">
+    document.getElementById("image_form").addEventListener("submit", async (event) => {
+        console.log(event)
+        event.preventDefault()
+        let formdata = new FormData(event.target)
+        console.log(formdata)
+        const response = await fetch("/api/removebg", {
+            method: 'POST',
+            headers: new Headers({
+                'X-API-Key': document.getElementById("token").value
+            }),
+            body: formdata
+        });
+        const image_blob = await response.blob()
+        imageurl = URL.createObjectURL(image_blob)
+        document.getElementById("image_preview").src = imageurl
+    })
+</script>
+</body>
+
+</html>

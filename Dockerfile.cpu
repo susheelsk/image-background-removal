@@ -1,0 +1,54 @@
+FROM python:3.8.2 as builder
+WORKDIR /app
+
+# Models download stage
+RUN pip3 install --no-cache-dir tqdm requests
+RUN mkdir -p ./carvekit/utils/
+RUN mkdir -p ./carvekit/ml/files
+RUN touch ./carvekit/__init__.py
+RUN touch ./carvekit/ml/__init__.py
+RUN touch ./carvekit/utils/__init__.py
+COPY ./carvekit/utils/download_models.py ./carvekit/utils/download_models.py
+COPY ./carvekit/ml/files/__init__.py ./carvekit/ml/files/__init__.py
+COPY ./carvekit/ml/files/models_loc.py ./carvekit/ml/files/models_loc.py
+RUN python3 -c "from carvekit.ml.files.models_loc import download_all; download_all();"
+RUN rm -rf ./carvekit
+
+FROM python:3.8.2
+WORKDIR /app
+
+RUN apt-get update && apt-get -y install libgl1  # Install cv2 dep.
+COPY --from=builder /root/.carvekit /root/.carvekit
+
+# Install requirements
+COPY requirements.txt ./
+RUN pip3 install --no-cache-dir -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+COPY requirements_test.txt ./
+RUN pip3 install --no-cache-dir -r requirements_test.txt
+
+# Update code
+COPY ./ ./
+
+# Install to site-packages to make possible run tests and process images by cli
+RUN pip3 install -e ./
+
+ENV CARVEKIT_PORT '5000'
+ENV CARVEKIT_HOST '0.0.0.0'
+ENV CARVEKIT_SEGMENTATION_NETWORK 'u2net'
+ENV CARVEKIT_PREPROCESSING_METHOD 'none'
+ENV CARVEKIT_POSTPROCESSING_METHOD 'fba'
+ENV CARVEKIT_DEVICE 'cpu'
+ENV CARVEKIT_BATCH_SIZE_SEG '5'
+ENV CARVEKIT_BATCH_SIZE_MATTING '1'
+ENV CARVEKIT_SEG_MASK_SIZE '320'
+ENV CARVEKIT_MATTING_MASK_SIZE '2048'
+ENV CARVEKIT_AUTH_ENABLE '1'
+
+# Tokens will be generated automatically every time the container is restarted if ENV is not set.
+
+# ENV CARVEKIT_ADMIN_TOKEN 'admin_token' # Do not use this env when creating an image as it is not safe.
+# ENV CARVEKIT_ALLOWED_TOKENS 'test_token1,test_token2' # Do not use this env when creating an image as it is not safe.
+
+EXPOSE 5000
+
+CMD ["/bin/sh", "-c", "uvicorn carvekit.web.app:app --host $CARVEKIT_HOST --port $CARVEKIT_PORT"]
