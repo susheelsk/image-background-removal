@@ -10,7 +10,8 @@
 **********************************************************************
 ## 📄 Description:  
 Automated high-quality background removal framework for an image using neural networks.
-**********************************************************************
+
+
 ## 🎆 Features:  
 - High Quality
 - Batch Processing
@@ -19,34 +20,36 @@ Automated high-quality background removal framework for an image using neural ne
 - 100% remove.bg compatible FastAPI HTTP API 
 - Removes background from hairs
 - Easy integration with your code
-**********************************************************************
+
 ## ⛱ Try yourself on [Google Colab](https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/carvekit_try.ipynb) 
-**********************************************************************
+
 ## 🎓 Implemented Neural Networks:
 * [U^2-net](https://github.com/NathanUA/U-2-Net)
-*  [BASNet](https://github.com/NathanUA/BASNet)
-* [DeepLabV3](https://github.com/tensorflow/models/tree/master/research/deeplab) 
-**********************************************************************
+* [BASNet](https://github.com/NathanUA/BASNet)
+* [DeepLabV3](https://github.com/tensorflow/models/tree/master/research/deeplab)
+
+
 ## 🖼️ Image pre-processing and post-processing methods:
 ### 🔍 Preprocessing methods:
 * `None` - No preprocessing methods used.
 ### ✂ Post-processing methods:
 * `No` - No post-processing methods used.
 * `fba` (default) - This algorithm improves the borders of the image when removing the background from images with hair, etc. using FBA Matting neural network. This method gives the best result in combination with u2net without any preprocessing methods.
-**********************************************************************
+
 ## 🧷 Dependencies:  
 * **See** `requirements.txt`
-**********************************************************************
+
+
 ## 🏷 Setup for CPU processing:
 1. Clone this repository
 2. `pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu`
 3. `pip install ./`
-**********************************************************************
+
 ## 🏷 Setup for GPU processing:  
 1. Install `CUDA` and setup `PyTorch` for GPU processing.
 2. `pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu113`
 3. `pip install ./`
-**********************************************************************
+
 ## 🧰 Running the CLI interface:  
  * ```python3 -m carvekit  -i <input_path> -o <output_path> --device <device>```  
  
