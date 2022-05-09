@@ -1,14 +1,14 @@
 # ✂️ CarveKit ✂️ 
 
-<center> <img src="docs/imgs/logo.png"> </center>
+<p align="center"> <img src="docs/imgs/logo.png"> </p>
 
-<center>
+<p align="center">
 <img src="https://github.com/OPHoperHPO/image-background-remove-tool/workflows/Test%20release%20version/badge.svg?branch=master"> <a src="https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/carvekit_try.ipynb">
 <img src="https://camo.githubusercontent.com/52feade06f2fecbf006889a904d221e6a730c194/68747470733a2f2f636f6c61622e72657365617263682e676f6f676c652e636f6d2f6173736574732f636f6c61622d62616467652e737667"></a>
-</center>
+</p>
 
 **********************************************************************
-<center> <img align="center" width="512" height="288" src="docs/imgs/compare/readme.jpg"> </center>
+<p align="center"> <img align="center" width="512" height="288" src="docs/imgs/compare/readme.jpg"> </p>
 
 > The higher resolution images from the picture above can be seen in the docs/imgs/compare/ and docs/imgs/input folders.
 
