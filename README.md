@@ -1,4 +1,4 @@
-<p align="center"> ✂️ CarveKit ✂️  </p>
+# <p align="center"> ✂️ CarveKit ✂️  </p>
 
 <p align="center"> <img src="docs/imgs/logo.png"> </p>
 
