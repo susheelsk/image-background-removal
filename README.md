@@ -87,8 +87,9 @@ Options:
 ````
 ## 📦 Running the Framework / FastAPI HTTP API server via Docker:
 Using the API via docker is a **fast** and non-complex way to have a working API.\
-Docker image has default front-end at `/` url and FastAPI backend with docs at `/docs` url. \
 **This HTTP API is 100% compatible with remove.bg API clients.** 
+
+>Docker image has default front-end at `/` url and FastAPI backend with docs at `/docs` url. \
 >Authentication is **enabled** by default. \
 > **Token keys are reset** on every container restart if ENV variables are not set. \
 See `docker-compose.<device>.yml` for more information. \
