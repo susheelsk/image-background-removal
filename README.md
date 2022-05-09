@@ -8,7 +8,7 @@
 </center>
 
 **********************************************************************
-<center> <img src="docs/imgs/compare/readme.jpg"> </center>
+<center> <img align="center" width="512" height="288" src="docs/imgs/compare/readme.jpg"> </center>
 
 > The higher resolution images from the picture above can be seen in the docs/imgs/compare/ and docs/imgs/input folders.
 
