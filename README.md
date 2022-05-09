@@ -84,11 +84,11 @@ from carvekit.trimap.generator import TrimapGenerator
 
 u2net = U2NET(device='cpu',
               batch_size=1)
-              
+
 fba = FBAMatting(device='cpu',
                  input_tensor_size=2048,
                  batch_size=1)
-                 
+
 trimap = TrimapGenerator()
 
 preprocessing = PreprocessingStub()
@@ -96,13 +96,13 @@ preprocessing = PreprocessingStub()
 postprocessing = MattingMethod(matting_module=fba,
                                trimap_generator=trimap,
                                device='cpu')
-                               
+
 interface = Interface(pre_pipe=preprocessing,
                       post_pipe=postprocessing,
                       seg_pipe=u2net)
 
 image = PIL.Image.open('tests/data/cat.jpg')
-cat_wo_bg = interface(['./tests/data/cat.jpg'])[0]
+cat_wo_bg = interface([image])[0]
 cat_wo_bg.save('2.png')
                    
 ```
