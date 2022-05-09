@@ -147,15 +147,19 @@ Options:
 
 Using the API via docker is a **fast** and non-complex way to have a working API.\
 **This HTTP API is 100% compatible with remove.bg API clients.** 
+<p align="center"> 
+<img src="docs/imgs/screenshot/frontend.png"> 
+<img src="docs/imgs/screenshot/docs_fastapi.png"> 
+</p>
 
->Docker image has default front-end at `/` url and FastAPI backend with docs at `/docs` url. \
-
->Authentication is **enabled** by default. \
+>### Important Notes:
+>1. Docker image has default front-end at `/` url and FastAPI backend with docs at `/docs` url.
+>2. Authentication is **enabled** by default. \
 > **Token keys are reset** on every container restart if ENV variables are not set. \
 See `docker-compose.<device>.yml` for more information. \
-> **You can see your access keys in the docker container logs.** 
-
-> There are examples of interaction with the API.\
+> **You can see your access keys in the docker container logs.**
+> 
+>3. There are examples of interaction with the API.\
 > See `docs/code_examples/python` for more details
 ### 🔨 Creating and running a container:
 1. Install `docker-compose`
