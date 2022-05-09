@@ -26,7 +26,12 @@ Automated high-quality background removal framework for an image using neural ne
 - Easy integration with your code
 
 ## ⛱ Try yourself on [Google Colab](https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/carvekit_try.ipynb) 
-
+## ⛓️ How does it work?
+It can be briefly described as
+1. The user selects a picture or a folder with pictures for processing
+2. The photo is preprocessed to ensure the best quality of the output image
+3. Using machine learning technology, the background of the image is removed
+4. Image post-processing to improve the quality of the processed image
 ## 🎓 Implemented Neural Networks:
 * [U^2-net](https://github.com/NathanUA/U-2-Net)
 * [BASNet](https://github.com/NathanUA/BASNet)
@@ -50,6 +55,58 @@ Automated high-quality background removal framework for an image using neural ne
 2. Install `CUDA` and setup `PyTorch` for GPU processing.
 3. `pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu113`
 4. `pip install ./`
+
+## 🧰 Interact via code:  
+### If you don't need deep configuration or don't want to deal with with it
+``` python
+import torch
+from carvekit.api.high import HiInterface
+
+interface = HiInterface(batch_size_seg=5, batch_size_matting=1,
+                               device='cuda' if torch.cuda.is_available() else 'cpu',
+                               seg_mask_size=320, matting_mask_size=2048)
+images_without_background = interface(['./tests/data/cat.jpg'])                               
+cat_wo_bg = images_without_background[0]
+cat_wo_bg.save('2.png')
+                   
+```
+
+### If you want control everything
+``` python
+import PIL.Image
+
+from carvekit.api.interface import Interface
+from carvekit.ml.wrap.fba_matting import FBAMatting
+from carvekit.ml.wrap.u2net import U2NET
+from carvekit.pipelines.postprocessing import MattingMethod
+from carvekit.pipelines.preprocessing import PreprocessingStub
+from carvekit.trimap.generator import TrimapGenerator
+
+u2net = U2NET(device='cpu',
+              batch_size=1)
+              
+fba = FBAMatting(device='cpu',
+                 input_tensor_size=2048,
+                 batch_size=1)
+                 
+trimap = TrimapGenerator()
+
+preprocessing = PreprocessingStub()
+
+postprocessing = MattingMethod(matting_module=fba,
+                               trimap_generator=trimap,
+                               device='cpu')
+                               
+interface = Interface(pre_pipe=preprocessing,
+                      post_pipe=postprocessing,
+                      seg_pipe=u2net)
+
+image = PIL.Image.open('tests/data/cat.jpg')
+cat_wo_bg = interface(['./tests/data/cat.jpg'])[0]
+cat_wo_bg.save('2.png')
+                   
+```
+
 
 ## 🧰 Running the CLI interface:  
  * ```python3 -m carvekit  -i <input_path> -o <output_path> --device <device>```  
@@ -92,11 +149,14 @@ Using the API via docker is a **fast** and non-complex way to have a working API
 **This HTTP API is 100% compatible with remove.bg API clients.** 
 
 >Docker image has default front-end at `/` url and FastAPI backend with docs at `/docs` url. \
+
 >Authentication is **enabled** by default. \
 > **Token keys are reset** on every container restart if ENV variables are not set. \
 See `docker-compose.<device>.yml` for more information. \
-> **You can see your access keys in the docker container logs.**
-> 
+> **You can see your access keys in the docker container logs.** 
+
+> There are examples of interaction with the API.\
+> See `docs/code_examples/python` for more details
 ### 🔨 Creating and running a container:
 1. Install `docker-compose`
 2. Run `docker-compose -f docker-compose.cpu.yml up -d`  # For CPU Processing
@@ -110,6 +170,7 @@ See `docker-compose.<device>.yml` for more information. \
 ### ☑️ Testing with local environment
 1. `pip install -r requirements_test.txt`
 2. `pytest`
+
 ### ☑️ Testing with Docker
 1. Run `docker-compose -f docker-compose.cpu.yml run carvekit_api pytest`  # For testing on CPU
 2. Run `docker-compose -f docker-compose.cuda.yml run carvekit_api pytest`  # For testing on GPU
@@ -117,12 +178,13 @@ See `docker-compose.<device>.yml` for more information. \
 
 ## 👪 Credits: [More info](docs/CREDITS.md)
 
+## 💵 Support
+  You can thank us and buy a small cup of coffee ☕
+- Ethereum wallet - `0x7Ab1B8015020242D2a9bC48F09b2F34b994bc2F8`
+
+
 ## 📧 __Feedback__
 We will be glad to receive feedback about the project and suggestions for integration.
 
 For all questions write: [farvard34@gmail.com](mailto://farvard34@gmail.com)
-
-## 💵 Support
-  You can thank us and buy a small cup of coffee ☕
-- Ethereum wallet - `0x7Ab1B8015020242D2a9bC48F09b2F34b994bc2F8`
 
