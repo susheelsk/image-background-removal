@@ -1,1 +1,0 @@
-**Move these files to the root of the project before use**

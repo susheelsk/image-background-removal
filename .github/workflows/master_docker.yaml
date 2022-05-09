@@ -1,0 +1,25 @@
+name: Test Docker CPU CI/CD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the CPU Docker img
+      run: docker build . --file Dockerfile.cpu --tag carvekit
+    - name: Test CPU Docker image
+      run: docker run --rm carvekit pytest
+    - name: Build the GPU Docker image
+      run: docker build . --file Dockerfile.cuda --tag carvekit_gpu
+    - name: Test GPU Docker image on CPU
+      run: docker run --rm carvekit_gpu pytest
+

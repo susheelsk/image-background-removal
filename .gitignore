@@ -1,6 +1,11 @@
-/carvekit/models/
+/models/
 /.idea/
 __pycache__
-/carvekit/tests/.pytest_cache/
-/carvekit/tests/tests_temp/
-/venv
+/tests/.pytest_cache/
+/tests/tests_temp/
+/carvekit/ml/files/checkpoints/basnet/basnet.pth
+/carvekit/ml/files/checkpoints/u2net/full_weights.pth
+/carvekit/ml/files/checkpoints/deeplab/deeplab.pth
+/carvekit/ml/files/checkpoints/fba_matting/fba_matting.pth
+/.pytest_cache/
+/carvekit.egg-info/

@@ -1,22 +1,10 @@
 # Credits:
-## Development team:
-1. ⭐ [Nikita Selin (Anodev) (OPHoperHPO)](https://github.com/OPHoperHPO) - Project Leader - **The main part of the functional**
-## Contributors:
-1. [Munawwar](https://github.com/Munawwar) - [GUI](https://github.com/OPHoperHPO/image-background-remove-tool/pull/10) > *Already deprecated and removed, because it was completely rewritten.*
-2. [Pubkey](https://github.com/pubkey) - [Add docker build, Improve http_api](https://github.com/OPHoperHPO/image-background-remove-tool/pull/25)
-3. [chris-rgr](https://github.com/chris-rgr) - [Loading models via absolute path](https://github.com/OPHoperHPO/image-background-remove-tool/pull/28)
-4. [xhit](https://github.com/xhit) - [Fix warning about mixed memory format pytorch](https://github.com/OPHoperHPO/image-background-remove-tool/pull/52)
-
 ## Disclaimer for pretrained models:
 All rights to the pretrained models used in this project belong to their authors. \
 I do not vouch for their quality and do not claim to be licensed to use any model. \
 It is your responsibility to determine if you have permission to use the pretrained model under the license for the dataset it was trained on or licensed under. \
 Any use of the pretrained model is strictly regulated by the licenses under which the model is distributed. \
 If you own the model and want to update it (file, segmentation quality information, etc.) or don't want your model to be included in this tool, please get in touch through a GitHub issue.
-
-## Icons:
-The GUI uses icons from the [Google Material Design Icons pack](https://github.com/google/material-design-icons/). \
-These images are licensed under the Apache License 2.0.
 
 ## Photos:
 The photos in the `docs/imgs/input/` and `docs/code_examples/python/input/` folders were taken from the Pexels website. \

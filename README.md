@@ -1,178 +1,195 @@
-# 🥧 Image Background Remove Tool 🥧 ![Test](https://github.com/OPHoperHPO/image-background-remove-tool/workflows/Test/badge.svg?branch=master) [![](https://camo.githubusercontent.com/52feade06f2fecbf006889a904d221e6a730c194/68747470733a2f2f636f6c61622e72657365617263682e676f6f676c652e636f6d2f6173736574732f636f6c61622d62616467652e737667)](https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/try.ipynb)
-![Input](/docs/imgs/compare/readme.jpg)
-> The higher resolution images from the picture above can be seen in the docs/imgs/compare/ folder.
+# <p align="center"> ✂️ CarveKit ✂️  </p>
+
+<p align="center"> <img src="docs/imgs/logo.png"> </p>
+
+<p align="center">
+<img src="https://github.com/OPHoperHPO/image-background-remove-tool/workflows/Test%20release%20version/badge.svg?branch=master"> <a src="https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/carvekit_try.ipynb">
+<img src="https://camo.githubusercontent.com/52feade06f2fecbf006889a904d221e6a730c194/68747470733a2f2f636f6c61622e72657365617263682e676f6f676c652e636f6d2f6173736574732f636f6c61622d62616467652e737667"></a>
+</p>
+
 **********************************************************************
+<p align="center"> <img align="center" width="512" height="288" src="docs/imgs/compare/readme.jpg"> </p>
+
+> The higher resolution images from the picture above can be seen in the docs/imgs/compare/ and docs/imgs/input folders.
+
 ## 📄 Description:  
-The program removes the background from photos using neural networks.  
+Automated high-quality background removal framework for an image using neural networks.
 
-**********************************************************************
+
 ## 🎆 Features:  
-* **GUI**
-* **Removes background from hair**
-* **Significantly improved output image quality**
-* **Removes background from image without loss of image resolution**
-* **All models support processing both on the video card and on the processor**
-* **Added support for new neural networks ([U^2-NET](https://github.com/NathanUA/U-2-Net), [BASNet]((https://github.com/NathanUA/BASNet))) on PyTorch**
-* **Updated DeepLabv3 core and moved to PyTorch implementation with ResNet 101 backbone.**
-* **The program has a lot of methods for image preprocessing and post-processing, which allows you to configure the quality and speed of image processing for your needs**
-* **Added flask http api, fully compatible with `remove.bg` api libraries. Just change the `endpoint url` and voila!** 
+- High Quality
+- Batch Processing
+- NVIDIA CUDA and CPU processing
+- Easy inference
+- 100% remove.bg compatible FastAPI HTTP API 
+- Removes background from hairs
+- Easy integration with your code
 
-**********************************************************************
-## ⛱ Try this program yourself on [Google Colab](https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/try.ipynb) 
-
-**********************************************************************
+## ⛱ Try yourself on [Google Colab](https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/carvekit_try.ipynb) 
+## ⛓️ How does it work?
+It can be briefly described as
+1. The user selects a picture or a folder with pictures for processing
+2. The photo is preprocessed to ensure the best quality of the output image
+3. Using machine learning technology, the background of the image is removed
+4. Image post-processing to improve the quality of the processed image
 ## 🎓 Implemented Neural Networks:
 * [U^2-net](https://github.com/NathanUA/U-2-Net)
 * [BASNet](https://github.com/NathanUA/BASNet)
-* [DeepLabV3](https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101/)
-> [More info about models.](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/MODELS.md)  
+* [DeepLabV3](https://github.com/tensorflow/models/tree/master/research/deeplab)
 
-**********************************************************************
+
 ## 🖼️ Image pre-processing and post-processing methods:
 ### 🔍 Preprocessing methods:
-* `None` (**default**) - No preprocessing methods used.
-* `bbd-fastrcnn` - This image pre-processing technique uses two neural networks ($used_model and Fast RCNN) to first detect the boundaries of objects in a photograph, cut them out, sequentially remove the background from each object in turn and subsequently collect the entire image from separate parts.
-* `bbmd-maskrcnn` - This image pre-processing technique uses two neural networks ($used_model and Mask RCNN) to first detect the boundaries and masks of objects in a photograph, cut them out, expand the masks by a certain number of pixels, apply them and remove the background from each object in turn and subsequently collect the entire image from separate parts. **So far it works very poorly!**
-
+* `None` - No preprocessing methods used.
+> They will be added in the future.
 ### ✂ Post-processing methods:
 * `No` - No post-processing methods used.
-* `fba` (**default**) - This algorithm improves the borders of the image when removing the background from images with hair, etc. using [FBA Matting](https://github.com/MarcoForte/FBA_Matting) neural network. This method gives the best result in combination with u2net without any preprocessing methods.
-* `rtb-bnb` - This algorithm improves the boundaries of the image obtained from the neural network. It is based on the principle of removing too transparent pixels and smoothing the borders after removing too transparent pixels.
-* `rtb-bnb2` - This algorithm improves the boundaries of the image obtained from the neural network. It is based on the principle of removing too transparent pixels and smoothing the borders after removing too transparent pixels. The algorithm performs this procedure twice. For the first time, the algorithm processes the image from the neural network, then sends the processed image back to the neural network, and then processes it again and returns it to the user. 
-**********************************************************************
-## 🧷 Dependencies:  
-* **See** `requirements.txt`
-* **See** `requirements_http.txt`, if you need http api.
-> Note: `mxnet` and `gluoncv` are used for image preprocessing methods and are installed optionally. \
-**Also, to speed up image processing by performing all the calculations on the video card, install separately special versions of the dependencies (`torch, mxnet, gluoncv and others`) designed to work with your video card.** 
-**********************************************************************
-## 🏷 Setup for Windows:  
-* Clone this repository  
-* Install numpy ```pip3 install numpy```
-* Install all the dependencies from **requirements.txt** via ```pip3 install -f https://download.pytorch.org/whl/torch_stable.html -r requirements.txt```  
-* Run ```python3 setup.py```
-> _This setup.bat script loads the trained model._  \
-> The install script also supports installing models using arguments. For more information, run `python3 setup.py --help`.\
-> The program was tested on python version 3.7.3
-**********************************************************************
-## 🏷 Setup for Linux:  
-* Clone repository: ```git clone https://github.com/OPHoperHPO/image-background-remove-tool```
-* Install numpy ```pip3 install numpy```  
-* Install all the dependencies from **requirements.txt**: ```pip3 install -r requirements.txt```  
-* Run ```python3 setup.py``` and select the model you need.
-> _This setup.py script loads the pre-trained model._ \
-> The install script also supports installing models using arguments. For more information, run `python3 setup.py --help`.\
-> The program was tested on python version 3.7.3
-**********************************************************************
-## 🖼️ GUI screenshot:
-![](/docs/imgs/screenshots/gui.png)
-**********************************************************************
-## 🖵 Running the GUI app:
-```python3 gui.py```
-**********************************************************************
-## 📦 Running the HTTP API server:
-### 🧲 With defaults:
-```python3 http_api.py```
+* `fba` (default) - This algorithm improves the borders of the image when removing the background from images with hair, etc. using FBA Matting neural network. This method gives the best result in combination with u2net without any preprocessing methods.
 
-### 🧲 With custom arguments:
-```python3 http_api.py -auth false -port 5000 -host 0.0.0.0 -m u2net -pre None -post fba```
+## 🏷 Setup for CPU processing:
+1. Clone this repository
+2. `pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu`
+3. `pip install ./`
 
-### ⏩ Example usage with curl:
-```bash
-curl -H 'X-API-Key: test'                                   \
-       -F 'image_file=@/home/user/test.jpg'                 \
-       -F 'size=auto'                                       \ # oneOf 'preview', 'medium', 'hd', 'auto'
-       -f http://localhost:5000/api/removebg -o no-bg.png
+## 🏷 Setup for GPU processing:  
+1. Make sure you have an NVIDIA GPU with 8 GB VRAM.
+2. Install `CUDA` and setup `PyTorch` for GPU processing.
+3. `pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu113`
+4. `pip install ./`
+
+## 🧰 Interact via code:  
+### If you don't need deep configuration or don't want to deal with with it
+``` python
+import torch
+from carvekit.api.high import HiInterface
+
+interface = HiInterface(batch_size_seg=5, batch_size_matting=1,
+                               device='cuda' if torch.cuda.is_available() else 'cpu',
+                               seg_mask_size=320, matting_mask_size=2048)
+images_without_background = interface(['./tests/data/cat.jpg'])                               
+cat_wo_bg = images_without_background[0]
+cat_wo_bg.save('2.png')
+                   
 ```
-> Note:  See example scripts in docs/code_examples/python for more information on using the http api.  
-## 📦 Running the HTTP API server via docker:
-Using the API via docker is a **fast** and non-complex way to have a working API.  \
-The docker image uses `u2net` as default and runs without authentication.
-### 💻 Using an already built image from DockerHub: 
-```bash
-docker run -d --restart unless-stopped \
- --name image-background-remove-tool \
- -p 5000:5000 \
- -e HOST='0.0.0.0'   \
- -e PORT='5000'  \
- -e AUTH='false'  \
- -e MODEL='u2net'  \
- -e PREPROCESSING='None'  \
- -e POSTPROCESSING='fba'  \
- -e ADMIN_TOKEN='admin'  \
- -e ALLOWED_TOKENS_PYTHON_ARR='["test"]'  \
- -e IS_DOCKER_CONTAINER='true'  \
-docker.io/anodev/image-background-remove-tool:release 
-```
-### 🔨 Building your own image:
-* Build the docker image
-```bash
-docker build --tag image-background-remove-tool:latest .
-```
-* Start a container from the image
-```bash
-docker run -d --restart unless-stopped \
- --name image-background-remove-tool \
- -p 5000:5000 \
- -e HOST='0.0.0.0'   \
- -e PORT='5000'  \
- -e AUTH='false'  \
- -e MODEL='u2net'  \
- -e PREPROCESSING='None'  \
- -e POSTPROCESSING='fba'  \
- -e ADMIN_TOKEN='admin'  \
- -e ALLOWED_TOKENS_PYTHON_ARR='["test"]'  \
- -e IS_DOCKER_CONTAINER='true'  \
-image-background-remove-tool:latest
+
+### If you want control everything
+``` python
+import PIL.Image
+
+from carvekit.api.interface import Interface
+from carvekit.ml.wrap.fba_matting import FBAMatting
+from carvekit.ml.wrap.u2net import U2NET
+from carvekit.pipelines.postprocessing import MattingMethod
+from carvekit.pipelines.preprocessing import PreprocessingStub
+from carvekit.trimap.generator import TrimapGenerator
+
+u2net = U2NET(device='cpu',
+              batch_size=1)
+
+fba = FBAMatting(device='cpu',
+                 input_tensor_size=2048,
+                 batch_size=1)
+
+trimap = TrimapGenerator()
+
+preprocessing = PreprocessingStub()
+
+postprocessing = MattingMethod(matting_module=fba,
+                               trimap_generator=trimap,
+                               device='cpu')
+
+interface = Interface(pre_pipe=preprocessing,
+                      post_pipe=postprocessing,
+                      seg_pipe=u2net)
+
+image = PIL.Image.open('tests/data/cat.jpg')
+cat_wo_bg = interface([image])[0]
+cat_wo_bg.save('2.png')
+                   
 ```
 
 
-**********************************************************************
-## 🧰 Running the script:  
- * ```python3 main.py -i <input_path> -o <output_path> -m <model_type> -pre <preprocessing_method> -post <postprocessing_method> --recursive```  
+## 🧰 Running the CLI interface:  
+ * ```python3 -m carvekit  -i <input_path> -o <output_path> --device <device>```  
  
 ### Explanation of args:  
-* `-i <input_path>` - Path to input file or dir.
-* `-o <output_path>` - Path to output file or dir.
-* `-pre <preprocessing_method>` - Preprocessing method. Can be `bbd-fastrcnn` or `bbmd-maskrcnn` or `None`. `None` is better to use.
-* `-post <postprocessing_method>` - Postprocessing method. Can be `fba` or `rtb-bnb` or `rtb-bnb2` or `No`. `fba` is better to use.
-* `-m <model_type>` - Can be `u2net` or `basnet` or `u2netp` or `deeplabv3`. `u2net` is better to use. 
-* `--recursive`  - Enables recursive search for images in a folder \
-**DeepLabV3** model designed to remove the background from **PORTRAIT** photos or **PHOTOS WITH ANIMALS!** \
-[More info about models.](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/MODELS.md)  
-> Note:  See example scripts in docs/code_examples/shell for more information on using the program.  
-**********************************************************************
+````
+Usage: carvekit [OPTIONS]
 
-## ⏳ TODO:  
-```
-1) Check TODOs in code.
-2) Implement support for Mask RCNN. (90% done)
-3) Add an algorithm for automatic color correction at image borders. (0% done)
-```
+  Performs background removal on specified photos using console interface.
 
-**********************************************************************
-## 👪 Credits: [More info](https://github.com/OPHoperHPO/image-background-remove-tool/blob/master/docs/CREDITS.md) 
+Options:
+  -i ./2.jpg                   Path to input file or dir  [required]
+  -o ./2.png                   Path to output file or dir
+  --pre none                   Preprocessing method
+  --post fba                   Postprocessing method.
+  --net u2net                  Segmentation Network
+  --recursive                  Enables recursive search for images in a folder
+  --batch_size 10              Batch Size for list of images to be loaded to
+                               RAM
 
-**********************************************************************
-## 💵 Support me:  
-  You can thank me for developing any of my projects, provide financial support for developing new projects and buy me a small cup of coffee.☕ \
-  Just support me on these platforms:
-  * ![](https://github.com/OPHoperHPO/OPHoperHPO/raw/master/assets/imgs/boosty_logo.jpeg) [**Boosty**](https://boosty.to/anodev)
-  * ![](https://github.com/OPHoperHPO/OPHoperHPO/raw/master/assets/imgs/donationalerts_logo.png) [**DonationAlerts**](https://www.donationalerts.com/r/anodev_development)
-  * ![](https://github.com/OPHoperHPO/OPHoperHPO/raw/master/assets/imgs/paypal_logo.jpg) [**PayPal**](https://paypal.me/anodevru)
-**********************************************************************
-## 🖼️ Sample Result:
-* **More sample images in [docs/imgs/input/](docs/imgs/input) and [docs/imgs/examples/](docs/imgs/examples) folders.**  \
-Examples of images from the background are contained in folders in the following format: `{model_name}/{preprocessing_method_name}/{postprocessing_method_name}`
-* Input:   
-* ![Input](/docs/imgs/input/1.jpg)
-* Output(u2net/None/fba):
-* ![Output](/docs/imgs/examples/u2net/None/fba/1.png "Output")
-* Output(deeplabv3/None/fba):
-* ![Output](/docs/imgs/examples/deeplabv3/None/fba/1.png "Output")
-*  Output(basnet/None/fba):
-* ![Output](/docs/imgs/examples/basnet/None/fba/1.png "Output")
-* Output(u2netp/None/fba):
-* ![Output](/docs/imgs/examples/u2netp/None/fba/1.png "Output")
-**********************************************************************
+  --batch_size_seg 5           Batch size for list of images to be processed
+                               by segmentation network
+
+  --batch_size_mat 1           Batch size for list of images to be processed
+                               by matting network
+
+  --seg_mask_size 320          The size of the input image for the
+                               segmentation neural network.
+
+  --matting_mask_size 2048     The size of the input image for the matting
+                               neural network.
+
+  --device cpu                 Processing Device.
+  --help                       Show this message and exit.
+
+````
+## 📦 Running the Framework / FastAPI HTTP API server via Docker:
+
+Using the API via docker is a **fast** and non-complex way to have a working API.\
+**This HTTP API is 100% compatible with remove.bg API clients.** 
+<p align="center"> 
+<img src="docs/imgs/screenshot/frontend.png"> 
+<img src="docs/imgs/screenshot/docs_fastapi.png"> 
+</p>
+
+>### Important Notes:
+>1. Docker image has default front-end at `/` url and FastAPI backend with docs at `/docs` url.
+>2. Authentication is **enabled** by default. \
+> **Token keys are reset** on every container restart if ENV variables are not set. \
+See `docker-compose.<device>.yml` for more information. \
+> **You can see your access keys in the docker container logs.**
+> 
+>3. There are examples of interaction with the API.\
+> See `docs/code_examples/python` for more details
+### 🔨 Creating and running a container:
+1. Install `docker-compose`
+2. Run `docker-compose -f docker-compose.cpu.yml up -d`  # For CPU Processing
+3. Run `docker-compose -f docker-compose.cuda.yml up -d`  # For GPU Processing
+> Also you can mount folders from your host machine to docker container
+> and use the CLI interface inside the docker container to process 
+> files in this folder. 
+
+## ☑️ Testing
+
+### ☑️ Testing with local environment
+1. `pip install -r requirements_test.txt`
+2. `pytest`
+
+### ☑️ Testing with Docker
+1. Run `docker-compose -f docker-compose.cpu.yml run carvekit_api pytest`  # For testing on CPU
+2. Run `docker-compose -f docker-compose.cuda.yml run carvekit_api pytest`  # For testing on GPU
+
+
+## 👪 Credits: [More info](docs/CREDITS.md)
+
+## 💵 Support
+  You can thank me for developing this project and buy a small cup of coffee ☕
+- Ethereum wallet - `0x7Ab1B8015020242D2a9bC48F09b2F34b994bc2F8`
+
+
+## 📧 __Feedback__
+I will be glad to receive feedback on the project and suggestions for integration.
+
+For all questions write: [farvard34@gmail.com](mailto://farvard34@gmail.com)
 
