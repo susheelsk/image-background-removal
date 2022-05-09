@@ -1,5 +1,6 @@
-/models/
+/carvekit/models/
 /.idea/
 __pycache__
-/tests/.pytest_cache/
-/tests/tests_temp/
+/carvekit/tests/.pytest_cache/
+/carvekit/tests/tests_temp/
+/venv
