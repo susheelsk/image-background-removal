@@ -41,6 +41,7 @@ It can be briefly described as
 ## 🖼️ Image pre-processing and post-processing methods:
 ### 🔍 Preprocessing methods:
 * `None` - No preprocessing methods used.
+> They will be added in the future.
 ### ✂ Post-processing methods:
 * `No` - No post-processing methods used.
 * `fba` (default) - This algorithm improves the borders of the image when removing the background from images with hair, etc. using FBA Matting neural network. This method gives the best result in combination with u2net without any preprocessing methods.
@@ -183,12 +184,12 @@ See `docker-compose.<device>.yml` for more information. \
 ## 👪 Credits: [More info](docs/CREDITS.md)
 
 ## 💵 Support
-  You can thank us and buy a small cup of coffee ☕
+  You can thank me for developing this project and buy a small cup of coffee ☕
 - Ethereum wallet - `0x7Ab1B8015020242D2a9bC48F09b2F34b994bc2F8`
 
 
 ## 📧 __Feedback__
-We will be glad to receive feedback about the project and suggestions for integration.
+I will be glad to receive feedback on the project and suggestions for integration.
 
 For all questions write: [farvard34@gmail.com](mailto://farvard34@gmail.com)
 
