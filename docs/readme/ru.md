@@ -11,8 +11,6 @@
 **********************************************************************
 <p align="center"> <img align="center" width="512" height="288" src="docs/imgs/compare/readme.jpg"> </p>
 
-[English version](README.md)
-
 > Изображения с более высоким разрешением с примером выше можно увидеть в директории docs/imgs/compare/ и docs/imgs/input folders.
 
 #### 📙 README Language
