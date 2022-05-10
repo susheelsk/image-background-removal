@@ -3,14 +3,23 @@
 <p align="center"> <img src="docs/imgs/logo.png"> </p>
 
 <p align="center">
-<img src="https://github.com/OPHoperHPO/image-background-remove-tool/workflows/Test%20release%20version/badge.svg?branch=master"> <a src="https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/carvekit_try.ipynb">
+<img src="https://github.com/OPHoperHPO/image-background-remove-tool/actions/workflows/master_docker.yaml/badge.svg">
+<img src="https://github.com/OPHoperHPO/image-background-remove-tool/actions/workflows/master.yml/badge.svg">
+<a src="https://colab.research.google.com/github/OPHoperHPO/image-background-remove-tool/blob/master/docs/other/carvekit_try.ipynb">
 <img src="https://camo.githubusercontent.com/52feade06f2fecbf006889a904d221e6a730c194/68747470733a2f2f636f6c61622e72657365617263682e676f6f676c652e636f6d2f6173736574732f636f6c61622d62616467652e737667"></a>
+
 </p>
+
 
 **********************************************************************
 <p align="center"> <img align="center" width="512" height="288" src="docs/imgs/compare/readme.jpg"> </p>
 
+
 > The higher resolution images from the picture above can be seen in the docs/imgs/compare/ and docs/imgs/input folders.
+
+#### 📙 README Language
+[Russian](docs/readme/ru.md)
+[English](README.md)
 
 ## 📄 Description:  
 Automated high-quality background removal framework for an image using neural networks.
@@ -40,10 +49,10 @@ It can be briefly described as
 
 ## 🖼️ Image pre-processing and post-processing methods:
 ### 🔍 Preprocessing methods:
-* `None` - No preprocessing methods used.
+* `none` - No preprocessing methods used.
 > They will be added in the future.
 ### ✂ Post-processing methods:
-* `No` - No post-processing methods used.
+* `none` - No post-processing methods used.
 * `fba` (default) - This algorithm improves the borders of the image when removing the background from images with hair, etc. using FBA Matting neural network. This method gives the best result in combination with u2net without any preprocessing methods.
 
 ## 🏷 Setup for CPU processing:
@@ -58,7 +67,7 @@ It can be briefly described as
 4. `pip install ./`
 
 ## 🧰 Interact via code:  
-### If you don't need deep configuration or don't want to deal with with it
+### If you don't need deep configuration or don't want to deal with it
 ``` python
 import torch
 from carvekit.api.high import HiInterface
@@ -192,4 +201,3 @@ See `docker-compose.<device>.yml` for more information. \
 I will be glad to receive feedback on the project and suggestions for integration.
 
 For all questions write: [farvard34@gmail.com](mailto://farvard34@gmail.com)
-
