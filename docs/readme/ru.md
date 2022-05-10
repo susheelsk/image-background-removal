@@ -1,6 +1,6 @@
 # <p align="center"> ✂️ CarveKit ✂️  </p>
 
-<p align="center"> <img src="docs/imgs/logo.png"> </p>
+<p align="center"> <img src="/docs/imgs/logo.png"> </p>
 
 <p align="center">
 <img src="https://github.githubassets.com/favicons/favicon-success.svg"> <a src="https://github.com/OPHoperHPO/image-background-remove-tool/actions">
@@ -9,13 +9,13 @@
 </p>
 
 **********************************************************************
-<p align="center"> <img align="center" width="512" height="288" src="docs/imgs/compare/readme.jpg"> </p>
+<p align="center"> <img align="center" width="512" height="288" src="/docs/imgs/compare/readme.jpg"> </p>
 
 > Изображения с более высоким разрешением с примером выше можно увидеть в директории docs/imgs/compare/ и docs/imgs/input folders.
 
 #### 📙 README Language
-[Russian](docs/readme/ru.md)
-[English](README.md)
+[Russian](/docs/readme/ru.md)
+[English](/README.md)
 
 ## 📄 О проекте:  
 Автоматизированное высококачественное удаление фона с изображения с использованием нейронных сетей
@@ -153,8 +153,8 @@ Options:
 Использование API через Docker — это **быстрый** и эффективный способ получить работающий API.\
 **Этот HTTP API на 100% совместим с API клиентами сайта remove.bg** 
 <p align="center"> 
-<img src="../imgs/screenshot/frontend.png"> 
-<img src="../imgs/screenshot/docs_fastapi.png"> 
+<img src="/docs/imgs/screenshot/frontend.png"> 
+<img src="/docs/imgs/screenshot/docs_fastapi.png"> 
 </p>
 
 >### Важная информация:
@@ -185,7 +185,7 @@ Options:
 2. Run `docker-compose -f docker-compose.cuda.yml run carvekit_api pytest`  # для тестирования на GPU
 
 
-## 👪 Credits: [Больше информации](../CREDITS.md)
+## 👪 Credits: [Больше информации](/docs/CREDITS.md)
 
 ## 💵 Поддержать развитие проекта
   Вы можете поблагодарить меня за разработку этого проекта и купить мне небольшую чашку кофе ☕
