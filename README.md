@@ -193,7 +193,7 @@ See `docker-compose.<device>.yml` for more information. \
 ## 👪 Credits: [More info](docs/CREDITS.md)
 
 ## 💵 Support
-  You can thank me for developing this project and buy a small cup of coffee ☕
+  You can thank me for developing this project and buy me a small cup of coffee ☕
 
 | Blockchain |            Cryptocurrency           |          Network          |                                              Wallet                                             |
 |:----------:|:-----------------------------------:|:-------------------------:|:-----------------------------------------------------------------------------------------------:|
