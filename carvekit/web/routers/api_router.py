@@ -16,6 +16,7 @@ from carvekit.web.deps import config, ml_processor
 from carvekit.web.handlers.response import handle_response, Authenticate
 from carvekit.web.responses.api import error_dict
 from carvekit.web.schemas.request import Parameters
+from carvekit.web.utils.net_utils import is_loopback
 
 api_router = APIRouter(prefix='', tags=['api'])
 
@@ -48,6 +49,16 @@ async def removebg(
     if content_type not in ["application/x-www-form-urlencoded",
                             "application/json"] and "multipart/form-data" not in content_type:
         return JSONResponse(content=error_dict("Invalid request content type"), status_code=400)
+
+    if image_url:
+        if (
+            not image_url.startswith("http://") or
+            not image_url.startswith("https://") or
+            is_loopback(image_url)
+        ):
+            print(f"Possible ssrf attempt to /api/removebg endpoint with image url: {image_url}")
+            return JSONResponse(content=error_dict("Invalid image url."),
+                                status_code=400)  # possible ssrf attempt
 
     image = None
     bg = None
