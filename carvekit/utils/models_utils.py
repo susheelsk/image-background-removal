@@ -5,7 +5,7 @@ License: Apache License 2.0
 """
 
 import random
-
+import warnings
 import torch
 
 
@@ -25,3 +25,14 @@ def fix_seed(seed=42):
         # noinspection PyUnresolvedReferences
         torch.backends.cudnn.benchmark = False
     return True
+
+
+def suppress_warnings():
+    # Suppress PyTorch 1.11.0 warning associated with changing order of args in nn.MaxPool2d layer,
+    # since source code is not affected by this issue and there aren't any other correct way to hide this message.
+    warnings.filterwarnings("ignore",
+                            category=UserWarning,
+                            message="Note that order of the arguments: ceil_mode and "
+                                    "return_indices will changeto match the args list "
+                                    "in nn.MaxPool2d in a future release.",
+                            module="torch")

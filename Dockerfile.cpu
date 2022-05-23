@@ -1,8 +1,8 @@
-FROM python:3.8.2 as builder
+FROM python:3.10.4 as builder
 WORKDIR /app
 
 # Models download stage
-RUN pip3 install --no-cache-dir tqdm requests
+RUN pip3 install --no-cache-dir tqdm==4.64.0 requests==2.27.1
 RUN mkdir -p ./carvekit/utils/
 RUN mkdir -p ./carvekit/ml/files
 RUN touch ./carvekit/__init__.py
@@ -14,7 +14,7 @@ COPY ./carvekit/ml/files/models_loc.py ./carvekit/ml/files/models_loc.py
 RUN python3 -c "from carvekit.ml.files.models_loc import download_all; download_all();"
 RUN rm -rf ./carvekit
 
-FROM python:3.8.2
+FROM python:3.10.4
 WORKDIR /app
 
 RUN apt-get update && apt-get -y install libgl1  # Install cv2 dep.
