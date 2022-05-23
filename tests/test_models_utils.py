@@ -9,11 +9,15 @@ from pathlib import Path
 from carvekit.utils.download_models import check_for_exists, check_model, sha512_checksum_calc, download_model
 from carvekit.ml.files.models_loc import u2net_full_pretrained, fba_pretrained, deeplab_pretrained, basnet_pretrained, \
     download_all
-from carvekit.utils.models_utils import fix_seed
+from carvekit.utils.models_utils import fix_seed, suppress_warnings
 
 
 def test_fix_seed():
     fix_seed(seed=42)
+
+
+def test_suppress_warnings():
+    suppress_warnings()
 
 
 def test_download_all():
