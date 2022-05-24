@@ -5,7 +5,7 @@
 
 body {
 
-    background:-moz-element(#particles-js);
+    /*background:-moz-element(.particles-js-canvas-el);*/
     background-color: #061b2a;
     font-family: 'Open Sans', sans-serif;
     line-height: 21px;
