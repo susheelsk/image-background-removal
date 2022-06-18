@@ -57,13 +57,12 @@ def removebg(i: str, o: str, pre: str, post: str, net: str, recursive: bool,
     )
 
     interface = init_interface(interface_config)
-    images_without_background = []
 
     for image_batch in tqdm.tqdm(batch_generator(all_images, n=batch_size),
                                  total=int(len(all_images) / batch_size),
                                  desc="Removing background", unit=" image batch",
                                  colour="blue"):
-        images_without_background += interface(image_batch)  # Remove background
+        images_without_background = interface(image_batch)  # Remove background
         thread_pool_processing(lambda x: save_file(out_path, image_batch[x], images_without_background[x]),
                                range((len(image_batch))))  # Drop images to fs
 
