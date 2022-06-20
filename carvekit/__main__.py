@@ -37,9 +37,9 @@ def removebg(i: str, o: str, pre: str, post: str, net: str, recursive: bool,
     input_path = Path(i)
     if input_path.is_dir():
         if recursive:
-            all_images = input_path.glob("*.*")
-        else:
             all_images = input_path.rglob("*.*")
+        else:
+            all_images = input_path.glob("*.*")
         all_images = [i for i in all_images if i.suffix.lower() in ALLOWED_SUFFIXES
                       and '_bg_removed' not in i.name]
     else:
