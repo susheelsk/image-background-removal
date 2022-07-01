@@ -8,7 +8,7 @@ from pydantic import BaseModel, validator
 
 class AuthConfig(BaseModel):
     """Config for web api token authentication """
-    auth: bool = False
+    auth: bool = True
     """Enables Token Authentication for API"""
     admin_token: str = secrets.token_hex(32)
     """Admin Token"""

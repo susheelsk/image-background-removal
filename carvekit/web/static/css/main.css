@@ -4,6 +4,8 @@
 /* =================================== */
 
 body {
+
+    /*background:-moz-element(.particles-js-canvas-el);*/
     background-color: #061b2a;
     font-family: 'Open Sans', sans-serif;
     line-height: 21px;
@@ -177,7 +179,7 @@ body > section,
 ==========================================*/
 
 #top {
-	background-image: url("../img/art.gif");
+	/*background-image: url("../img/art.gif");*/
 	background-attachment: fixed !important;
 	background-position: center center;
 	background-repeat: no-repeat;

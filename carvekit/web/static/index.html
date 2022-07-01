@@ -40,8 +40,9 @@
     <link rel="stylesheet" href="css/main.css">
     <!-- media-queries -->
     <link rel="stylesheet" href="css/media-queries.css">
-
+    <link rel="stylesheet" href="css/particles.css">
     <!-- Modernizer Script for old Browsers -->
+
     <script src="js/modernizr-2.6.2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://use.fontawesome.com/releases/v5.7.2/css/all.css"></script>
@@ -49,9 +50,10 @@
 </head>
 
 <body id="body" class="">
-
+<div id="particles-js"></div>
 <!-- preloader -->
 <div id="preloader">
+
     <img src="img/preloader.gif" alt="Preloader">
 </div>
 <!-- end preloader -->
@@ -59,7 +61,6 @@
 <!--
 Fixed Navigation
 ==================================== -->
-
 
 <header id="navigation" class="navbar-fixed-top navbar">
     <div class="container" style="padding-top: 10px; padding-bottom: 30px;">
@@ -74,6 +75,7 @@ Fixed Navigation
             <!-- /responsive nav button -->
 
         <!-- logo -->
+
         <a class="navbar-brand " href="#body" style="padding: 5px">
           <h1 id="logo">
             <img src="img\CarveKit_logo_main.png" style="width: 230px; height: 40px; margin: 6pt;  " alt="logo-razres">
@@ -105,8 +107,11 @@ Top Section
 ==================================== -->
 
 <section id="top" class="top">
+
     <div class="parallax-overlay">
+
         <div class="container">
+
             <div class="row number-counters">
                 <div class="item" data-wow-duration="1000ms">
                     <div class="caption text-center" data-wow-duration="1000ms">
@@ -119,6 +124,8 @@ Top Section
             </div>
         </div>
     </div>
+
+
 </section>
 
 <!--
@@ -130,8 +137,16 @@ End Top Section
 Try yourself
 ==================================== -->
 
+
 <section id="tryBySelf" class="tryBySelf">
-    <div class="container text-center" style="width: 100%;">
+
+    <div class="container text-center" style="width: 100%; ">
+        <div style="    backdrop-filter: blur(1px);
+        padding: 32px;
+        border-radius: 20px;
+    width: fit-content;
+    position: relative;
+    margin: auto;">
         <div class="row">
 
             <div class="sec-title text-center mb50 wow bounceInDown animated" data-wow-duration="500ms">
@@ -152,18 +167,23 @@ Try yourself
                             <span class="fileupload-preview"></span>
                             <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none">×</a>
                           </div>
-                          <input class="form-input" id="token" placeholder="API token">
+                          <input class="form-input"  style="z-index: 0" id="token"  placeholder="API token">
+
+
+                            <button class="btn btn-primary" style="z-index: 0;
+margin-top: 16px" id="butn" type="submit"><i class="fa fa-download">
+                    </i> Remove background
+                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+
+                    </button>
                         </div>
                     </div>
 
-                    <button class="btn btn-primary" id="butn" type="submit"><i class="fa fa-download">
-                    </i> Remove background
-                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-                        
-                    </button>
+
                 </form>
             </div>
         </div>
+            </div>
     </div>
 </section>
 
@@ -221,8 +241,8 @@ End Contact Us
 <script src="js/jquery.easing.min.js"></script>
 <!-- jquery easing -->
 <script src="js/wow.min.js"></script>
-
-
+    <script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>
+    <script  src="js/particles.js"></script>
 <script>
     var wow = new WOW({
         boxClass: 'wow', // animated element css class (default is wow)
