@@ -37,9 +37,9 @@ def removebg(i: str, o: str, pre: str, post: str, net: str, recursive: bool,
     input_path = Path(i)
     if input_path.is_dir():
         if recursive:
-            all_images = input_path.glob("*.*")
-        else:
             all_images = input_path.rglob("*.*")
+        else:
+            all_images = input_path.glob("*.*")
         all_images = [i for i in all_images if i.suffix.lower() in ALLOWED_SUFFIXES
                       and '_bg_removed' not in i.name]
     else:
@@ -57,13 +57,12 @@ def removebg(i: str, o: str, pre: str, post: str, net: str, recursive: bool,
     )
 
     interface = init_interface(interface_config)
-    images_without_background = []
 
     for image_batch in tqdm.tqdm(batch_generator(all_images, n=batch_size),
                                  total=int(len(all_images) / batch_size),
                                  desc="Removing background", unit=" image batch",
                                  colour="blue"):
-        images_without_background += interface(image_batch)  # Remove background
+        images_without_background = interface(image_batch)  # Remove background
         thread_pool_processing(lambda x: save_file(out_path, image_batch[x], images_without_background[x]),
                                range((len(image_batch))))  # Drop images to fs
 
