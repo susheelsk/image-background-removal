@@ -15,13 +15,13 @@ def read(filename: str):
     file = open(filepath, 'r')
     return file.read()
 
-def req_file(filename, folder="."):
+
+def req_file(filename: str, folder: str = "."):
     with open(os.path.join(folder, filename), encoding='utf-8') as f:
         content = f.readlines()
     # you may also want to remove whitespace characters
     # Example: `\n` at the end of each line
     return [x.strip() for x in content]
-
 
 
 setup(
