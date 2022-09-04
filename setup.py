@@ -10,10 +10,18 @@ from setuptools import setup, find_packages
 from carvekit import version
 
 
-def read(filename):
+def read(filename: str):
     filepath = os.path.join(os.path.dirname(__file__), filename)
     file = open(filepath, 'r')
     return file.read()
+
+def req_file(filename, folder="."):
+    with open(os.path.join(folder, filename), encoding='utf-8') as f:
+        content = f.readlines()
+    # you may also want to remove whitespace characters
+    # Example: `\n` at the end of each line
+    return [x.strip() for x in content]
+
 
 
 setup(
@@ -29,25 +37,7 @@ setup(
     url='https://github.com/OPHoperHPO/image-background-remove-tool',
     packages=find_packages(),
     scripts=[],
-    install_requires=[
-        'requests~=2.27.1',
-        'torch~=1.11.0',
-        'Pillow==9.0.1',
-        'typing~=3.7.4.3',
-        'torchvision~=0.12.0',
-        'opencv-python~=4.5.5.64',
-        'numpy~=1.22.4',
-        'loguru~=0.6.0',
-        'uvicorn~=0.17.6',
-        'fastapi~=0.78.0',
-        'starlette~=0.19.1',
-        'pydantic~=1.9.1',
-        'click~=8.1.3',
-        'tqdm~=4.64.0',
-        'setuptools~=62.3.2',
-        'aiofiles~=0.8.0',
-        'python-multipart~=0.0.5',
-    ],
+    install_requires=req_file("requirements.txt"),
     include_package_data=True,
     zip_safe=False,
     classifiers=[
