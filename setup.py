@@ -12,7 +12,7 @@ from carvekit import version
 
 def read(filename: str):
     filepath = os.path.join(os.path.dirname(__file__), filename)
-    file = open(filepath, 'r')
+    file = open(filepath, 'r', encoding='utf-8')
     return file.read()
 
 
