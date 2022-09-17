@@ -4,6 +4,7 @@ Author: Nikita Selin (OPHoperHPO)[https://github.com/OPHoperHPO].
 License: Apache License 2.0
 """
 import os
+import re
 
 from setuptools import setup, find_packages
 
@@ -21,11 +22,13 @@ def req_file(filename: str, folder: str = "."):
         content = f.readlines()
     # you may also want to remove whitespace characters
     # Example: `\n` at the end of each line
+    if os.getenv("COLAB_PACKAGE_RELEASE") is not None:
+        return [re.sub("(~=.*)|(==.*)|(typing.*)", "", x.strip()) for x in content]
     return [x.strip() for x in content]
 
 
 setup(
-    name='carvekit',
+    name='carvekit_colab' if os.getenv("COLAB_PACKAGE_RELEASE") is not None else 'carvekit',
     version=version,
     author="Nikita Selin (Anodev)",
     author_email='farvard34@gmail.com',
