@@ -32,9 +32,13 @@ jobs:
         pip install build twine
     - name: Build package
       run: python -m build
+    - name: Publish package
+      run: twine upload -u __token__ -p ${{ secrets.PYPIKEY }} dist/*
+    - name: Clear dist
+      run: rm -rf dist
     - name: Build colab ready package
       run: python -m build
       env:
         COLAB_PACKAGE_RELEASE: true
-    - name: Publish packages
-      run: twine upload -u __token__ -p ${{ secrets.PYPIKEY }} dist/*
+    - name: Publish colab package
+      run: twine upload -u __token__ -p ${{ secrets.PYPIKEY2 }} dist/*
