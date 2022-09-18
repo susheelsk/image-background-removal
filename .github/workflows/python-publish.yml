@@ -1,0 +1,42 @@
+name: Upload Python Package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+
+    - name: Build package
+      run: python -m build
+
+    - name: Publish package
+      run: twine upload -u __token__ -p ${{ secrets.PYPIKEY }} dist/*
+
+    - name: Clear dist
+      run: rm -rf dist
+
+    - name: Build colab ready package
+      run: python -m build
+      env:
+        COLAB_PACKAGE_RELEASE: true
+
+    - name: Publish colab package
+      run: twine upload -u __token__ -p ${{ secrets.PYPIKEY2 }} dist/*
