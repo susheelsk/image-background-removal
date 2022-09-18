@@ -9,13 +9,8 @@ on:
     - cron: '23 5 * * 5'
 
 jobs:
-
   build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Build the CPU Docker img
