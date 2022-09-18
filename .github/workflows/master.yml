@@ -9,106 +9,39 @@ on:
     - cron: '23 5 * * 5'
     
 jobs:
-  test_ubuntu:
-    runs-on: ubuntu-latest
+  test_package:
     strategy:
       matrix:
         python-version: [3.8, 3.9, 3.10.4]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip3 install --no-cache-dir -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
         pip3 install --no-cache-dir -r requirements_test.txt
+
     - name: Download all models
       run: |
         python3 -c "from carvekit.ml.files.models_loc import download_all; download_all();"
+
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
     - name: Test with pytest
       run: |
         pytest -s -v
-#    - name: Packing a docs folder in a zip archive
-#      run: |
-#        zip -r docs.zip ./docs/
-#    - name: Upload docs folder
-#      uses: actions/upload-artifact@v1
-#      with:
-#        name: generated_docs_examples.zip
-#        path: docs.zip
-#    - name: Push to Docker Hub
-#      uses: docker/build-push-action@v1.1.0
-#      with:
-#        tags: merge-to-nontested
-#        username: ${{ secrets.DOCKER_USERNAME }}
-#        password: ${{ secrets.DOCKER_PASSWORD }}
-#        repository: anodev/image-background-remove-tool
-#        tag_with_ref: true
-  test_windows:
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.9, 3.10.4]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        pip3 install --no-cache-dir -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
-        pip3 install --no-cache-dir -r requirements_test.txt
-    - name: Download all models
-      run: |
-        python3 -c "from carvekit.ml.files.models_loc import download_all; download_all();"
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        pytest -s -v
-  test_macos:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.9, 3.10.4]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        pip3 install --no-cache-dir -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
-        pip3 install --no-cache-dir -r requirements_test.txt
-    - name: Download all models
-      run: |
-        python3 -c "from carvekit.ml.files.models_loc import download_all; download_all();"
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        pytest -s -v
+
