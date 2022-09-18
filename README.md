@@ -176,6 +176,8 @@ See `docker-compose.<device>.yml` for more information. \
 > and use the CLI interface inside the docker container to process 
 > files in this folder. 
 
+> Building a docker image on Windows is not officially supported. You can try using WSL2 or "Linux Containers Mode" but I haven't tested this.
+
 ## ☑️ Testing
 
 ### ☑️ Testing with local environment
