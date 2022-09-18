@@ -11,7 +11,7 @@ RUN echo '#' > ./carvekit/utils/__init__.py
 COPY ./carvekit/utils/download_models.py ./carvekit/utils/download_models.py
 COPY ./carvekit/ml/files/__init__.py ./carvekit/ml/files/__init__.py
 COPY ./carvekit/ml/files/models_loc.py ./carvekit/ml/files/models_loc.py
-RUN python3 -c "from carvekit.ml.files.models_loc import download_all; download_all();"
+RUN python3 -c 'from carvekit.ml.files.models_loc import download_all; download_all();'
 RUN rm -rf ./carvekit
 
 FROM python:3.10.4
