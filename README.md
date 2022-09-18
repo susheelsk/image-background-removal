@@ -56,8 +56,7 @@ It can be briefly described as
 * `fba` (default) - This algorithm improves the borders of the image when removing the background from images with hair, etc. using FBA Matting neural network. This method gives the best result in combination with u2net without any preprocessing methods.
 
 ## 🏷 Setup for CPU processing:
-1. Clone this repository
-2. `pip install carvekit --extra-index-url https://download.pytorch.org/whl/cpu`
+1. `pip install carvekit --extra-index-url https://download.pytorch.org/whl/cpu`
 > The project supports python versions from 3.8 to 3.10.4
 ## 🏷 Setup for GPU processing:  
 1. Make sure you have an NVIDIA GPU with 8 GB VRAM.
