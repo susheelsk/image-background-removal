@@ -56,15 +56,12 @@ It can be briefly described as
 * `fba` (default) - This algorithm improves the borders of the image when removing the background from images with hair, etc. using FBA Matting neural network. This method gives the best result in combination with u2net without any preprocessing methods.
 
 ## 🏷 Setup for CPU processing:
-1. Clone this repository
-2. `pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu`
-3. `pip install ./`
+1. `pip install carvekit --extra-index-url https://download.pytorch.org/whl/cpu`
 > The project supports python versions from 3.8 to 3.10.4
 ## 🏷 Setup for GPU processing:  
 1. Make sure you have an NVIDIA GPU with 8 GB VRAM.
-2. Install `CUDA` and setup `PyTorch` for GPU processing.
-3. `pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu113`
-4. `pip install ./`
+2. Install `CUDA Toolkit and Video Driver for your GPU`
+3. `pip install carvekit --extra-index-url https://download.pytorch.org/whl/cu113`
 > The project supports python versions from 3.8 to 3.10.4
 ## 🧰 Interact via code:  
 ### If you don't need deep configuration or don't want to deal with it
@@ -178,6 +175,8 @@ See `docker-compose.<device>.yml` for more information. \
 > Also you can mount folders from your host machine to docker container
 > and use the CLI interface inside the docker container to process 
 > files in this folder. 
+
+> Building a docker image on Windows is not officially supported. You can try using WSL2 or "Linux Containers Mode" but I haven't tested this.
 
 ## ☑️ Testing
 
